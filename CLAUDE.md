@@ -16,43 +16,49 @@ The requirement docs are in `docs/`. Read the relevant ones before changing code
 - `docs/IMPLEMENTATION_PLAN.md`: the build order, Steps 0–15. Work on ONE step at a time and check its "Done when" list.
 - `docs/DECISIONS.md`: append a row whenever a decision is made. If a decision changes a requirement, edit BRD/PRD/SRS in the same commit.
 
-## Current state vs. target layout
+## Naming and layout
 
-The repo is still at the start of the plan (Step 0/1). Right now it contains one template Web API project at `src/GreenArcade.Api`, which still has the `WeatherForecast` sample. It also has `GreenArcade.slnx` and a `docker-compose.yml` with services `api`, `postgres` and `redis`. Redis is not part of the SRS, so don't build on it unless a decision is logged.
-
-The target layout (SRS §7, IMPLEMENTATION_PLAN Step 1):
+The code is named **RowCycle** (`RowCycle.slnx`, `RowCycle.*` projects and namespaces). The product is still called **Green Arcade** in the docs and UI.
 
 ```
-backend/   GreenArcade.Api, .Application, .Domain, .Infrastructure, .Tests
-frontend/  green-arcade-web  (Angular: core/, shared/, features/store|account|actions|admin)
+RowCycle.slnx, Directory.Build.props (net10.0, nullable, warnings as errors)
+backend/src/    RowCycle.Api, RowCycle.Application, RowCycle.Domain, RowCycle.Infrastructure
+backend/tests/  RowCycle.Tests  (xUnit + WebApplicationFactory + Testcontainers)
+frontend/       green-arcade-web  (Angular, from Step 11: core/, shared/, features/store|account|actions|admin)
 ```
 
-Dependencies: Api → Application → Domain, and Infrastructure → Application. Infrastructure implements the interfaces that Application defines (repositories, `IFileStorage`, `IEmailSender`, the points-balance lock).
+Dependencies: Api → Application, Infrastructure · Infrastructure → Application → Domain. Infrastructure implements the interfaces Application defines (repositories, `IFileStorage`, `IEmailSender`, the points-balance lock). Domain and Application reference no EF Core / Npgsql / ASP.NET packages.
 
-When the restructure lands, update the commands below to the new paths.
+Cross-cutting pieces already in the Api project:
+- Controllers get the `/api/v1` prefix automatically (`Conventions/RoutePrefixConvention.cs`). Write `[Route("products")]`, not `[Route("api/v1/products")]`.
+- `Middleware/CorrelationIdMiddleware.cs` sets `X-Correlation-Id`, `HttpContext.TraceIdentifier` and the Serilog `CorrelationId` property. Problem Details responses include it as `correlationId`.
+- Exceptions and bare error status codes return RFC 7807 bodies (`AddProblemDetails` + `UseExceptionHandler` + `UseStatusCodePages`).
+- `/health` checks PostgreSQL and returns JSON.
+- The connection string is `ConnectionStrings:Postgres`. `RowCycle.Infrastructure.DependencyInjection.GetConnectionString` fails fast if it's missing.
+
+Integration tests use `[Collection(ApiCollection.Name)]` to share one `ApiFactory` (`backend/tests/RowCycle.Tests/Infrastructure/ApiFactory.cs`), which starts one Postgres container per test run. Inject settings with `builder.UseSetting`, not `ConfigureAppConfiguration`: `Program.cs` reads configuration before the latter is applied.
 
 ## Commands
 
-The SDK is pinned to .NET 10.0.400 in `global.json`.
+The SDK is pinned to .NET 10.0.400 in `global.json`. Docker must be running for the DB and for tests.
 
 ```bash
-dotnet build GreenArcade.slnx
-dotnet run --project src/GreenArcade.Api            # http://localhost:5130, Swagger at /swagger (Development only)
-docker compose up -d postgres                        # dev DB; credentials come from .env (gitignored)
-docker compose up --build                            # api on :8080 + postgres + redis
+docker compose up -d db                                            # dev DB; credentials come from .env (gitignored)
+dotnet user-secrets set "ConnectionStrings:Postgres" "Host=localhost;Port=5432;Database=<db>;Username=<user>;Password=<pw>" --project backend/src/RowCycle.Api   # once
+dotnet build RowCycle.slnx
+dotnet run --project backend/src/RowCycle.Api                      # http://localhost:5130, Swagger at /swagger (Development only)
+dotnet test RowCycle.slnx                                          # all tests
+dotnet test RowCycle.slnx --filter "FullyQualifiedName~HealthTests"   # one class or test
+docker compose up --build                                          # api on :8080 + db
 ```
 
-Once the projects from the target layout exist:
+From Step 2 (EF Core) and Step 11 (Angular):
 
 ```bash
-dotnet test                                                        # all tests (Testcontainers needs Docker running)
-dotnet test --filter "FullyQualifiedName~PointsServiceTests"       # one class or test
-dotnet ef migrations add <Name> -p backend/src/GreenArcade.Infrastructure -s backend/src/GreenArcade.Api
-dotnet ef database update     -p backend/src/GreenArcade.Infrastructure -s backend/src/GreenArcade.Api
+dotnet ef migrations add <Name> -p backend/src/RowCycle.Infrastructure -s backend/src/RowCycle.Api
+dotnet ef database update     -p backend/src/RowCycle.Infrastructure -s backend/src/RowCycle.Api
 cd frontend/green-arcade-web && npm start
 ```
-
-Note: the project folder name ends with a space (`Green Arcade App `), so quote absolute paths.
 
 ## Stack (fixed — do not substitute)
 

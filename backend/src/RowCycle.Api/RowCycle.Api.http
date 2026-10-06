@@ -1,0 +1,6 @@
+@RowCycle.Api_HostAddress = http://localhost:5130
+
+GET {{RowCycle.Api_HostAddress}}/health
+Accept: application/json
+
+###

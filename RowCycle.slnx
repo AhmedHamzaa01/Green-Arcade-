@@ -1,0 +1,12 @@
+<Solution>
+  <Folder Name="/backend/" />
+  <Folder Name="/backend/src/">
+    <Project Path="backend/src/RowCycle.Api/RowCycle.Api.csproj" />
+    <Project Path="backend/src/RowCycle.Application/RowCycle.Application.csproj" />
+    <Project Path="backend/src/RowCycle.Domain/RowCycle.Domain.csproj" />
+    <Project Path="backend/src/RowCycle.Infrastructure/RowCycle.Infrastructure.csproj" />
+  </Folder>
+  <Folder Name="/backend/tests/">
+    <Project Path="backend/tests/RowCycle.Tests/RowCycle.Tests.csproj" />
+  </Folder>
+</Solution>

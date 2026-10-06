@@ -15,3 +15,6 @@ Append one line per decision. Newest at the bottom. If a decision changes a requ
 | 2026-10-04 | UI library: Angular Material | SRS §1 | Ahmed Hamza |
 | 2026-10-04 | Purchase points are a fixed `reward_points` per product (shown as "earn X points"), awarded to the buyer at checkout for points and COD orders; replaces the per-EGP rate. Cancelling reverses them | BRD §6–7, PRD F5–F8, FR-14/15/17/18, SRS §4 | Ahmed Hamza |
 | 2026-10-04 | Product reward points are awarded when the order is Delivered, not at checkout (supersedes the previous row). Cancellation is only possible before delivery, so rewards never need reversing | BRD §7, PRD F6–F7, FR-14/17/18, Step 7 | Ahmed Hamza |
+| 2026-10-06 | Code, solution and projects are named RowCycle (`RowCycle.*`); the product stays "Green Arcade" | SRS §7, CLAUDE.md | Ahmed Hamza |
+| 2026-10-06 | Redis removed from docker-compose; nothing in the MVP needs it | SRS §7 | Ahmed Hamza |
+| 2026-10-06 | API docs: built-in .NET OpenAPI document + Swagger UI (`Swashbuckle.AspNetCore.SwaggerUI`); Swashbuckle generator dropped | SRS §1 | Ahmed Hamza |

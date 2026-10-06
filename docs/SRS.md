@@ -161,7 +161,8 @@ Browse tables with **pgAdmin 4** or **DBeaver** (both free).
 
 ```
 green-arcade/
-  backend/   GreenArcade.Api, .Application, .Domain, .Infrastructure, .Tests
+  RowCycle.slnx
+  backend/   src/RowCycle.Api, .Application, .Domain, .Infrastructure · tests/RowCycle.Tests
   frontend/  green-arcade-web (Angular: core/, shared/, features/store, features/account, features/actions, features/admin)
-  docker-compose.yml  (postgres + api)
+  docker-compose.yml  (db + api)
 ```
