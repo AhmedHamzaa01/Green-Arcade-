@@ -15,6 +15,7 @@ public sealed class ApiFactory : WebApplicationFactory<Program>, IAsyncLifetime
     {
         // UseSetting applies before Program.cs reads configuration; ConfigureAppConfiguration would be too late.
         builder.UseSetting("ConnectionStrings:Postgres", _postgres.GetConnectionString());
+        builder.UseSetting("Database:MigrateOnStartup", "true");
     }
 
     async Task IAsyncLifetime.DisposeAsync()

@@ -36,6 +36,11 @@ builder.Services.AddCors(options => options.AddPolicy("web", policy => policy
 
 var app = builder.Build();
 
+if (app.Configuration.GetValue<bool>("Database:MigrateOnStartup"))
+{
+    await app.Services.MigrateDatabaseAsync();
+}
+
 app.UseExceptionHandler();
 app.UseStatusCodePages();
 app.UseMiddleware<CorrelationIdMiddleware>();
@@ -62,7 +67,7 @@ app.UseAuthorization();
 app.MapHealthChecks("/health", new HealthCheckOptions { ResponseWriter = WriteHealthResponse });
 app.MapControllers();
 
-app.Run();
+await app.RunAsync();
 
 static Task WriteHealthResponse(HttpContext context, Microsoft.Extensions.Diagnostics.HealthChecks.HealthReport report)
 {

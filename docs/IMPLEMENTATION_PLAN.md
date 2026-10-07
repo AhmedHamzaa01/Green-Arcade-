@@ -49,13 +49,14 @@ Answer and record in `docs/DECISIONS.md`. Defaults are listed so you can proceed
 
 - Domain entities for every table in SRS §4 (except Identity tables) with enums for statuses and types.
 - `AppDbContext`, entity configurations, check constraints (`points_balance >= 0`, `stock >= 0`), indexes, snake_case.
-- Initial migration; seed submission categories, product categories, roles.
+- Identity tables (`asp_net_*`, Guid keys) so `user_id` columns have FKs from the start.
+- Initial migration; seed submission categories, product categories, roles, `daily_submission_limit`.
 
 **Done when:** migration applies to a clean DB; tables visible in pgAdmin/DBeaver match SRS §4.
 
 ## Step 3 — Auth + roles
 
-- Identity with `Guid` keys; register, login, refresh (rotation), verify email, forgot/reset password.
+- Identity services on the Step 2 tables; register, login, refresh (rotation), verify email, forgot/reset password.
 - `IEmailSender` with a dev implementation that logs the email.
 - JWT config, role policies, seeded admin user from config.
 - Rate limiting on `/auth/*`.

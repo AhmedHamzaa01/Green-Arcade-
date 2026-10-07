@@ -75,7 +75,7 @@ Identity tables (`asp_net_users`, roles, claims) come from ASP.NET Core Identity
 | `badges` | id, name, icon_url, rule_type, rule_category_id null, threshold | |
 | `user_badges` | user_id, badge_id, awarded_at | PK (user_id, badge_id) |
 | `product_categories` | id, name, slug, sort_order, is_active | |
-| `products` | id, category_id, name, slug, description, price_egp, price_points int null, reward_points int default 0, is_active, product_type | product_type keeps room for B2B items later; `CHECK (reward_points >= 0)` |
+| `products` | id, category_id, name, slug, description, price_egp, price_points int null, reward_points int default 0, is_active, product_type, created_at | product_type keeps room for B2B items later; `CHECK (reward_points >= 0)` |
 | `product_variants` | id, product_id, name, sku, stock int, price_override null | Every product has at least one variant; `CHECK (stock >= 0)` |
 | `product_images` | id, product_id, url, sort_order | |
 | `carts` / `cart_items` | cart: id, user_id · item: cart_id, variant_id, quantity | |
@@ -83,7 +83,7 @@ Identity tables (`asp_net_users`, roles, claims) come from ASP.NET Core Identity
 | `order_items` | id, order_id, variant_id, product_name, unit_price_egp, unit_price_points, unit_reward_points, quantity | Snapshot of prices and rewards at checkout |
 | `order_status_history` | id, order_id, from_status, to_status, changed_by, changed_at | |
 | `settings` | key, value (jsonb) | daily_submission_limit |
-| `audit_logs` | id, user_id, action, entity, entity_id, data jsonb, created_at | |
+| `audit_logs` | id, user_id, action, entity, entity_id text, data jsonb, created_at | entity_id is text so it can hold a uuid or a settings key |
 
 ## 5. API endpoints
 

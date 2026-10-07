@@ -18,3 +18,6 @@ Append one line per decision. Newest at the bottom. If a decision changes a requ
 | 2026-10-06 | Code, solution and projects are named RowCycle (`RowCycle.*`); the product stays "Green Arcade" | SRS §7, CLAUDE.md | Ahmed Hamza |
 | 2026-10-06 | Redis removed from docker-compose; nothing in the MVP needs it | SRS §7 | Ahmed Hamza |
 | 2026-10-06 | API docs: built-in .NET OpenAPI document + Swagger UI (`Swashbuckle.AspNetCore.SwaggerUI`); Swashbuckle generator dropped | SRS §1 | Ahmed Hamza |
+| 2026-10-07 | Identity tables (`asp_net_*`, Guid keys) and the four roles are created in Step 2's initial migration so `user_id` columns get real FKs from the start; Step 3 adds only the auth features | IMPLEMENTATION_PLAN Steps 2–3 | Ahmed Hamza |
+| 2026-10-07 | Enum columns (statuses, types, payment method) are stored as text, e.g. `Placed`, `Earn` | SRS §4 | Ahmed Hamza |
+| 2026-10-07 | `products.created_at` added for the "newest" sort; `audit_logs.entity_id` is text so it can hold a uuid or a settings key | SRS §4, PRD F5, FR-19 | Ahmed Hamza |
