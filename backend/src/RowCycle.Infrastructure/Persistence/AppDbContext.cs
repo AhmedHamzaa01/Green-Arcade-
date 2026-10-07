@@ -1,6 +1,8 @@
+using System.Linq.Expressions;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using RowCycle.Domain.Common;
 using RowCycle.Domain.Entities;
 using RowCycle.Domain.Enums;
 using RowCycle.Infrastructure.Identity;
@@ -35,6 +37,7 @@ public class AppDbContext(DbContextOptions<AppDbContext> options)
 
         // Identity sets PascalCase table names explicitly; rename them to match SRS §4 (asp_net_users, ...).
         builder.Entity<AppUser>().ToTable("asp_net_users");
+        builder.Entity<AppUser>().Property(u => u.IsActive).HasDefaultValue(true).HasSentinel(true);
         builder.Entity<AppRole>().ToTable("asp_net_roles");
         builder.Entity<IdentityUserRole<Guid>>().ToTable("asp_net_user_roles");
         builder.Entity<IdentityUserClaim<Guid>>().ToTable("asp_net_user_claims");
@@ -44,6 +47,23 @@ public class AppDbContext(DbContextOptions<AppDbContext> options)
 
         builder.ApplyConfigurationsFromAssembly(typeof(AppDbContext).Assembly);
         SeedData.Apply(builder);
+        ApplySoftDeleteFilters(builder);
+    }
+
+    /// <summary>Hides soft-deleted rows from every query. Use <c>IgnoreQueryFilters()</c> to see them (e.g. history views).</summary>
+    private static void ApplySoftDeleteFilters(ModelBuilder builder)
+    {
+        foreach (var entityType in builder.Model.GetEntityTypes()
+                     .Where(t => typeof(ISoftDeletable).IsAssignableFrom(t.ClrType)))
+        {
+            var entity = Expression.Parameter(entityType.ClrType, "e");
+            var notDeleted = Expression.Lambda(
+                Expression.Equal(
+                    Expression.Property(entity, nameof(ISoftDeletable.DeletedAt)),
+                    Expression.Constant(null, typeof(DateTimeOffset?))),
+                entity);
+            builder.Entity(entityType.ClrType).HasQueryFilter(notDeleted);
+        }
     }
 
     protected override void ConfigureConventions(ModelConfigurationBuilder configurationBuilder)

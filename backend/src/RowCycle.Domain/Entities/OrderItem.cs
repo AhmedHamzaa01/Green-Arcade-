@@ -1,7 +1,9 @@
+using RowCycle.Domain.Common;
+
 namespace RowCycle.Domain.Entities;
 
 /// <summary>Prices and rewards are snapshots taken at checkout (FR-15).</summary>
-public class OrderItem
+public class OrderItem : INonDeletable
 {
     public Guid Id { get; set; }
     public Guid OrderId { get; set; }

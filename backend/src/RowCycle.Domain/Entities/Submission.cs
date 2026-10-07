@@ -1,8 +1,9 @@
+using RowCycle.Domain.Common;
 using RowCycle.Domain.Enums;
 
 namespace RowCycle.Domain.Entities;
 
-public class Submission
+public class Submission : INonDeletable
 {
     public Guid Id { get; set; }
     public Guid UserId { get; set; }

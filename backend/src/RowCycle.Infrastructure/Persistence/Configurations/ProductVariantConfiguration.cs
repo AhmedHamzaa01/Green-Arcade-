@@ -15,6 +15,6 @@ internal sealed class ProductVariantConfiguration : IEntityTypeConfiguration<Pro
         });
         builder.Property(x => x.Name).HasMaxLength(100);
         builder.Property(x => x.Sku).HasMaxLength(64);
-        builder.HasIndex(x => x.Sku).IsUnique();
+        builder.HasIndex(x => x.Sku).IsUnique().HasFilter("deleted_at IS NULL");
     }
 }

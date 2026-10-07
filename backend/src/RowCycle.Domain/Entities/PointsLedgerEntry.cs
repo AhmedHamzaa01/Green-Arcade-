@@ -1,9 +1,10 @@
+using RowCycle.Domain.Common;
 using RowCycle.Domain.Enums;
 
 namespace RowCycle.Domain.Entities;
 
 /// <summary>One append-only row per points change (FR-05). Never updated or deleted.</summary>
-public class PointsLedgerEntry
+public class PointsLedgerEntry : INonDeletable
 {
     public Guid Id { get; set; }
     public Guid UserId { get; set; }

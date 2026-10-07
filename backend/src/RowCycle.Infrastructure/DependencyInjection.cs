@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using RowCycle.Infrastructure.Persistence;
 
 namespace RowCycle.Infrastructure;
@@ -13,9 +14,12 @@ public static class DependencyInjection
     {
         var connectionString = GetConnectionString(configuration);
 
-        services.AddDbContext<AppDbContext>(options => options
+        services.TryAddSingleton(TimeProvider.System);
+        services.AddScoped<SoftDeleteInterceptor>();
+        services.AddDbContext<AppDbContext>((sp, options) => options
             .UseNpgsql(connectionString, npgsql => npgsql.MigrationsAssembly(typeof(AppDbContext).Assembly.FullName))
-            .UseSnakeCaseNamingConvention());
+            .UseSnakeCaseNamingConvention()
+            .AddInterceptors(sp.GetRequiredService<SoftDeleteInterceptor>()));
 
         return services;
     }

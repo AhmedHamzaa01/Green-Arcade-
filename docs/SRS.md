@@ -85,6 +85,8 @@ Identity tables (`asp_net_users`, roles, claims) come from ASP.NET Core Identity
 | `settings` | key, value (jsonb) | daily_submission_limit |
 | `audit_logs` | id, user_id, action, entity, entity_id text, data jsonb, created_at | entity_id is text so it can hold a uuid or a settings key |
 
+**Deleting data.** Rows in `products`, `product_variants`, `product_images`, `product_categories`, `submission_categories`, `badges` and `addresses` are soft-deleted: a nullable `deleted_at` is set and the row is hidden from queries. Unique slugs, SKUs and names apply only to rows that are not deleted. `points_ledger`, `orders`, `order_items`, `order_status_history`, `submissions` and `audit_logs` are never deleted. Users are deactivated with `asp_net_users.is_active = false`, which blocks login.
+
 ## 5. API endpoints
 
 Base path `/api/v1`. JSON in and out; errors use RFC 7807 Problem Details; lists return `{ items, page, pageSize, total }`.

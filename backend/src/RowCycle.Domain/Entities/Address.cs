@@ -1,6 +1,8 @@
+using RowCycle.Domain.Common;
+
 namespace RowCycle.Domain.Entities;
 
-public class Address
+public class Address : ISoftDeletable
 {
     public Guid Id { get; set; }
     public Guid UserId { get; set; }
@@ -10,4 +12,6 @@ public class Address
     public string Building { get; set; } = string.Empty;
     public string? Notes { get; set; }
     public bool IsDefault { get; set; }
+
+    public DateTimeOffset? DeletedAt { get; set; }
 }

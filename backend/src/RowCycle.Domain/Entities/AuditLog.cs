@@ -1,7 +1,9 @@
+using RowCycle.Domain.Common;
+
 namespace RowCycle.Domain.Entities;
 
 /// <summary>One row per admin write (FR-19).</summary>
-public class AuditLog
+public class AuditLog : INonDeletable
 {
     public Guid Id { get; set; }
     public Guid? UserId { get; set; }

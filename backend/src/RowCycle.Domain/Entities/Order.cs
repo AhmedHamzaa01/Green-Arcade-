@@ -1,8 +1,9 @@
+using RowCycle.Domain.Common;
 using RowCycle.Domain.Enums;
 
 namespace RowCycle.Domain.Entities;
 
-public class Order
+public class Order : INonDeletable
 {
     public Guid Id { get; set; }
 

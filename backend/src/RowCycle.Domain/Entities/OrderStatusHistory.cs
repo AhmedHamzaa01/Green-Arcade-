@@ -1,8 +1,9 @@
+using RowCycle.Domain.Common;
 using RowCycle.Domain.Enums;
 
 namespace RowCycle.Domain.Entities;
 
-public class OrderStatusHistory
+public class OrderStatusHistory : INonDeletable
 {
     public Guid Id { get; set; }
     public Guid OrderId { get; set; }

@@ -1,6 +1,6 @@
 # Green Arcade MVP — Implementation Plan
 
-Steps are ordered by dependency: each step only uses things built in earlier steps. Do one step per Claude Code session (or per branch), check its "Done when" list, then move on.
+Steps are ordered by dependency: each step only uses things built in earlier steps. Do one step per Claude Code session, committed directly to `main`; check its "Done when" list, then move on.
 
 | Step | Name | Depends on | Covers |
 | --- | --- | --- | --- |
@@ -53,6 +53,12 @@ Answer and record in `docs/DECISIONS.md`. Defaults are listed so you can proceed
 - Initial migration; seed submission categories, product categories, roles, `daily_submission_limit`.
 
 **Done when:** migration applies to a clean DB; tables visible in pgAdmin/DBeaver match SRS §4.
+
+## Step 2b — Soft delete
+
+- `deleted_at` + global query filter on catalog, category, badge and address tables; history tables refuse deletes; `asp_net_users.is_active`.
+
+**Done when:** deleted rows are hidden but kept; a deleted slug can be reused; deleting a ledger row fails.
 
 ## Step 3 — Auth + roles
 

@@ -1,8 +1,9 @@
+using RowCycle.Domain.Common;
 using RowCycle.Domain.Enums;
 
 namespace RowCycle.Domain.Entities;
 
-public class Badge
+public class Badge : ISoftDeletable
 {
     public Guid Id { get; set; }
     public string Name { get; set; } = string.Empty;
@@ -13,4 +14,6 @@ public class Badge
     public Guid? RuleCategoryId { get; set; }
 
     public int Threshold { get; set; }
+
+    public DateTimeOffset? DeletedAt { get; set; }
 }

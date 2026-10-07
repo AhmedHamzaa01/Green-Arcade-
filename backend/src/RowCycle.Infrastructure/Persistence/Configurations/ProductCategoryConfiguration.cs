@@ -11,6 +11,6 @@ internal sealed class ProductCategoryConfiguration : IEntityTypeConfiguration<Pr
         builder.ToTable("product_categories");
         builder.Property(x => x.Name).HasMaxLength(100);
         builder.Property(x => x.Slug).HasMaxLength(100);
-        builder.HasIndex(x => x.Slug).IsUnique();
+        builder.HasIndex(x => x.Slug).IsUnique().HasFilter("deleted_at IS NULL");
     }
 }

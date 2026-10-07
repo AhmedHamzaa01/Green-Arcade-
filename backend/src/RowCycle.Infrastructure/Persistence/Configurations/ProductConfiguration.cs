@@ -22,7 +22,7 @@ internal sealed class ProductConfiguration : IEntityTypeConfiguration<Product>
         builder.Property(x => x.RewardPoints).HasDefaultValue(0);
         builder.Property(x => x.CreatedAt).HasDefaultValueSql("now()");
 
-        builder.HasIndex(x => x.Slug).IsUnique();
+        builder.HasIndex(x => x.Slug).IsUnique().HasFilter("deleted_at IS NULL");
         builder.HasIndex(x => x.CategoryId);
 
         builder.HasMany(x => x.Variants).WithOne(v => v.Product).HasForeignKey(v => v.ProductId).OnDelete(DeleteBehavior.Cascade);

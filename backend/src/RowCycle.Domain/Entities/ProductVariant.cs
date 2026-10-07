@@ -1,7 +1,9 @@
+using RowCycle.Domain.Common;
+
 namespace RowCycle.Domain.Entities;
 
 /// <summary>Every product has at least one variant; stock lives here.</summary>
-public class ProductVariant
+public class ProductVariant : ISoftDeletable
 {
     public Guid Id { get; set; }
     public Guid ProductId { get; set; }
@@ -12,4 +14,6 @@ public class ProductVariant
 
     /// <summary>EGP price for this variant when it differs from <see cref="Product.PriceEgp"/>.</summary>
     public decimal? PriceOverride { get; set; }
+
+    public DateTimeOffset? DeletedAt { get; set; }
 }

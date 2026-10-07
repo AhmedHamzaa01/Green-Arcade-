@@ -1,8 +1,9 @@
+using RowCycle.Domain.Common;
 using RowCycle.Domain.Enums;
 
 namespace RowCycle.Domain.Entities;
 
-public class Product
+public class Product : ISoftDeletable
 {
     public Guid Id { get; set; }
     public Guid CategoryId { get; set; }
@@ -26,4 +27,6 @@ public class Product
 
     public List<ProductVariant> Variants { get; set; } = [];
     public List<ProductImage> Images { get; set; } = [];
+
+    public DateTimeOffset? DeletedAt { get; set; }
 }
