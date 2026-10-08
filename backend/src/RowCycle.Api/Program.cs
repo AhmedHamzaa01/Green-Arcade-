@@ -1,9 +1,17 @@
 using System.Text.Json;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.Extensions.Options;
+using Microsoft.IdentityModel.Tokens;
+using RowCycle.Api.Authorization;
+using RowCycle.Api.Controllers;
 using RowCycle.Api.Conventions;
+using RowCycle.Api.ErrorHandling;
+using RowCycle.Api.OpenApi;
 using RowCycle.Api.Middleware;
 using RowCycle.Application;
 using RowCycle.Infrastructure;
+using RowCycle.Infrastructure.Auth;
 using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -17,7 +25,27 @@ builder.Services.AddApplication();
 builder.Services.AddInfrastructure(builder.Configuration);
 
 builder.Services.AddControllers(options => options.Conventions.Add(new RoutePrefixConvention("api/v1")));
-builder.Services.AddOpenApi();
+builder.Services.AddOpenApi(options => options.AddDocumentTransformer<BearerSecurityTransformer>());
+
+// JWT access tokens (FR-03). Claim names are kept as issued ("sub", "role"), not mapped to long .NET URIs.
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer();
+builder.Services.AddOptions<JwtBearerOptions>(JwtBearerDefaults.AuthenticationScheme)
+    .Configure<IOptions<JwtOptions>>((options, jwt) =>
+    {
+        options.MapInboundClaims = false;
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidIssuer = jwt.Value.Issuer,
+            ValidAudience = jwt.Value.Audience,
+            IssuerSigningKey = jwt.Value.CreateSigningKey(),
+            NameClaimType = AppClaimTypes.UserId,
+            RoleClaimType = AppClaimTypes.Role,
+            ClockSkew = TimeSpan.FromSeconds(30),
+        };
+    });
+builder.Services.AddAppAuthorization();
+builder.Services.AddAppRateLimiting(builder.Configuration);
+builder.Services.AddExceptionHandler<AppExceptionHandler>();
 
 // RFC 7807 bodies for exceptions and bare status codes (404, 401, ...).
 builder.Services.AddProblemDetails(options =>
@@ -41,6 +69,8 @@ if (app.Configuration.GetValue<bool>("Database:MigrateOnStartup"))
     await app.Services.MigrateDatabaseAsync();
 }
 
+await app.Services.SeedAdminAsync();
+
 app.UseExceptionHandler();
 app.UseStatusCodePages();
 app.UseMiddleware<CorrelationIdMiddleware>();
@@ -62,6 +92,8 @@ else
 }
 
 app.UseCors("web");
+app.UseRateLimiter();
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapHealthChecks("/health", new HealthCheckOptions { ResponseWriter = WriteHealthResponse });

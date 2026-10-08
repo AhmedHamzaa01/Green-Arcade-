@@ -82,6 +82,7 @@ Identity tables (`asp_net_users`, roles, claims) come from ASP.NET Core Identity
 | `orders` | id, order_number, user_id, payment_method (points/cod), status, total_egp, total_points, total_reward_points, shipping address snapshot (jsonb), created_at | |
 | `order_items` | id, order_id, variant_id, product_name, unit_price_egp, unit_price_points, unit_reward_points, quantity | Snapshot of prices and rewards at checkout |
 | `order_status_history` | id, order_id, from_status, to_status, changed_by, changed_at | |
+| `refresh_tokens` | id, user_id, token_hash, created_at, expires_at, revoked_at | Only the SHA-256 hash is stored; single use (FR-03) |
 | `settings` | key, value (jsonb) | daily_submission_limit |
 | `audit_logs` | id, user_id, action, entity, entity_id text, data jsonb, created_at | entity_id is text so it can hold a uuid or a settings key |
 
@@ -96,6 +97,7 @@ Base path `/api/v1`. JSON in and out; errors use RFC 7807 Problem Details; lists
 | POST | /auth/register | Public | Create account |
 | POST | /auth/login | Public | Get tokens |
 | POST | /auth/refresh | Public | Rotate refresh token |
+| POST | /auth/logout | Public | Revoke a refresh token |
 | POST | /auth/verify-email | Public | Confirm email token |
 | POST | /auth/forgot-password, /auth/reset-password | Public | Password reset |
 | GET / PUT | /me | Member | Read / update profile |
