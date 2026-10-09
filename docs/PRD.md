@@ -1,10 +1,10 @@
-# Green Arcade — Product Requirements Document (MVP)
+# RowCycle — Product Requirements Document (MVP)
 
 Version 0.1 (draft) · 2026-10-01
 
 ## 1. Product overview
 
-Green Arcade MVP lets people earn points for verified sustainable actions and spend them in Row-Cycle's store, all in one responsive web app. It is both a marketplace and an awareness platform, tied together by a single points ledger.
+RowCycle MVP lets people earn points for verified sustainable actions and spend them in Row-Cycle's store, all in one responsive web app. It is both a marketplace and an awareness platform, tied together by a single points ledger.
 
 **Product goals for the MVP**
 

@@ -1,4 +1,4 @@
-# Green Arcade — Software Requirements Specification (MVP)
+# RowCycle — Software Requirements Specification (MVP)
 
 Version 0.1 (draft) · 2026-10-01
 
@@ -44,7 +44,7 @@ Arrows show dependencies: Api and Infrastructure both depend on Application, whi
 | --- | --- | --- |
 | FR-01 | System registers a user with unique email; password min 8 chars with a digit and a letter. | F1 |
 | FR-02 | System sends a verification email; unverified users cannot submit or check out. | F1 |
-| FR-03 | Login returns a JWT (15 min) and a refresh token (7 days, rotated on use). | F1 |
+| FR-03 | Login returns a JWT access token (15 min) in the body and sets the refresh token (7 days, rotated on use) as an httpOnly, SameSite=Strict cookie limited to `/api/v1/auth`. | F1 |
 | FR-04 | Password reset works through a one-time emailed token valid for 1 hour. | F1 |
 | FR-05 | Every points change inserts one immutable `points_ledger` row; rows are never updated or deleted. | F2 |
 | FR-06 | A write that would make the balance negative is rejected. Balance updates take a row lock on the user's balance. | F2 |
@@ -96,9 +96,9 @@ Base path `/api/v1`. JSON in and out; errors use RFC 7807 Problem Details; lists
 | Method | Path | Role | Purpose |
 | --- | --- | --- | --- |
 | POST | /auth/register | Public | Create account |
-| POST | /auth/login | Public | Get tokens |
-| POST | /auth/refresh | Public | Rotate refresh token |
-| POST | /auth/logout | Public | Revoke a refresh token |
+| POST | /auth/login | Public | Access token in the body; refresh token cookie |
+| POST | /auth/refresh | Public | Uses the cookie; new access token + new cookie |
+| POST | /auth/logout | Public | Revokes the cookie's token and deletes the cookie |
 | POST | /auth/verify-email | Public | Confirm email token |
 | POST | /auth/forgot-password, /auth/reset-password | Public | Password reset |
 | GET / PUT | /me | Member | Read / update profile |
@@ -133,7 +133,7 @@ Starting proposals for an MVP; adjust once real traffic is known.
 | --- | --- | --- |
 | NFR-01 | Performance | 95% of API reads respond in under 500 ms at 100 concurrent users |
 | NFR-02 | Responsiveness | Usable from 360 px width up; Lighthouse mobile performance ≥ 80 on the store pages |
-| NFR-03 | Security | HTTPS only; passwords hashed by Identity; JWT signing key in secrets, never in code; rate-limit auth endpoints |
+| NFR-03 | Security | HTTPS only; passwords hashed by Identity; JWT signing key in secrets, never in code; rate-limit auth endpoints; the refresh token is never readable by page scripts (httpOnly cookie), and the web app and API must be served from the same site so the SameSite=Strict cookie is sent |
 | NFR-04 | Security | Uploaded files get random names, are never executed, and are served from storage, not the API folder |
 | NFR-05 | Data integrity | Ledger, stock and order writes run inside one DB transaction; concurrency tested |
 | NFR-06 | Availability | 99% monthly uptime target for the MVP |
@@ -147,7 +147,7 @@ Starting proposals for an MVP; adjust once real traffic is known.
 
 Browse tables with **pgAdmin 4** or **DBeaver** (both free).
 
-1. Run PostgreSQL in Docker: `docker run --name green-arcade-db -e POSTGRES_PASSWORD=dev -p 5432:5432 -d postgres`, or use the PostgreSQL installer (can also install pgAdmin).
+1. Run PostgreSQL in Docker: `docker run --name rowcycle-db -e POSTGRES_PASSWORD=dev -p 5432:5432 -d postgres`, or use the PostgreSQL installer (can also install pgAdmin).
 2. Connect pgAdmin or DBeaver to `localhost:5432`, user `postgres`.
 3. In the API, add `Npgsql.EntityFrameworkCore.PostgreSQL`, then `options.UseNpgsql(connectionString)`.
 4. `dotnet ef migrations add Initial` and `dotnet ef database update` work as with SQL Server.
@@ -166,9 +166,9 @@ Browse tables with **pgAdmin 4** or **DBeaver** (both free).
 **Repository layout**
 
 ```
-green-arcade/
+RowCycle/
   RowCycle.slnx
   backend/   src/RowCycle.Api, .Application, .Domain, .Infrastructure · tests/RowCycle.Tests
-  frontend/  green-arcade-web (Angular: core/, shared/, features/store, features/account, features/actions, features/admin)
+  frontend/  rowcycle-web (Angular: core/, shared/, features/store, features/account, features/actions, features/admin)
   docker-compose.yml  (db + api)
 ```

@@ -83,7 +83,7 @@ if (app.Environment.IsDevelopment())
     app.MapOpenApi();
     app.UseSwaggerUI(options =>
     {
-        options.SwaggerEndpoint("/openapi/v1.json", "Green Arcade API v1");
+        options.SwaggerEndpoint("/openapi/v1.json", "RowCycle API v1");
         options.RoutePrefix = "swagger";
     });
 }

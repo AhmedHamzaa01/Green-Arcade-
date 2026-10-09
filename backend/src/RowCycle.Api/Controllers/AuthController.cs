@@ -10,8 +10,11 @@ namespace RowCycle.Api.Controllers;
 [Route("auth")]
 [EnableRateLimiting(RateLimitPolicies.Auth)]
 [Produces("application/json")]
-public sealed class AuthController(IAuthService auth) : ControllerBase
+public sealed class AuthController(IAuthService auth, IWebHostEnvironment environment) : ControllerBase
 {
+    /// <summary>Cookies are HTTPS-only except in local Development (plain http://localhost).</summary>
+    private bool SecureCookies => !environment.IsDevelopment();
+
     /// <summary>Create an account. A verification link is emailed.</summary>
     [HttpPost("register")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
@@ -33,26 +36,35 @@ public sealed class AuthController(IAuthService auth) : ControllerBase
         return NoContent();
     }
 
-    /// <summary>Get an access token (15 min) and a refresh token (7 days).</summary>
+    /// <summary>Returns an access token (15 min) and sets the refresh token cookie (7 days).</summary>
     [HttpPost("login")]
     [ProducesResponseType<AuthResponse>(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-    public Task<AuthResponse> Login(LoginRequest request, CancellationToken cancellationToken) =>
-        auth.LoginAsync(request, cancellationToken);
+    public async Task<AuthResponse> Login(LoginRequest request, CancellationToken cancellationToken)
+    {
+        var session = await auth.LoginAsync(request, cancellationToken);
+        RefreshTokenCookie.Write(Response, session, SecureCookies);
+        return session.ToResponse();
+    }
 
-    /// <summary>Swap a refresh token for a new pair. Each refresh token works once.</summary>
+    /// <summary>Uses the refresh token cookie to get a new access token and a new cookie. Each refresh token works once.</summary>
     [HttpPost("refresh")]
     [ProducesResponseType<AuthResponse>(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-    public Task<AuthResponse> Refresh(RefreshRequest request, CancellationToken cancellationToken) =>
-        auth.RefreshAsync(request, cancellationToken);
+    public async Task<AuthResponse> Refresh(CancellationToken cancellationToken)
+    {
+        var session = await auth.RefreshAsync(RefreshTokenCookie.Read(Request), cancellationToken);
+        RefreshTokenCookie.Write(Response, session, SecureCookies);
+        return session.ToResponse();
+    }
 
-    /// <summary>End the session that owns this refresh token.</summary>
+    /// <summary>Ends this session: revokes the refresh token and deletes the cookie.</summary>
     [HttpPost("logout")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
-    public async Task<IActionResult> Logout(LogoutRequest request, CancellationToken cancellationToken)
+    public async Task<IActionResult> Logout(CancellationToken cancellationToken)
     {
-        await auth.LogoutAsync(request, cancellationToken);
+        await auth.LogoutAsync(RefreshTokenCookie.Read(Request), cancellationToken);
+        RefreshTokenCookie.Delete(Response, SecureCookies);
         return NoContent();
     }
 

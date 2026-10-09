@@ -1,0 +1,109 @@
+@use '@angular/material' as mat;
+
+// Material 3 theme: green for RowCycle.
+html {
+  color-scheme: light;
+  @include mat.theme((
+    color: (
+      primary: mat.$green-palette,
+      tertiary: mat.$cyan-palette,
+    ),
+    typography: Roboto,
+    density: 0,
+  ));
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  font-family: Roboto, 'Helvetica Neue', sans-serif;
+  background: var(--mat-sys-surface-container-lowest);
+  color: var(--mat-sys-on-surface);
+}
+
+// Page content width; mobile-first (360px and up).
+.page {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 16px;
+}
+
+.page-narrow {
+  max-width: 440px;
+  margin: 0 auto;
+  padding: 24px 16px;
+}
+
+.full-width {
+  width: 100%;
+}
+
+.stack {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.muted {
+  color: var(--mat-sys-on-surface-variant);
+}
+
+.positive {
+  color: var(--mat-sys-primary);
+}
+
+.negative {
+  color: var(--mat-sys-error);
+}
+
+.snack-error {
+  --mat-snack-bar-container-color: var(--mat-sys-error-container);
+  --mat-snack-bar-supporting-text-color: var(--mat-sys-on-error-container);
+}
+
+a {
+  color: var(--mat-sys-primary);
+}
+
+// Auth pages: one card in the middle of the screen (below the 64px top bar).
+.auth-page {
+  min-height: calc(100vh - 64px);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+
+  app-page-header {
+    text-align: center;
+  }
+}
+
+.auth-card {
+  padding: 8px;
+}
+
+.form-error {
+  color: var(--mat-sys-error);
+  margin: 0;
+}
+
+.card-links {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 16px;
+}

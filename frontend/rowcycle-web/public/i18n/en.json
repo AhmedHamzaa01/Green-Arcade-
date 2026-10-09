@@ -1,0 +1,129 @@
+{
+  "app": { "name": "RowCycle", "tagline": "Earn points for green actions. Spend them in the Row-Cycle store." },
+  "nav": {
+    "home": "Home",
+    "profile": "Profile",
+    "points": "Points",
+    "admin": "Admin",
+    "settings": "Settings",
+    "auditLog": "Audit log",
+    "login": "Log in",
+    "register": "Sign up",
+    "logout": "Log out",
+    "menu": "Menu"
+  },
+  "common": {
+    "close": "Close",
+    "save": "Save",
+    "loading": "Loading…",
+    "back": "Back",
+    "all": "All"
+  },
+  "errors": {
+    "generic": "Something went wrong. Please try again.",
+    "network": "Can't reach the server. Check your connection.",
+    "forbidden": "You don't have permission to do that.",
+    "notFound": "Page not found."
+  },
+  "validation": {
+    "required": "This field is required.",
+    "email": "Enter a valid email address.",
+    "minlength": "Must be at least {{ requiredLength }} characters.",
+    "passwordLetter": "Must contain a letter.",
+    "passwordDigit": "Must contain a digit.",
+    "min": "Must be at least {{ min }}.",
+    "max": "Must be at most {{ max }}."
+  },
+  "home": {
+    "title": "Welcome to RowCycle",
+    "intro": "Collect cans, clean the coast, recycle — upload a photo, get points, and spend them on medals, trophies and recycled-aluminium goods.",
+    "storeSoon": "The store is coming soon.",
+    "start": "Create an account",
+    "goToProfile": "Go to your profile"
+  },
+  "auth": {
+    "email": "Email",
+    "password": "Password",
+    "fullName": "Full name",
+    "newPassword": "New password",
+    "passwordHint": "At least 8 characters, with a letter and a digit.",
+    "login": {
+      "title": "Log in",
+      "submit": "Log in",
+      "forgot": "Forgot your password?",
+      "noAccount": "No account yet?",
+      "register": "Sign up"
+    },
+    "register": {
+      "title": "Create your account",
+      "submit": "Sign up",
+      "haveAccount": "Already have an account?",
+      "login": "Log in"
+    },
+    "checkEmail": {
+      "title": "Check your email",
+      "body": "We sent a verification link to {{ email }}. Open it to confirm your email, then log in.",
+      "devHint": "Development: the email is printed in the API console.",
+      "login": "Go to log in"
+    },
+    "verify": {
+      "title": "Verify your email",
+      "working": "Confirming your email…",
+      "success": "Your email is confirmed. You can now submit actions and check out.",
+      "failed": "This link is invalid or expired.",
+      "continue": "Continue"
+    },
+    "forgot": {
+      "title": "Forgot your password",
+      "intro": "Enter your email and we'll send you a link to set a new password.",
+      "submit": "Send link",
+      "sent": "If an account exists for that email, a reset link is on its way. It's valid for 1 hour.",
+      "back": "Back to log in"
+    },
+    "reset": {
+      "title": "Set a new password",
+      "submit": "Save password",
+      "success": "Your password was changed. Log in with the new one.",
+      "missingLink": "This page needs the link from the reset email."
+    }
+  },
+  "account": {
+    "profile": {
+      "title": "Your profile",
+      "points": "Points balance",
+      "verified": "Email verified",
+      "notVerified": "Email not verified",
+      "notVerifiedHint": "Open the link we emailed you to submit actions and check out.",
+      "roles": "Roles",
+      "viewPoints": "View points history"
+    },
+    "points": {
+      "title": "Points history",
+      "balance": "Balance",
+      "empty": "No points yet. Approved actions and delivered orders add points here.",
+      "types": { "Earn": "Earned", "Redeem": "Spent", "Reverse": "Returned", "Adjust": "Adjustment" },
+      "sources": { "Submission": "Action", "Order": "Order", "Manual": "Admin" }
+    }
+  },
+  "admin": {
+    "settings": {
+      "title": "Settings",
+      "dailySubmissionLimit": "Daily submission limit",
+      "dailySubmissionLimitHint": "How many photos a member can submit per day (1–50).",
+      "saved": "Settings saved."
+    },
+    "audit": {
+      "title": "Audit log",
+      "intro": "Every change made by staff: who, what and when.",
+      "when": "When",
+      "action": "Action",
+      "entity": "Entity",
+      "item": "Item",
+      "user": "User",
+      "details": "Details",
+      "filter": "Entity",
+      "empty": "No audit entries yet."
+    }
+  },
+  "notFound": { "title": "Page not found", "home": "Go home" }
+}

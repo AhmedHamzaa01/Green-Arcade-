@@ -1,4 +1,4 @@
-# Green Arcade MVP — Implementation Plan
+# RowCycle MVP — Implementation Plan
 
 Steps are ordered by dependency: each step only uses things built in earlier steps. Do one step per Claude Code session, committed directly to `main`; check its "Done when" list, then move on.
 

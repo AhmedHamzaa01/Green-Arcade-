@@ -6,6 +6,7 @@ using System.Text.Json;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.JsonWebTokens;
@@ -22,7 +23,9 @@ namespace RowCycle.Tests;
 public sealed class AuthTests(ApiFactory factory)
 {
     private const string Password = "Secret123";
-    private readonly HttpClient _client = factory.CreateClient();
+
+    // Cookies are handled by hand so tests can replay an old refresh token on purpose.
+    private readonly HttpClient _client = factory.CreateClient(new WebApplicationFactoryClientOptions { HandleCookies = false });
 
     [Fact]
     public async Task Register_verify_login_refresh_works_end_to_end()
@@ -43,6 +46,34 @@ public sealed class AuthTests(ApiFactory factory)
         var refreshed = await RefreshAsync(tokens.RefreshToken);
         Assert.NotEqual(tokens.RefreshToken, refreshed.RefreshToken);
         Assert.True((await GetMeAsync(refreshed.AccessToken)).EmailVerified);
+    }
+
+    [Fact]
+    public async Task Refresh_token_is_only_in_a_secure_httponly_cookie()
+    {
+        var email = NewEmail();
+        await RegisterAsync(email);
+
+        var response = await PostLoginAsync(email, Password);
+
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        var cookie = Assert.Single(response.Headers.GetValues("Set-Cookie"), c => c.StartsWith("rc_refresh=")).ToLowerInvariant();
+        Assert.Contains("httponly", cookie);
+        Assert.Contains("samesite=strict", cookie);
+        Assert.Contains("path=/api/v1/auth", cookie);
+        Assert.Contains("expires=", cookie);
+
+        using var body = JsonDocument.Parse(await response.Content.ReadAsStringAsync());
+        Assert.True(body.RootElement.TryGetProperty("accessToken", out _));
+        Assert.False(body.RootElement.TryGetProperty("refreshToken", out _));
+    }
+
+    [Fact]
+    public async Task Refresh_without_a_cookie_returns_401()
+    {
+        var response = await _client.PostAsync("/api/v1/auth/refresh", null);
+
+        Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
     }
 
     [Fact]
@@ -82,11 +113,8 @@ public sealed class AuthTests(ApiFactory factory)
         var first = await LoginAsync(email, Password);
         var second = await RefreshAsync(first.RefreshToken);
 
-        var reuse = await _client.PostAsJsonAsync("/api/v1/auth/refresh", new RefreshRequest(first.RefreshToken));
-        Assert.Equal(HttpStatusCode.Unauthorized, reuse.StatusCode);
-
-        var afterReuse = await _client.PostAsJsonAsync("/api/v1/auth/refresh", new RefreshRequest(second.RefreshToken));
-        Assert.Equal(HttpStatusCode.Unauthorized, afterReuse.StatusCode);
+        Assert.Equal(HttpStatusCode.Unauthorized, (await PostRefreshAsync(first.RefreshToken)).StatusCode);
+        Assert.Equal(HttpStatusCode.Unauthorized, (await PostRefreshAsync(second.RefreshToken)).StatusCode);
     }
 
     [Fact]
@@ -96,11 +124,14 @@ public sealed class AuthTests(ApiFactory factory)
         await RegisterAsync(email);
         var tokens = await LoginAsync(email, Password);
 
-        var logout = await _client.PostAsJsonAsync("/api/v1/auth/logout", new LogoutRequest(tokens.RefreshToken));
-        Assert.Equal(HttpStatusCode.NoContent, logout.StatusCode);
+        using var logout = new HttpRequestMessage(HttpMethod.Post, "/api/v1/auth/logout");
+        logout.Headers.Add("Cookie", $"rc_refresh={tokens.RefreshToken}");
+        var response = await _client.SendAsync(logout);
+        Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
 
-        var refresh = await _client.PostAsJsonAsync("/api/v1/auth/refresh", new RefreshRequest(tokens.RefreshToken));
-        Assert.Equal(HttpStatusCode.Unauthorized, refresh.StatusCode);
+        var deleted = Assert.Single(response.Headers.GetValues("Set-Cookie"), c => c.StartsWith("rc_refresh="));
+        Assert.Contains("expires=Thu, 01 Jan 1970", deleted, StringComparison.OrdinalIgnoreCase);
+        Assert.Equal(HttpStatusCode.Unauthorized, (await PostRefreshAsync(tokens.RefreshToken)).StatusCode);
     }
 
     [Fact]
@@ -125,8 +156,7 @@ public sealed class AuthTests(ApiFactory factory)
             new ResetPasswordRequest(email, link["token"], "Another789"));
         Assert.Equal(HttpStatusCode.BadRequest, reuse.StatusCode);
 
-        var oldSession = await _client.PostAsJsonAsync("/api/v1/auth/refresh", new RefreshRequest(session.RefreshToken));
-        Assert.Equal(HttpStatusCode.Unauthorized, oldSession.StatusCode);
+        Assert.Equal(HttpStatusCode.Unauthorized, (await PostRefreshAsync(session.RefreshToken)).StatusCode);
     }
 
     [Fact]
@@ -239,19 +269,40 @@ public sealed class AuthTests(ApiFactory factory)
     private Task<HttpResponseMessage> PostLoginAsync(string email, string password) =>
         _client.PostAsJsonAsync("/api/v1/auth/login", new LoginRequest(email, password));
 
-    private async Task<AuthResponse> LoginAsync(string email, string password)
+    private async Task<Session> LoginAsync(string email, string password)
     {
         var response = await PostLoginAsync(email, password);
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-        return (await response.Content.ReadFromJsonAsync<AuthResponse>())!;
+        return await ReadSessionAsync(response);
     }
 
-    private async Task<AuthResponse> RefreshAsync(string refreshToken)
+    private async Task<Session> RefreshAsync(string refreshToken)
     {
-        var response = await _client.PostAsJsonAsync("/api/v1/auth/refresh", new RefreshRequest(refreshToken));
+        var response = await PostRefreshAsync(refreshToken);
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-        return (await response.Content.ReadFromJsonAsync<AuthResponse>())!;
+        return await ReadSessionAsync(response);
     }
+
+    /// <summary>POST /auth/refresh sending <paramref name="refreshToken"/> as the cookie, like a browser would.</summary>
+    private Task<HttpResponseMessage> PostRefreshAsync(string refreshToken)
+    {
+        var request = new HttpRequestMessage(HttpMethod.Post, "/api/v1/auth/refresh");
+        request.Headers.Add("Cookie", $"rc_refresh={refreshToken}");
+        return _client.SendAsync(request);
+    }
+
+    /// <summary>The access token from the body and the refresh token from the Set-Cookie header.</summary>
+    private static async Task<Session> ReadSessionAsync(HttpResponseMessage response)
+    {
+        var body = (await response.Content.ReadFromJsonAsync<AuthResponse>())!;
+        var cookie = response.Headers.GetValues("Set-Cookie").Single(c => c.StartsWith("rc_refresh="));
+        var parts = cookie.Split(';', StringSplitOptions.TrimEntries);
+        var token = Uri.UnescapeDataString(parts[0]["rc_refresh=".Length..]);
+        var expires = DateTimeOffset.Parse(parts.Single(p => p.StartsWith("expires=", StringComparison.OrdinalIgnoreCase))["expires=".Length..]);
+        return new Session(body.AccessToken, body.AccessTokenExpiresAt, token, expires);
+    }
+
+    private sealed record Session(string AccessToken, DateTimeOffset AccessTokenExpiresAt, string RefreshToken, DateTimeOffset RefreshTokenExpiresAt);
 
     private async Task<MeResponse> GetMeAsync(string accessToken)
     {

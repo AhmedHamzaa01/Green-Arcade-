@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project
 
-Green Arcade is a responsive web app for Row-Cycle (Alexandria, Egypt). Members earn points for photo-verified sustainable actions and spend them in Row-Cycle's store (medals, trophies, recycled-aluminium goods, merch). One points ledger connects earning and spending. There will never be separate "game" and "store" points.
+RowCycle is a responsive web app for Row-Cycle (Alexandria, Egypt). Members earn points for photo-verified sustainable actions and spend them in Row-Cycle's store (medals, trophies, recycled-aluminium goods, merch). One points ledger connects earning and spending. There will never be separate "game" and "store" points.
 
 ## Source of truth
 
@@ -18,13 +18,13 @@ The requirement docs are in `docs/`. Read the relevant ones before changing code
 
 ## Naming and layout
 
-The code is named **RowCycle** (`RowCycle.slnx`, `RowCycle.*` projects and namespaces). The product is still called **Green Arcade** in the docs and UI.
+The code and the product are both named **RowCycle** (`RowCycle.slnx`, `RowCycle.*` projects and namespaces, and the name users see). The product was called "Green Arcade" until 2026-10-10; the local dev database is still named `greenarcade_db`.
 
 ```
 RowCycle.slnx, Directory.Build.props (net10.0, nullable, warnings as errors)
 backend/src/    RowCycle.Api, RowCycle.Application, RowCycle.Domain, RowCycle.Infrastructure
 backend/tests/  RowCycle.Tests  (xUnit + WebApplicationFactory + Testcontainers)
-frontend/       green-arcade-web  (Angular, from Step 11: core/, shared/, features/store|account|actions|admin)
+frontend/       rowcycle-web  (Angular, from Step 11: core/, shared/, features/store|account|actions|admin)
 ```
 
 Dependencies: Api → Application, Infrastructure · Infrastructure → Application → Domain. Infrastructure implements the interfaces Application defines (repositories, `IFileStorage`, `IEmailSender`, the points-balance lock). Domain and Application reference no EF Core / Npgsql / ASP.NET packages.
@@ -52,13 +52,23 @@ dotnet test RowCycle.slnx --filter "FullyQualifiedName~HealthTests"   # one clas
 docker compose up --build                                          # api on :8080 + db
 ```
 
-From Step 2 (EF Core) and Step 11 (Angular):
+EF Core migrations:
 
 ```bash
 dotnet ef migrations add <Name> -p backend/src/RowCycle.Infrastructure -s backend/src/RowCycle.Api
 dotnet ef database update     -p backend/src/RowCycle.Infrastructure -s backend/src/RowCycle.Api
-cd frontend/green-arcade-web && npm start
 ```
+
+Frontend (Angular 22, needs Node 22.22+). Run the API first; the dev server proxies `/api` to `http://localhost:5130` (`proxy.conf.json`):
+
+```bash
+cd frontend/rowcycle-web
+npm start                    # http://localhost:4200
+npm test -- --watch=false    # unit tests (Vitest)
+npm run build                # production build
+```
+
+Frontend layout: `core/` (API services + models, `AuthSession`, interceptors, guards, errors), `shared/` (reusable components), `features/<area>/` (pages). All UI text lives in `public/i18n/en.json` (Transloco). The access token is kept in memory; the refresh token is an httpOnly cookie the browser handles.
 
 ## Stack (fixed — do not substitute)
 

@@ -1,0 +1,71 @@
+<mat-toolbar class="toolbar">
+  <a class="brand" routerLink="/">
+    <mat-icon>recycling</mat-icon>
+    <span>{{ 'app.name' | transloco }}</span>
+  </a>
+
+  <!-- Wide screens: links in the bar -->
+  <nav class="desktop-nav">
+    @if (session.isLoggedIn()) {
+      <a mat-button routerLink="/account/profile" routerLinkActive="active">{{ 'nav.profile' | transloco }}</a>
+      <a mat-button routerLink="/account/points" routerLinkActive="active">{{ 'nav.points' | transloco }}</a>
+    }
+    @if (session.hasRole('Admin')) {
+      <button mat-button [matMenuTriggerFor]="adminMenu">
+        {{ 'nav.admin' | transloco }}<mat-icon iconPositionEnd>expand_more</mat-icon>
+      </button>
+    }
+  </nav>
+
+  <span class="spacer"></span>
+
+  @if (session.user(); as user) {
+    <button mat-button class="desktop-nav" [matMenuTriggerFor]="userMenu">
+      <mat-icon>account_circle</mat-icon>{{ user.fullName }}
+    </button>
+  } @else {
+    <span class="desktop-nav">
+      <a mat-button routerLink="/login">{{ 'nav.login' | transloco }}</a>
+      <a mat-flat-button routerLink="/register">{{ 'nav.register' | transloco }}</a>
+    </span>
+  }
+
+  <!-- Phones: everything in one menu -->
+  <button mat-icon-button class="mobile-nav" [matMenuTriggerFor]="mobileMenu" [attr.aria-label]="'nav.menu' | transloco">
+    <mat-icon>menu</mat-icon>
+  </button>
+</mat-toolbar>
+
+<mat-menu #adminMenu="matMenu">
+  <a mat-menu-item routerLink="/admin/settings"><mat-icon>tune</mat-icon>{{ 'nav.settings' | transloco }}</a>
+  <a mat-menu-item routerLink="/admin/audit-log"><mat-icon>history</mat-icon>{{ 'nav.auditLog' | transloco }}</a>
+</mat-menu>
+
+<mat-menu #userMenu="matMenu">
+  <a mat-menu-item routerLink="/account/profile"><mat-icon>person</mat-icon>{{ 'nav.profile' | transloco }}</a>
+  <button mat-menu-item (click)="logout()"><mat-icon>logout</mat-icon>{{ 'nav.logout' | transloco }}</button>
+</mat-menu>
+
+<mat-menu #mobileMenu="matMenu">
+  <a mat-menu-item routerLink="/"><mat-icon>home</mat-icon>{{ 'nav.home' | transloco }}</a>
+  @if (session.isLoggedIn()) {
+    <a mat-menu-item routerLink="/account/profile"><mat-icon>person</mat-icon>{{ 'nav.profile' | transloco }}</a>
+    <a mat-menu-item routerLink="/account/points"><mat-icon>stars</mat-icon>{{ 'nav.points' | transloco }}</a>
+  }
+  @if (session.hasRole('Admin')) {
+    <mat-divider />
+    <a mat-menu-item routerLink="/admin/settings"><mat-icon>tune</mat-icon>{{ 'nav.settings' | transloco }}</a>
+    <a mat-menu-item routerLink="/admin/audit-log"><mat-icon>history</mat-icon>{{ 'nav.auditLog' | transloco }}</a>
+  }
+  <mat-divider />
+  @if (session.isLoggedIn()) {
+    <button mat-menu-item (click)="logout()"><mat-icon>logout</mat-icon>{{ 'nav.logout' | transloco }}</button>
+  } @else {
+    <a mat-menu-item routerLink="/login"><mat-icon>login</mat-icon>{{ 'nav.login' | transloco }}</a>
+    <a mat-menu-item routerLink="/register"><mat-icon>person_add</mat-icon>{{ 'nav.register' | transloco }}</a>
+  }
+</mat-menu>
+
+<main>
+  <router-outlet />
+</main>

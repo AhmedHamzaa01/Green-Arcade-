@@ -1,14 +1,14 @@
-# Green Arcade — Business Requirements Document (MVP)
+# RowCycle — Business Requirements Document (MVP)
 
 Version 0.1 (draft) · 2026-10-01
 
 ## 1. Purpose and document control
 
-The MVP of Green Arcade is a responsive web app (Angular + .NET + PostgreSQL) that combines a points engine, a photo-verified action loop, and Row-Cycle's merch store in one first release. This BRD states *why* the product is being built and *what the business needs*; the PRD defines product behaviour and the SRS defines the technical requirements.
+The MVP of RowCycle is a responsive web app (Angular + .NET + PostgreSQL) that combines a points engine, a photo-verified action loop, and Row-Cycle's merch store in one first release. This BRD states *why* the product is being built and *what the business needs*; the PRD defines product behaviour and the SRS defines the technical requirements.
 
 | Item | Value |
 | --- | --- |
-| Product | Green Arcade (web MVP) |
+| Product | RowCycle (web MVP) |
 | Company | Row-Cycle Inc., Alexandria, Egypt |
 | Founder | Abdelmouez Shahin |
 | Version | 0.1 (draft) |
@@ -17,7 +17,7 @@ The MVP of Green Arcade is a responsive web app (Angular + .NET + PostgreSQL) th
 
 ## 2. Business background
 
-Row-Cycle already runs real-world collection and clean-up activity; it has no digital layer that rewards participants or sells its products online. Green Arcade fills that gap.
+Row-Cycle already runs real-world collection and clean-up activity; it has no digital layer that rewards participants or sells its products online. RowCycle fills that gap.
 
 - **What Row-Cycle does:** turns discarded aluminium cans (originally Red Bull cans) into recycled-aluminium products for sports and events, including medals and trophies.
 - **Existing operations:** community can-collection drives with cafés, rowing clubs and volunteers; coastal and lake clean-ups across Egypt and Africa; partnerships with NGOs, universities and sports federations.

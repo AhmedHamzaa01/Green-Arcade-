@@ -73,7 +73,7 @@ internal sealed class AuthService(
         }
     }
 
-    public async Task<AuthResponse> LoginAsync(LoginRequest request, CancellationToken cancellationToken = default)
+    public async Task<AuthSession> LoginAsync(LoginRequest request, CancellationToken cancellationToken = default)
     {
         await ValidateAsync(request, cancellationToken);
 
@@ -96,11 +96,14 @@ internal sealed class AuthService(
         return await IssueTokensAsync(user, cancellationToken);
     }
 
-    public async Task<AuthResponse> RefreshAsync(RefreshRequest request, CancellationToken cancellationToken = default)
+    public async Task<AuthSession> RefreshAsync(string? refreshToken, CancellationToken cancellationToken = default)
     {
-        await ValidateAsync(request, cancellationToken);
+        if (string.IsNullOrWhiteSpace(refreshToken))
+        {
+            throw InvalidRefreshToken;
+        }
 
-        var stored = await refreshTokens.FindAsync(request.RefreshToken, cancellationToken) ?? throw InvalidRefreshToken;
+        var stored = await refreshTokens.FindAsync(refreshToken, cancellationToken) ?? throw InvalidRefreshToken;
 
         if (stored.RevokedAt is not null)
         {
@@ -131,10 +134,12 @@ internal sealed class AuthService(
         return await IssueTokensAsync(user, cancellationToken);
     }
 
-    public async Task LogoutAsync(LogoutRequest request, CancellationToken cancellationToken = default)
+    public async Task LogoutAsync(string? refreshToken, CancellationToken cancellationToken = default)
     {
-        await ValidateAsync(request, cancellationToken);
-        await refreshTokens.RevokeAsync(request.RefreshToken, cancellationToken);
+        if (!string.IsNullOrWhiteSpace(refreshToken))
+        {
+            await refreshTokens.RevokeAsync(refreshToken, cancellationToken);
+        }
     }
 
     public async Task ForgotPasswordAsync(ForgotPasswordRequest request, CancellationToken cancellationToken = default)
@@ -152,7 +157,7 @@ internal sealed class AuthService(
         var link = BuildLink("reset-password", ("email", user.Email), ("token", token));
         await emailSender.SendAsync(
             user.Email,
-            "Reset your Green Arcade password",
+            "Reset your RowCycle password",
             $"<p>Reset your password: {Anchor(link)}</p>" +
             "<p>The link is valid for 1 hour. If you didn't ask for this, ignore this email.</p>",
             cancellationToken);
@@ -185,12 +190,12 @@ internal sealed class AuthService(
         return mapper.Map<MeResponse>(new MeSource(user, profile, roles));
     }
 
-    private async Task<AuthResponse> IssueTokensAsync(UserAccount user, CancellationToken cancellationToken)
+    private async Task<AuthSession> IssueTokensAsync(UserAccount user, CancellationToken cancellationToken)
     {
         var roles = await identity.GetRolesAsync(user.Id, cancellationToken);
         var access = accessTokens.Issue(user, roles);
         var refresh = await refreshTokens.CreateAsync(user.Id, cancellationToken);
-        return new AuthResponse(access.Token, access.ExpiresAt, refresh.Token, refresh.ExpiresAt);
+        return new AuthSession(access.Token, access.ExpiresAt, refresh.Token, refresh.ExpiresAt);
     }
 
     private async Task SendVerificationEmailAsync(Guid userId, string email, CancellationToken cancellationToken)
@@ -199,7 +204,7 @@ internal sealed class AuthService(
         var link = BuildLink("verify-email", ("userId", userId.ToString()), ("token", token));
         await emailSender.SendAsync(
             email,
-            "Verify your Green Arcade email",
+            "Verify your RowCycle email",
             $"<p>Confirm your email: {Anchor(link)}</p><p>The link is valid for 24 hours.</p>",
             cancellationToken);
     }
