@@ -1,3 +1,4 @@
+using System.Text.Json;
 using AutoMapper;
 using RowCycle.Application.Auth;
 using RowCycle.Application.Dtos;
@@ -14,6 +15,7 @@ internal sealed class MappingProfile : Profile
     {
         MapAuth();
         MapPoints();
+        MapAudit();
     }
 
     private void MapAuth()
@@ -32,6 +34,24 @@ internal sealed class MappingProfile : Profile
     private void MapPoints()
     {
         CreateMap<PointsLedgerEntry, PointsEntryResponse>();
+    }
+
+    private void MapAudit()
+    {
+        CreateMap<AuditLog, AuditLogResponse>()
+            .ForCtorParam(nameof(AuditLogResponse.Data), o => o.MapFrom(s => ParseJson(s.Data)));
+    }
+
+    /// <summary>Stored JSON text → a JSON value in the response (not an escaped string).</summary>
+    private static JsonElement? ParseJson(string? json)
+    {
+        if (json is null)
+        {
+            return null;
+        }
+
+        using var document = JsonDocument.Parse(json);
+        return document.RootElement.Clone();
     }
 }
 

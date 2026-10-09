@@ -1,7 +1,9 @@
 using FluentValidation;
 using Microsoft.Extensions.DependencyInjection;
+using RowCycle.Application.Audit;
 using RowCycle.Application.Auth;
 using RowCycle.Application.Points;
+using RowCycle.Application.Settings;
 
 namespace RowCycle.Application;
 
@@ -14,6 +16,8 @@ public static class DependencyInjection
         services.AddValidatorsFromAssembly(typeof(DependencyInjection).Assembly, includeInternalTypes: true);
         services.AddScoped<IAuthService, AuthService>();
         services.AddScoped<IPointsService, PointsService>();
+        services.AddScoped<IAuditLogService, AuditLogService>();
+        services.AddScoped<ISettingsService, SettingsService>();
         return services;
     }
 }

@@ -34,3 +34,6 @@ Append one line per decision. Newest at the bottom. If a decision changes a requ
 | 2026-10-09 | Shared building blocks: `IRepository<T>` (find/add/remove), `PageRequest` (page ≥ 1, pageSize 1–100, default 20) and `PagedResult<T>`; enums are sent as text in JSON | SRS §5 | Ahmed Hamza |
 | 2026-10-09 | AutoMapper maps entities to DTOs (one `Profile` per feature, validated by a test). It is commercial since v15: development/testing run without a key (warning in the log); production needs a Lucky Penny licence, set as `AutoMapper:LicenseKey` | SRS §1, CLAUDE.md | Ahmed Hamza |
 | 2026-10-09 | The balance row lock uses SQL (`SELECT ... FOR UPDATE`) because LINQ has no locking operator; all other queries use LINQ | FR-06 | Ahmed Hamza |
+| 2026-10-10 | Audit logging is an explicit `IAuditLogService.Record(...)` call inside each admin service, saved in the same transaction as the change, with meaningful data (e.g. old/new value), instead of an automatic endpoint filter. Unchanged values write no row | FR-19, Step 5 | Ahmed Hamza |
+| 2026-10-10 | `GET /admin/audit-logs` (Admin) lists the audit log, paged and filterable | SRS §5, FR-19 | Ahmed Hamza |
+| 2026-10-10 | `daily_submission_limit` is editable between 1 and 50 (default 5) | FR-09 | Ahmed Hamza |

@@ -123,6 +123,7 @@ Base path `/api/v1`. JSON in and out; errors use RFC 7807 Problem Details; lists
 | POST | /admin/users/{id}/points-adjustments | Admin | Manual points |
 | CRUD | /admin/badges, /admin/submission-categories | Admin | Rules |
 | GET / PUT | /admin/settings | Admin | Settings |
+| GET | /admin/audit-logs | Admin | Audit log, newest first (filter by entity, entity id, user) |
 
 ## 6. Non-functional requirements
 
