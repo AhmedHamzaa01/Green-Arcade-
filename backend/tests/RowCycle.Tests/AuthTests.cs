@@ -1,6 +1,6 @@
-using System.Net;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
+using System.Net;
 using System.Security.Claims;
 using System.Text.Json;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -11,6 +11,7 @@ using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.JsonWebTokens;
 using RowCycle.Api.Authorization;
 using RowCycle.Application.Auth;
+using RowCycle.Application.Dtos;
 using RowCycle.Domain.Constants;
 using RowCycle.Infrastructure.Identity;
 using RowCycle.Tests.Infrastructure;

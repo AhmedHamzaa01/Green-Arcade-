@@ -1,4 +1,4 @@
-namespace RowCycle.Application.Auth;
+namespace RowCycle.Application.Dtos;
 
 public sealed record RegisterRequest(string FullName, string Email, string Password);
 

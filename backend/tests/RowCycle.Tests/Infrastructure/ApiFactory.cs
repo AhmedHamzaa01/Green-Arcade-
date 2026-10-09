@@ -1,8 +1,10 @@
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.DependencyInjection;
 using RowCycle.Application.Common;
+using RowCycle.Infrastructure.Identity;
 using Testcontainers.PostgreSql;
 
 namespace RowCycle.Tests.Infrastructure;
@@ -16,6 +18,14 @@ public sealed class ApiFactory : WebApplicationFactory<Program>, IAsyncLifetime
     private readonly PostgreSqlContainer _postgres = new PostgreSqlBuilder("postgres:16-alpine").Build();
 
     public TestEmailSender Emails { get; } = new();
+
+    /// <summary>Id of the seeded admin, for created_by columns.</summary>
+    public static Guid AdminUserId(ApiFactory factory)
+    {
+        using var scope = factory.Services.CreateScope();
+        var users = scope.ServiceProvider.GetRequiredService<UserManager<AppUser>>();
+        return users.FindByEmailAsync(AdminEmail).GetAwaiter().GetResult()!.Id;
+    }
 
     public Task InitializeAsync() => _postgres.StartAsync();
 

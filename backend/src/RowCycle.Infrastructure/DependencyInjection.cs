@@ -6,6 +6,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using RowCycle.Application.Auth;
 using RowCycle.Application.Common;
+using RowCycle.Application.Points;
 using RowCycle.Application.Users;
 using RowCycle.Infrastructure.Auth;
 using RowCycle.Infrastructure.Email;
@@ -41,6 +42,7 @@ public static class DependencyInjection
 
         services.AddScoped<IUnitOfWork, UnitOfWork>();
         services.AddScoped<IUserProfileRepository, UserProfileRepository>();
+        services.AddScoped<IPointsLedgerRepository, PointsLedgerRepository>();
         services.AddScoped<IIdentityService, IdentityService>();
         services.AddScoped<IRefreshTokenStore, RefreshTokenStore>();
         services.AddSingleton<IAccessTokenIssuer, JwtAccessTokenIssuer>();

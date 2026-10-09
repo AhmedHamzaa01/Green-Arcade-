@@ -8,6 +8,13 @@ internal sealed class UnitOfWork(AppDbContext db) : IUnitOfWork
 
     public async Task ExecuteInTransactionAsync(Func<CancellationToken, Task> work, CancellationToken cancellationToken = default)
     {
+        if (db.Database.CurrentTransaction is not null)
+        {
+            await work(cancellationToken);
+            await db.SaveChangesAsync(cancellationToken);
+            return;
+        }
+
         await using var transaction = await db.Database.BeginTransactionAsync(cancellationToken);
         await work(cancellationToken);
         await db.SaveChangesAsync(cancellationToken);

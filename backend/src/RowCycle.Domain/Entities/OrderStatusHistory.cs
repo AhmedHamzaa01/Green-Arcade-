@@ -3,7 +3,7 @@ using RowCycle.Domain.Enums;
 
 namespace RowCycle.Domain.Entities;
 
-public class OrderStatusHistory : INonDeletable
+public class OrderStatusHistory : IAppendOnly
 {
     public Guid Id { get; set; }
     public Guid OrderId { get; set; }

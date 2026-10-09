@@ -12,6 +12,7 @@ services:
       - Jwt__SigningKey=${JWT_SIGNING_KEY}
       - Admin__Email=${ADMIN_EMAIL}
       - Admin__Password=${ADMIN_PASSWORD}
+      - AutoMapper__LicenseKey=${AUTOMAPPER_LICENSE_KEY:-}
     depends_on:
       db:
         condition: service_healthy

@@ -66,7 +66,7 @@ cd frontend/green-arcade-web && npm start
 - EF Core + Npgsql, code-first migrations, `snake_case` names via `EFCore.NamingConventions`
 - PostgreSQL (Docker for dev); browse it with pgAdmin or DBeaver
 - ASP.NET Core Identity with `Guid` keys, JWT (15 min) + rotating refresh tokens (7 days); roles Member, Moderator, StoreManager, Admin
-- FluentValidation, Serilog, OpenAPI
+- FluentValidation, AutoMapper (entity → DTO; licence key in `AutoMapper:LicenseKey`), Serilog, OpenAPI
 - Angular (latest stable, standalone components, signals), mobile-first from 360 px; UI text in translation files so Arabic/RTL can be added later
 - xUnit + Testcontainers (real PostgreSQL) for integration tests
 

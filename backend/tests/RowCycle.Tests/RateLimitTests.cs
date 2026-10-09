@@ -1,7 +1,8 @@
-using System.Net;
 using System.Net.Http.Json;
+using System.Net;
 using Microsoft.AspNetCore.Hosting;
 using RowCycle.Application.Auth;
+using RowCycle.Application.Dtos;
 using RowCycle.Tests.Infrastructure;
 
 namespace RowCycle.Tests;

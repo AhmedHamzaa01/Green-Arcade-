@@ -16,6 +16,7 @@ The MVP is a single Angular web app (member area + admin area) calling one ASP.N
 | File storage | Local disk in dev; S3-compatible or Azure Blob in production | Behind an `IFileStorage` interface |
 | Email | SMTP provider behind `IEmailSender` | Verification, password reset, order updates |
 | Validation | FluentValidation | |
+| Mapping | AutoMapper (entity → DTO) | Commercial licence since v15; key in `AutoMapper:LicenseKey` (user-secrets / env var). Without a key it works but logs a warning; production needs a licence |
 | Logging | Serilog | |
 | API docs | OpenAPI (Swagger / Scalar) | |
 | Tests | xUnit + Testcontainers (PostgreSQL) | |

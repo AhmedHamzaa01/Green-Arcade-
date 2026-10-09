@@ -1,4 +1,5 @@
 using FluentValidation;
+using RowCycle.Application.Dtos;
 
 namespace RowCycle.Application.Auth;
 

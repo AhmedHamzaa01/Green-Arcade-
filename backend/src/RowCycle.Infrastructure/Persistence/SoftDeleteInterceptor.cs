@@ -6,7 +6,7 @@ namespace RowCycle.Infrastructure.Persistence;
 
 /// <summary>
 /// Turns deletes of <see cref="ISoftDeletable"/> entities into an update of <c>deleted_at</c>,
-/// and refuses to delete <see cref="INonDeletable"/> history rows.
+/// refuses to delete <see cref="INonDeletable"/> history rows, and refuses to change <see cref="IAppendOnly"/> rows.
 /// </summary>
 internal sealed class SoftDeleteInterceptor(TimeProvider timeProvider) : SaveChangesInterceptor
 {
@@ -31,6 +31,11 @@ internal sealed class SoftDeleteInterceptor(TimeProvider timeProvider) : SaveCha
         }
 
         var now = timeProvider.GetUtcNow();
+        foreach (var entry in context.ChangeTracker.Entries().Where(e => e.State == EntityState.Modified && e.Entity is IAppendOnly))
+        {
+            throw new InvalidOperationException($"{entry.Metadata.ClrType.Name} rows are append-only and can't be changed.");
+        }
+
         foreach (var entry in context.ChangeTracker.Entries().Where(e => e.State == EntityState.Deleted).ToList())
         {
             switch (entry.Entity)

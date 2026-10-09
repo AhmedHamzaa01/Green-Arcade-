@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
 using RowCycle.Application.Auth;
+using RowCycle.Application.Dtos;
 
 namespace RowCycle.Api.Controllers;
 

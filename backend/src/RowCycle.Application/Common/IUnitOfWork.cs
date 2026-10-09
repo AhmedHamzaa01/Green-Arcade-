@@ -5,6 +5,9 @@ public interface IUnitOfWork
 {
     Task SaveChangesAsync(CancellationToken cancellationToken = default);
 
-    /// <summary>Runs <paramref name="work"/>, saves, and commits; rolls everything back if anything throws.</summary>
+    /// <summary>
+    /// Runs <paramref name="work"/>, saves, and commits; rolls everything back if anything throws.
+    /// Called inside another transaction, it joins that one, so the outer caller commits once (e.g. checkout + points).
+    /// </summary>
     Task ExecuteInTransactionAsync(Func<CancellationToken, Task> work, CancellationToken cancellationToken = default);
 }

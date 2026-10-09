@@ -1,4 +1,5 @@
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Extensions.Options;
@@ -21,10 +22,11 @@ builder.Services.AddSerilog((services, logger) => logger
     .ReadFrom.Services(services)
     .Enrich.FromLogContext());
 
-builder.Services.AddApplication();
+builder.Services.AddApplication(builder.Configuration["AutoMapper:LicenseKey"]);
 builder.Services.AddInfrastructure(builder.Configuration);
 
-builder.Services.AddControllers(options => options.Conventions.Add(new RoutePrefixConvention("api/v1")));
+builder.Services.AddControllers(options => options.Conventions.Add(new RoutePrefixConvention("api/v1")))
+    .AddJsonOptions(options => options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()));
 builder.Services.AddOpenApi(options => options.AddDocumentTransformer<BearerSecurityTransformer>());
 
 // JWT access tokens (FR-03). Claim names are kept as issued ("sub", "role"), not mapped to long .NET URIs.

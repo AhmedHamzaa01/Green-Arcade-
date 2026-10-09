@@ -17,6 +17,9 @@ internal sealed class PointsLedgerEntryConfiguration : IEntityTypeConfiguration<
         builder.Property(x => x.CreatedAt).HasDefaultValueSql("now()");
 
         builder.HasIndex(x => new { x.UserId, x.CreatedAt }).IsDescending(false, true);
-        builder.HasIndex(x => new { x.SourceType, x.SourceId });
+        // One Earn, one Redeem and one Reverse per submission/order; manual adjustments have no source id.
+        builder.HasIndex(x => new { x.SourceType, x.SourceId, x.Type })
+            .IsUnique()
+            .HasFilter("source_id IS NOT NULL");
     }
 }

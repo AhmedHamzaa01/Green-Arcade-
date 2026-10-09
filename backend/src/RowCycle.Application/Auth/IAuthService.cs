@@ -1,3 +1,5 @@
+using RowCycle.Application.Dtos;
+
 namespace RowCycle.Application.Auth;
 
 /// <summary>Account and session use cases (F1, FR-01–FR-04).</summary>

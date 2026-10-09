@@ -1,9 +1,12 @@
 using System.Text.Encodings.Web;
+using AutoMapper;
 using FluentValidation;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using RowCycle.Application.Common;
+using RowCycle.Application.Dtos;
+using RowCycle.Application.Mapping;
 using RowCycle.Application.Users;
 using RowCycle.Domain.Constants;
 using RowCycle.Domain.Entities;
@@ -22,6 +25,7 @@ internal sealed class AuthService(
     IEmailSender emailSender,
     IOptions<AppOptions> appOptions,
     TimeProvider timeProvider,
+    IMapper mapper,
     IServiceProvider services,
     ILogger<AuthService> logger) : IAuthService
 {
@@ -178,15 +182,7 @@ internal sealed class AuthService(
         var profile = await profiles.FindAsync(userId, cancellationToken) ?? throw AppException.NotFound("Profile not found.");
         var roles = await identity.GetRolesAsync(userId, cancellationToken);
 
-        return new MeResponse(
-            user.Id,
-            user.Email,
-            user.EmailConfirmed,
-            profile.FullName,
-            profile.PhotoUrl,
-            profile.Phone,
-            profile.PointsBalance,
-            roles.Order().ToList());
+        return mapper.Map<MeResponse>(new MeSource(user, profile, roles));
     }
 
     private async Task<AuthResponse> IssueTokensAsync(UserAccount user, CancellationToken cancellationToken)
