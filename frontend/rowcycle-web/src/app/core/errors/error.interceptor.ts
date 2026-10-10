@@ -29,5 +29,9 @@ function messageFor(error: HttpErrorResponse): string {
   if (error.status === 403) {
     return 'errors.forbidden';
   }
-  return toProblem(error).title ?? 'errors.generic';
+  const problem = toProblem(error);
+  if (!problem.title) {
+    return 'errors.generic';
+  }
+  return problem.detail ? `${problem.title} ${problem.detail}` : problem.title;
 }

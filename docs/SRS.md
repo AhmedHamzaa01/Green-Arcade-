@@ -117,7 +117,9 @@ Base path `/api/v1`. JSON in and out; errors use RFC 7807 Problem Details; lists
 | GET | /admin/dashboard | Staff | Counts |
 | GET | /admin/submissions | Moderator | Queue (filter by status) |
 | POST | /admin/submissions/{id}/approve, /reject | Moderator | Review |
-| CRUD | /admin/products, /admin/product-categories, /admin/products/{id}/images | StoreManager | Catalog |
+| CRUD | /admin/product-categories | StoreManager | Categories (delete refused while products remain) |
+| CRUD | /admin/products, /admin/products/{id}/variants/{variantId} | StoreManager | Products and variants (stock); a product always keeps one variant |
+| POST / DELETE / PUT | /admin/products/{id}/images, …/images/{imageId}, …/images/order | StoreManager | Product photos (JPG/PNG/WEBP ≤ 10 MB, checked by content), served read-only under `/media` |
 | GET / PUT | /admin/orders, /admin/orders/{id}/status | StoreManager | Orders |
 | GET / PUT | /admin/users, /admin/users/{id}/role, /block | Admin | Users |
 | POST | /admin/users/{id}/points-adjustments | Admin | Manual points |

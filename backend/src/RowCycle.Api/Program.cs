@@ -2,6 +2,7 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using RowCycle.Api.Authorization;
@@ -13,6 +14,7 @@ using RowCycle.Api.Middleware;
 using RowCycle.Application;
 using RowCycle.Infrastructure;
 using RowCycle.Infrastructure.Auth;
+using RowCycle.Infrastructure.Storage;
 using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -92,6 +94,20 @@ else
     // In containers TLS ends at the reverse proxy; locally the API runs on plain HTTP.
     app.UseHttpsRedirection();
 }
+
+// Uploaded images, read-only, from the storage folder (outside the code folder, NFR-04).
+var storage = app.Services.GetRequiredService<IOptions<StorageOptions>>().Value;
+app.UseStaticFiles(new StaticFileOptions
+{
+    FileProvider = new PhysicalFileProvider(RowCycle.Infrastructure.DependencyInjection.GetStorageRoot(app.Services)),
+    RequestPath = storage.PublicPath,
+    ServeUnknownFileTypes = false,
+    OnPrepareResponse = context =>
+    {
+        context.Context.Response.Headers.XContentTypeOptions = "nosniff";
+        context.Context.Response.Headers.CacheControl = "public, max-age=604800";
+    },
+});
 
 app.UseCors("web");
 app.UseRateLimiter();

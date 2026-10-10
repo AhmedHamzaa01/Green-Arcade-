@@ -17,16 +17,16 @@ import { AuthSession } from '../../core/auth/auth-session';
           <mat-icon class="positive">eco</mat-icon>
           <h1>{{ 'home.title' | transloco }}</h1>
           <p>{{ 'home.intro' | transloco }}</p>
-          <p class="muted">{{ 'home.storeSoon' | transloco }}</p>
         </mat-card-content>
       </mat-card>
 
       <!-- Actions sit below the welcome card -->
       <div class="actions">
+        <a mat-flat-button routerLink="/products">{{ 'home.browse' | transloco }}</a>
         @if (session.isLoggedIn()) {
-          <a mat-flat-button routerLink="/account/profile">{{ 'home.goToProfile' | transloco }}</a>
+          <a mat-stroked-button routerLink="/account/profile">{{ 'home.goToProfile' | transloco }}</a>
         } @else {
-          <a mat-flat-button routerLink="/register">{{ 'home.start' | transloco }}</a>
+          <a mat-stroked-button routerLink="/register">{{ 'home.start' | transloco }}</a>
           <a mat-stroked-button routerLink="/login">{{ 'nav.login' | transloco }}</a>
         }
       </div>

@@ -20,6 +20,11 @@ internal sealed class AppExceptionHandler(IProblemDetailsService problemDetails)
                 Status = StatusCodes.Status400BadRequest,
                 Title = "One or more fields are invalid.",
             },
+            BadHttpRequestException badRequest => new ProblemDetails
+            {
+                Status = badRequest.StatusCode,
+                Title = badRequest.StatusCode == StatusCodes.Status413PayloadTooLarge ? "Request is too large." : "Bad request.",
+            },
             AppException app => new ProblemDetails
             {
                 Status = ToStatusCode(app.Kind),

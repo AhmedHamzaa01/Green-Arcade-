@@ -4,6 +4,10 @@ import { authGuard, guestGuard, roleGuard } from './core/auth/auth.guards';
 export const routes: Routes = [
   { path: '', loadComponent: () => import('./features/home/home').then((m) => m.Home) },
 
+  // Store (F5)
+  { path: 'products', loadComponent: () => import('./features/store/product-list').then((m) => m.ProductList) },
+  { path: 'products/:slug', loadComponent: () => import('./features/store/product-detail').then((m) => m.ProductDetailPage) },
+
   // Auth (F1)
   { path: 'login', canActivate: [guestGuard], loadComponent: () => import('./features/auth/login').then((m) => m.Login) },
   { path: 'register', canActivate: [guestGuard], loadComponent: () => import('./features/auth/register').then((m) => m.Register) },
@@ -24,8 +28,8 @@ export const routes: Routes = [
     ],
   },
 
-  // Admin (F8): only users with the Admin role even load this code.
-  { path: 'admin', canMatch: [roleGuard('Admin')], loadChildren: () => import('./features/admin/admin.routes').then((m) => m.adminRoutes) },
+  // Staff area (F8): only staff even load this code; each page also checks its own roles.
+  { path: 'admin', canMatch: [roleGuard('Admin', 'StoreManager')], loadChildren: () => import('./features/admin/admin.routes').then((m) => m.adminRoutes) },
 
   { path: '**', loadComponent: () => import('./features/not-found').then((m) => m.NotFound) },
 ];

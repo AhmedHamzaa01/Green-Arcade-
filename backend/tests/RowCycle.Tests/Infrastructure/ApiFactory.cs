@@ -19,6 +19,9 @@ public sealed class ApiFactory : WebApplicationFactory<Program>, IAsyncLifetime
 
     public TestEmailSender Emails { get; } = new();
 
+    /// <summary>Uploads go to a temporary folder for this test run.</summary>
+    public string StoragePath { get; } = Path.Combine(Path.GetTempPath(), $"rowcycle-tests-{Guid.NewGuid():N}");
+
     /// <summary>Id of the seeded admin, for created_by columns.</summary>
     public static Guid AdminUserId(ApiFactory factory)
     {
@@ -39,6 +42,7 @@ public sealed class ApiFactory : WebApplicationFactory<Program>, IAsyncLifetime
         builder.UseSetting("RateLimiting:Auth:PermitLimit", "100000");
         builder.UseSetting("Admin:Email", AdminEmail);
         builder.UseSetting("Admin:Password", AdminPassword);
+        builder.UseSetting("Storage:LocalPath", StoragePath);
 
         builder.ConfigureTestServices(services => services.AddSingleton<IEmailSender>(Emails));
     }
@@ -46,6 +50,11 @@ public sealed class ApiFactory : WebApplicationFactory<Program>, IAsyncLifetime
     async Task IAsyncLifetime.DisposeAsync()
     {
         await _postgres.DisposeAsync();
+        if (Directory.Exists(StoragePath))
+        {
+            Directory.Delete(StoragePath, recursive: true);
+        }
+
         await base.DisposeAsync();
     }
 }

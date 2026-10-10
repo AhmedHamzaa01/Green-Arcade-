@@ -34,6 +34,7 @@ Cross-cutting pieces already in the Api project:
 - `Middleware/CorrelationIdMiddleware.cs` sets `X-Correlation-Id`, `HttpContext.TraceIdentifier` and the Serilog `CorrelationId` property. Problem Details responses include it as `correlationId`.
 - Exceptions and bare error status codes return RFC 7807 bodies (`AddProblemDetails` + `UseExceptionHandler` + `UseStatusCodePages`).
 - `/health` checks PostgreSQL and returns JSON.
+- Uploaded files go through `IFileStorage` (`LocalFileStorage` → `Storage:LocalPath`, dev `<repo>/storage`) and are served read-only at `/media`; check images with `ImageFileCheck` (content signature, ≤ 10 MB).
 - The connection string is `ConnectionStrings:Postgres`. `RowCycle.Infrastructure.DependencyInjection.GetConnectionString` fails fast if it's missing.
 
 Integration tests use `[Collection(ApiCollection.Name)]` to share one `ApiFactory` (`backend/tests/RowCycle.Tests/Infrastructure/ApiFactory.cs`), which starts one Postgres container per test run. Inject settings with `builder.UseSetting`, not `ConfigureAppConfiguration`: `Program.cs` reads configuration before the latter is applied.

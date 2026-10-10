@@ -13,6 +13,8 @@ services:
       - Admin__Email=${ADMIN_EMAIL}
       - Admin__Password=${ADMIN_PASSWORD}
       - AutoMapper__LicenseKey=${AUTOMAPPER_LICENSE_KEY:-}
+    volumes:
+      - uploads:/app/storage
     depends_on:
       db:
         condition: service_healthy
@@ -35,3 +37,4 @@ services:
 
 volumes:
   postgres_data:
+  uploads:

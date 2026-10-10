@@ -16,6 +16,7 @@ internal sealed class MappingProfile : Profile
         MapAuth();
         MapPoints();
         MapAudit();
+        MapCatalog();
     }
 
     private void MapAuth()
@@ -41,6 +42,46 @@ internal sealed class MappingProfile : Profile
         CreateMap<AuditLog, AuditLogResponse>()
             .ForCtorParam(nameof(AuditLogResponse.Data), o => o.MapFrom(s => ParseJson(s.Data)));
     }
+
+    private void MapCatalog()
+    {
+        CreateMap<ProductCategory, ProductCategoryResponse>();
+        CreateMap<ProductImage, ProductImageResponse>();
+        CreateMap<ProductVariant, AdminProductVariantResponse>();
+
+        // Shoppers see the variant's own price (or the product's) and whether it's in stock, not the stock count.
+        CreateMap<ProductVariant, ProductVariantResponse>()
+            .ForCtorParam(nameof(ProductVariantResponse.PriceEgp), o => o.MapFrom(v => v.PriceOverride ?? v.Product!.PriceEgp))
+            .ForCtorParam(nameof(ProductVariantResponse.InStock), o => o.MapFrom(v => v.Stock > 0));
+
+        CreateMap<Product, ProductListItem>()
+            .ForCtorParam(nameof(ProductListItem.CategoryName), o => o.MapFrom(p => p.Category!.Name))
+            .ForCtorParam(nameof(ProductListItem.CategorySlug), o => o.MapFrom(p => p.Category!.Slug))
+            .ForCtorParam(nameof(ProductListItem.ImageUrl), o => o.MapFrom(p => MainImageUrl(p)))
+            .ForCtorParam(nameof(ProductListItem.InStock), o => o.MapFrom(p => p.Variants.Any(v => v.Stock > 0)));
+
+        CreateMap<Product, ProductDetailResponse>()
+            .ForCtorParam(nameof(ProductDetailResponse.CategoryName), o => o.MapFrom(p => p.Category!.Name))
+            .ForCtorParam(nameof(ProductDetailResponse.CategorySlug), o => o.MapFrom(p => p.Category!.Slug))
+            .ForCtorParam(nameof(ProductDetailResponse.InStock), o => o.MapFrom(p => p.Variants.Any(v => v.Stock > 0)))
+            .ForCtorParam(nameof(ProductDetailResponse.Variants), o => o.MapFrom(p => p.Variants.OrderBy(v => v.Name)))
+            .ForCtorParam(nameof(ProductDetailResponse.Images), o => o.MapFrom(p => p.Images.OrderBy(i => i.SortOrder)));
+
+        CreateMap<Product, AdminProductListItem>()
+            .ForCtorParam(nameof(AdminProductListItem.CategoryName), o => o.MapFrom(p => p.Category!.Name))
+            .ForCtorParam(nameof(AdminProductListItem.TotalStock), o => o.MapFrom(p => p.Variants.Sum(v => v.Stock)))
+            .ForCtorParam(nameof(AdminProductListItem.VariantCount), o => o.MapFrom(p => p.Variants.Count))
+            .ForCtorParam(nameof(AdminProductListItem.ImageUrl), o => o.MapFrom(p => MainImageUrl(p)));
+
+        CreateMap<Product, AdminProductResponse>()
+            .ForCtorParam(nameof(AdminProductResponse.CategoryName), o => o.MapFrom(p => p.Category!.Name))
+            .ForCtorParam(nameof(AdminProductResponse.Variants), o => o.MapFrom(p => p.Variants.OrderBy(v => v.Name)))
+            .ForCtorParam(nameof(AdminProductResponse.Images), o => o.MapFrom(p => p.Images.OrderBy(i => i.SortOrder)));
+    }
+
+    /// <summary>The first image in display order, or null.</summary>
+    private static string? MainImageUrl(Product product) =>
+        product.Images.OrderBy(i => i.SortOrder).Select(i => i.Url).FirstOrDefault();
 
     /// <summary>Stored JSON text → a JSON value in the response (not an escaped string).</summary>
     private static JsonElement? ParseJson(string? json)

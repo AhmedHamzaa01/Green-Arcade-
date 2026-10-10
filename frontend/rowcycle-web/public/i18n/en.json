@@ -1,23 +1,40 @@
 {
-  "app": { "name": "RowCycle", "tagline": "Earn points for green actions. Spend them in the Row-Cycle store." },
+  "app": {
+    "name": "RowCycle",
+    "tagline": "Earn points for green actions. Spend them in the Row-Cycle store."
+  },
   "nav": {
     "home": "Home",
     "profile": "Profile",
     "points": "Points",
-    "admin": "Admin",
+    "admin": "Staff",
     "settings": "Settings",
     "auditLog": "Audit log",
     "login": "Log in",
     "register": "Sign up",
     "logout": "Log out",
-    "menu": "Menu"
+    "menu": "Menu",
+    "store": "Store",
+    "products": "Products",
+    "categories": "Categories"
   },
   "common": {
     "close": "Close",
     "save": "Save",
     "loading": "Loading…",
     "back": "Back",
-    "all": "All"
+    "all": "All",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "add": "Add",
+    "create": "Create",
+    "yes": "Yes",
+    "no": "No",
+    "active": "Active",
+    "inactive": "Inactive",
+    "search": "Search",
+    "actions": "Actions"
   },
   "errors": {
     "generic": "Something went wrong. Please try again.",
@@ -39,7 +56,8 @@
     "intro": "Collect cans, clean the coast, recycle — upload a photo, get points, and spend them on medals, trophies and recycled-aluminium goods.",
     "storeSoon": "The store is coming soon.",
     "start": "Create an account",
-    "goToProfile": "Go to your profile"
+    "goToProfile": "Go to your profile",
+    "browse": "Browse the store"
   },
   "auth": {
     "email": "Email",
@@ -101,8 +119,17 @@
       "title": "Points history",
       "balance": "Balance",
       "empty": "No points yet. Approved actions and delivered orders add points here.",
-      "types": { "Earn": "Earned", "Redeem": "Spent", "Reverse": "Returned", "Adjust": "Adjustment" },
-      "sources": { "Submission": "Action", "Order": "Order", "Manual": "Admin" }
+      "types": {
+        "Earn": "Earned",
+        "Redeem": "Spent",
+        "Reverse": "Returned",
+        "Adjust": "Adjustment"
+      },
+      "sources": {
+        "Submission": "Action",
+        "Order": "Order",
+        "Manual": "Admin"
+      }
     }
   },
   "admin": {
@@ -123,7 +150,103 @@
       "details": "Details",
       "filter": "Entity",
       "empty": "No audit entries yet."
+    },
+    "catalog": {
+      "products": {
+        "title": "Products",
+        "subtitle": "Everything in the store, including inactive products.",
+        "new": "New product",
+        "name": "Name",
+        "category": "Category",
+        "price": "Price",
+        "stock": "Stock",
+        "status": "Status",
+        "variants": "{{ count }} variants",
+        "empty": "No products yet.",
+        "deleteConfirm": "Delete \"{{ name }}\"? It disappears from the store; past orders keep their copy.",
+        "deleted": "Product deleted."
+      },
+      "edit": {
+        "newTitle": "New product",
+        "editTitle": "Edit product",
+        "details": "Details",
+        "name": "Name",
+        "slug": "URL name (slug)",
+        "slugHint": "Leave empty to make it from the name.",
+        "category": "Category",
+        "description": "Description",
+        "priceEgp": "Price (EGP)",
+        "pricePoints": "Price in points",
+        "pricePointsHint": "Leave empty if it can't be bought with points.",
+        "rewardPoints": "Reward points",
+        "rewardPointsHint": "Points the buyer earns when the order is delivered.",
+        "active": "Visible in the store",
+        "saved": "Product saved.",
+        "created": "Product created. Now set its stock and add photos.",
+        "variants": "Variants and stock",
+        "variantsHint": "Stock is counted per variant (e.g. per size).",
+        "variantName": "Name",
+        "sku": "SKU",
+        "stock": "Stock",
+        "priceOverride": "Own price (EGP)",
+        "priceOverrideHint": "Leave empty to use the product price.",
+        "addVariant": "Add variant",
+        "editVariant": "Edit variant",
+        "variantSaved": "Variant saved.",
+        "variantDeleted": "Variant deleted.",
+        "deleteVariantConfirm": "Delete variant \"{{ name }}\"?",
+        "images": "Photos",
+        "imagesHint": "JPG, PNG or WEBP, up to 10 MB. The first photo is the main one.",
+        "upload": "Upload photo",
+        "uploaded": "Photo uploaded.",
+        "imageDeleted": "Photo deleted.",
+        "moveLeft": "Move left",
+        "moveRight": "Move right",
+        "noImages": "No photos yet.",
+        "saveFirst": "Save the product first to add variants and photos.",
+        "viewInStore": "View in store"
+      },
+      "categories": {
+        "title": "Categories",
+        "subtitle": "How the store is organised.",
+        "new": "New category",
+        "edit": "Edit category",
+        "name": "Name",
+        "slug": "URL name (slug)",
+        "slugHint": "Leave empty to make it from the name.",
+        "sortOrder": "Order",
+        "active": "Visible in the store",
+        "empty": "No categories yet.",
+        "saved": "Category saved.",
+        "deleted": "Category deleted.",
+        "deleteConfirm": "Delete category \"{{ name }}\"?"
+      }
     }
   },
-  "notFound": { "title": "Page not found", "home": "Go home" }
+  "notFound": {
+    "title": "Page not found",
+    "home": "Go home"
+  },
+  "store": {
+    "title": "Store",
+    "subtitle": "Medals, trophies and goods made from recycled aluminium.",
+    "search": "Search products",
+    "allCategories": "All",
+    "sort": {
+      "label": "Sort by",
+      "Newest": "Newest",
+      "PriceAsc": "Price: low to high",
+      "PriceDesc": "Price: high to low"
+    },
+    "empty": "No products match your search.",
+    "outOfStock": "Out of stock",
+    "inStock": "In stock",
+    "earnPoints": "Buy this and earn {{ points }} points",
+    "orPoints": "or {{ points }} points",
+    "variant": "Option",
+    "addToCart": "Add to cart",
+    "cartSoon": "The cart is coming soon.",
+    "backToStore": "Back to store",
+    "notFound": "This product is not available."
+  }
 }

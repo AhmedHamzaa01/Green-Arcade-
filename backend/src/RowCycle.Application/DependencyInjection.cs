@@ -2,6 +2,7 @@ using FluentValidation;
 using Microsoft.Extensions.DependencyInjection;
 using RowCycle.Application.Audit;
 using RowCycle.Application.Auth;
+using RowCycle.Application.Catalog;
 using RowCycle.Application.Points;
 using RowCycle.Application.Settings;
 
@@ -18,6 +19,8 @@ public static class DependencyInjection
         services.AddScoped<IPointsService, PointsService>();
         services.AddScoped<IAuditLogService, AuditLogService>();
         services.AddScoped<ISettingsService, SettingsService>();
+        services.AddScoped<ICatalogService, CatalogService>();
+        services.AddScoped<ICatalogAdminService, CatalogAdminService>();
         return services;
     }
 }

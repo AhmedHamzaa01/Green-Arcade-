@@ -6,6 +6,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using RowCycle.Application.Audit;
 using RowCycle.Application.Auth;
+using RowCycle.Application.Catalog;
 using RowCycle.Application.Common;
 using RowCycle.Application.Points;
 using RowCycle.Application.Settings;
@@ -15,6 +16,7 @@ using RowCycle.Infrastructure.Email;
 using RowCycle.Infrastructure.Identity;
 using RowCycle.Infrastructure.Persistence;
 using RowCycle.Infrastructure.Persistence.Repositories;
+using RowCycle.Infrastructure.Storage;
 
 namespace RowCycle.Infrastructure;
 
@@ -47,6 +49,11 @@ public static class DependencyInjection
         services.AddScoped<IPointsLedgerRepository, PointsLedgerRepository>();
         services.AddScoped<ISettingsRepository, SettingsRepository>();
         services.AddScoped<IAuditLogRepository, AuditLogRepository>();
+        services.AddScoped<IProductCategoryRepository, ProductCategoryRepository>();
+        services.AddScoped<IProductRepository, ProductRepository>();
+
+        services.AddOptions<StorageOptions>().Bind(configuration.GetSection(StorageOptions.SectionName));
+        services.AddSingleton<IFileStorage, LocalFileStorage>();
         services.AddScoped<IIdentityService, IdentityService>();
         services.AddScoped<IRefreshTokenStore, RefreshTokenStore>();
         services.AddSingleton<IAccessTokenIssuer, JwtAccessTokenIssuer>();
@@ -81,6 +88,15 @@ public static class DependencyInjection
 
         // Password reset tokens (default provider) are valid for 1 hour (FR-04).
         services.Configure<DataProtectionTokenProviderOptions>(o => o.TokenLifespan = TimeSpan.FromHours(1));
+    }
+
+    /// <summary>The absolute folder uploads are stored in (created if missing), for serving them read-only.</summary>
+    public static string GetStorageRoot(IServiceProvider services)
+    {
+        var options = services.GetRequiredService<Microsoft.Extensions.Options.IOptions<StorageOptions>>().Value;
+        var root = LocalFileStorage.ResolveRoot(options, services.GetRequiredService<Microsoft.Extensions.Hosting.IHostEnvironment>());
+        Directory.CreateDirectory(root);
+        return root;
     }
 
     /// <summary>Applies pending migrations. Called at startup when <c>Database:MigrateOnStartup</c> is true (Development, tests).</summary>
