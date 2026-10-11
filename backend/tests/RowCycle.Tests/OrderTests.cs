@@ -1,5 +1,7 @@
 using System.Net;
 using System.Net.Http.Json;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using Microsoft.Extensions.DependencyInjection;
 using RowCycle.Application.Audit;
 using RowCycle.Application.Common;
@@ -14,6 +16,12 @@ namespace RowCycle.Tests;
 [Collection(ApiCollection.Name)]
 public sealed class OrderTests(ApiFactory factory)
 {
+    private static readonly JsonSerializerOptions JsonOptions = new()
+    {
+        PropertyNameCaseInsensitive = true,
+        Converters = { new JsonStringEnumConverter() },
+    };
+
     private readonly string _tag = $"o{Guid.NewGuid():N}"[..10];
 
     [Fact]
@@ -26,7 +34,7 @@ public sealed class OrderTests(ApiFactory factory)
         var (member, _) = await TestAuth.VerifiedMemberClientAsync(factory);
 
         // 1. Initial cart is empty
-        var emptyCart = await member.GetFromJsonAsync<CartResponse>("/api/v1/cart");
+        var emptyCart = await member.GetFromJsonAsync<CartResponse>("/api/v1/cart", JsonOptions);
         Assert.NotNull(emptyCart);
         Assert.Empty(emptyCart.Items);
         Assert.Equal(0, emptyCart.TotalEgp);
@@ -34,7 +42,7 @@ public sealed class OrderTests(ApiFactory factory)
         // 2. Add item to cart
         var addResponse = await member.PostAsJsonAsync("/api/v1/cart/items", new AddToCartRequest(variantId, 2));
         Assert.Equal(HttpStatusCode.OK, addResponse.StatusCode);
-        var cartAfterAdd = await addResponse.Content.ReadFromJsonAsync<CartResponse>();
+        var cartAfterAdd = await addResponse.Content.ReadFromJsonAsync<CartResponse>(JsonOptions);
         Assert.NotNull(cartAfterAdd);
         var item = Assert.Single(cartAfterAdd.Items);
         Assert.Equal(variantId, item.VariantId);
@@ -44,7 +52,7 @@ public sealed class OrderTests(ApiFactory factory)
         // 3. Update quantity
         var updateResponse = await member.PutAsJsonAsync($"/api/v1/cart/items/{variantId}", new UpdateCartItemRequest(5));
         Assert.Equal(HttpStatusCode.OK, updateResponse.StatusCode);
-        var cartAfterUpdate = await updateResponse.Content.ReadFromJsonAsync<CartResponse>();
+        var cartAfterUpdate = await updateResponse.Content.ReadFromJsonAsync<CartResponse>(JsonOptions);
         Assert.NotNull(cartAfterUpdate);
         Assert.Equal(5, cartAfterUpdate.Items[0].Quantity);
         Assert.Equal(125m, cartAfterUpdate.TotalEgp);
@@ -52,7 +60,7 @@ public sealed class OrderTests(ApiFactory factory)
         // 4. Remove item
         var removeResponse = await member.DeleteAsync($"/api/v1/cart/items/{variantId}");
         Assert.Equal(HttpStatusCode.OK, removeResponse.StatusCode);
-        var cartAfterRemove = await removeResponse.Content.ReadFromJsonAsync<CartResponse>();
+        var cartAfterRemove = await removeResponse.Content.ReadFromJsonAsync<CartResponse>(JsonOptions);
         Assert.NotNull(cartAfterRemove);
         Assert.Empty(cartAfterRemove.Items);
 
@@ -60,7 +68,7 @@ public sealed class OrderTests(ApiFactory factory)
         await member.PostAsJsonAsync("/api/v1/cart/items", new AddToCartRequest(variantId, 1));
         var clearResponse = await member.DeleteAsync("/api/v1/cart");
         Assert.Equal(HttpStatusCode.NoContent, clearResponse.StatusCode);
-        var finalCart = await member.GetFromJsonAsync<CartResponse>("/api/v1/cart");
+        var finalCart = await member.GetFromJsonAsync<CartResponse>("/api/v1/cart", JsonOptions);
         Assert.NotNull(finalCart);
         Assert.Empty(finalCart.Items);
     }
@@ -79,7 +87,7 @@ public sealed class OrderTests(ApiFactory factory)
         var response = await member.PostAsJsonAsync("/api/v1/orders", checkoutRequest);
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 
-        var order = await response.Content.ReadFromJsonAsync<OrderDetailResponse>();
+        var order = await response.Content.ReadFromJsonAsync<OrderDetailResponse>(JsonOptions);
         Assert.NotNull(order);
         Assert.Equal(OrderStatus.Placed, order.Status);
         Assert.Equal(PaymentMethod.Cod, order.PaymentMethod);
@@ -92,16 +100,16 @@ public sealed class OrderTests(ApiFactory factory)
         Assert.Equal(2, order.Items[0].Quantity);
 
         // Verify stock decremented
-        var updatedProduct = await admin.GetFromJsonAsync<AdminProductResponse>($"/api/v1/admin/products/{product.Id}");
+        var updatedProduct = await admin.GetFromJsonAsync<AdminProductResponse>($"/api/v1/admin/products/{product.Id}", JsonOptions);
         Assert.Equal(8, updatedProduct!.Variants[0].Stock);
 
         // Verify cart is now empty
-        var cart = await member.GetFromJsonAsync<CartResponse>("/api/v1/cart");
+        var cart = await member.GetFromJsonAsync<CartResponse>("/api/v1/cart", JsonOptions);
         Assert.NotNull(cart);
         Assert.Empty(cart.Items);
 
         // Verify order appears in /me/orders
-        var myOrders = await member.GetFromJsonAsync<PagedResult<OrderSummaryResponse>>("/api/v1/me/orders");
+        var myOrders = await member.GetFromJsonAsync<PagedResult<OrderSummaryResponse>>("/api/v1/me/orders", JsonOptions);
         Assert.NotNull(myOrders);
         Assert.Contains(myOrders.Items, o => o.Id == order.Id);
     }
@@ -122,7 +130,7 @@ public sealed class OrderTests(ApiFactory factory)
         var response = await member.PostAsJsonAsync("/api/v1/orders", checkoutRequest);
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 
-        var order = await response.Content.ReadFromJsonAsync<OrderDetailResponse>();
+        var order = await response.Content.ReadFromJsonAsync<OrderDetailResponse>(JsonOptions);
         Assert.NotNull(order);
         Assert.Equal(PaymentMethod.Points, order.PaymentMethod);
         Assert.Equal(75, order.TotalPoints); // 3 * 25
@@ -130,16 +138,16 @@ public sealed class OrderTests(ApiFactory factory)
         Assert.Equal(6, order.TotalRewardPoints); // 3 * 2
 
         // Verify user balance is 100 - 75 = 25
-        var me = await member.GetFromJsonAsync<MeResponse>("/api/v1/me");
+        var me = await member.GetFromJsonAsync<MeResponse>("/api/v1/me", JsonOptions);
         Assert.Equal(25, me!.PointsBalance);
 
         // Verify ledger has Redeem row
-        var pointsHistory = await member.GetFromJsonAsync<PointsHistoryResponse>("/api/v1/me/points");
+        var pointsHistory = await member.GetFromJsonAsync<PointsHistoryResponse>("/api/v1/me/points", JsonOptions);
         Assert.NotNull(pointsHistory);
         Assert.Contains(pointsHistory.Items, p => p.Type == PointsEntryType.Redeem && p.Amount == -75);
 
         // Verify stock decremented to 7
-        var updatedProduct = await admin.GetFromJsonAsync<AdminProductResponse>($"/api/v1/admin/products/{product.Id}");
+        var updatedProduct = await admin.GetFromJsonAsync<AdminProductResponse>($"/api/v1/admin/products/{product.Id}", JsonOptions);
         Assert.Equal(7, updatedProduct!.Variants[0].Stock);
     }
 
@@ -160,7 +168,7 @@ public sealed class OrderTests(ApiFactory factory)
         Assert.Equal(HttpStatusCode.Conflict, response.StatusCode);
 
         // Stock remains 1
-        var updatedProduct = await admin.GetFromJsonAsync<AdminProductResponse>($"/api/v1/admin/products/{product.Id}");
+        var updatedProduct = await admin.GetFromJsonAsync<AdminProductResponse>($"/api/v1/admin/products/{product.Id}", JsonOptions);
         Assert.Equal(1, updatedProduct!.Variants[0].Stock);
     }
 
@@ -180,9 +188,9 @@ public sealed class OrderTests(ApiFactory factory)
         Assert.Equal(HttpStatusCode.Conflict, response.StatusCode);
 
         // Balance remains 30, stock remains 5
-        var me = await member.GetFromJsonAsync<MeResponse>("/api/v1/me");
+        var me = await member.GetFromJsonAsync<MeResponse>("/api/v1/me", JsonOptions);
         Assert.Equal(30, me!.PointsBalance);
-        var updatedProduct = await admin.GetFromJsonAsync<AdminProductResponse>($"/api/v1/admin/products/{product.Id}");
+        var updatedProduct = await admin.GetFromJsonAsync<AdminProductResponse>($"/api/v1/admin/products/{product.Id}", JsonOptions);
         Assert.Equal(5, updatedProduct!.Variants[0].Stock);
     }
 
@@ -212,25 +220,25 @@ public sealed class OrderTests(ApiFactory factory)
 
         await member.PostAsJsonAsync("/api/v1/cart/items", new AddToCartRequest(variantId, 2)); // 60 points
         var orderResponse = await member.PostAsJsonAsync("/api/v1/orders", new CheckoutRequest(PaymentMethod.Points, SampleAddress()));
-        var order = (await orderResponse.Content.ReadFromJsonAsync<OrderDetailResponse>())!;
+        var order = (await orderResponse.Content.ReadFromJsonAsync<OrderDetailResponse>(JsonOptions))!;
 
-        Assert.Equal(40, (await member.GetFromJsonAsync<MeResponse>("/api/v1/me"))!.PointsBalance);
-        Assert.Equal(6, (await admin.GetFromJsonAsync<AdminProductResponse>($"/api/v1/admin/products/{product.Id}"))!.Variants[0].Stock);
+        Assert.Equal(40, (await member.GetFromJsonAsync<MeResponse>("/api/v1/me", JsonOptions))!.PointsBalance);
+        Assert.Equal(6, (await admin.GetFromJsonAsync<AdminProductResponse>($"/api/v1/admin/products/{product.Id}", JsonOptions))!.Variants[0].Stock);
 
         // Cancel order
         var cancelResponse = await member.PostAsync($"/api/v1/me/orders/{order.Id}/cancel", null);
         Assert.Equal(HttpStatusCode.OK, cancelResponse.StatusCode);
-        var cancelled = await cancelResponse.Content.ReadFromJsonAsync<OrderDetailResponse>();
+        var cancelled = await cancelResponse.Content.ReadFromJsonAsync<OrderDetailResponse>(JsonOptions);
         Assert.Equal(OrderStatus.Cancelled, cancelled!.Status);
 
         // Stock restored back to 8
-        Assert.Equal(8, (await admin.GetFromJsonAsync<AdminProductResponse>($"/api/v1/admin/products/{product.Id}"))!.Variants[0].Stock);
+        Assert.Equal(8, (await admin.GetFromJsonAsync<AdminProductResponse>($"/api/v1/admin/products/{product.Id}", JsonOptions))!.Variants[0].Stock);
 
         // Points refunded back to 100
-        Assert.Equal(100, (await member.GetFromJsonAsync<MeResponse>("/api/v1/me"))!.PointsBalance);
+        Assert.Equal(100, (await member.GetFromJsonAsync<MeResponse>("/api/v1/me", JsonOptions))!.PointsBalance);
 
         // Points history has Reverse entry
-        var history = await member.GetFromJsonAsync<PointsHistoryResponse>("/api/v1/me/points");
+        var history = await member.GetFromJsonAsync<PointsHistoryResponse>("/api/v1/me/points", JsonOptions);
         Assert.Contains(history!.Items, p => p.Type == PointsEntryType.Reverse && p.Amount == 60);
     }
 
@@ -246,9 +254,9 @@ public sealed class OrderTests(ApiFactory factory)
         // 1. COD Order Delivery awards reward points
         await member.PostAsJsonAsync("/api/v1/cart/items", new AddToCartRequest(variantId, 2)); // 2 * 12 = 24 reward points
         var codOrder = (await (await member.PostAsJsonAsync("/api/v1/orders", new CheckoutRequest(PaymentMethod.Cod, SampleAddress())))
-            .Content.ReadFromJsonAsync<OrderDetailResponse>())!;
+            .Content.ReadFromJsonAsync<OrderDetailResponse>(JsonOptions))!;
 
-        Assert.Equal(0, (await member.GetFromJsonAsync<MeResponse>("/api/v1/me"))!.PointsBalance);
+        Assert.Equal(0, (await member.GetFromJsonAsync<MeResponse>("/api/v1/me", JsonOptions))!.PointsBalance);
 
         // Placed -> Confirmed -> Shipped -> Delivered
         Assert.Equal(HttpStatusCode.OK, (await admin.PutAsJsonAsync($"/api/v1/admin/orders/{codOrder.Id}/status", new UpdateOrderStatusRequest(OrderStatus.Confirmed))).StatusCode);
@@ -257,16 +265,16 @@ public sealed class OrderTests(ApiFactory factory)
         Assert.Equal(HttpStatusCode.OK, deliveredResponse.StatusCode);
 
         // Buyer received 24 reward points
-        Assert.Equal(24, (await member.GetFromJsonAsync<MeResponse>("/api/v1/me"))!.PointsBalance);
+        Assert.Equal(24, (await member.GetFromJsonAsync<MeResponse>("/api/v1/me", JsonOptions))!.PointsBalance);
 
         // 2. Points Order Delivery also awards reward points
         await member.PostAsJsonAsync("/api/v1/cart/items", new AddToCartRequest(variantId, 1)); // 50 points, 12 reward points
         await GivePointsAsync(userId, 50); // total balance 24 + 50 = 74
 
         var pointsOrder = (await (await member.PostAsJsonAsync("/api/v1/orders", new CheckoutRequest(PaymentMethod.Points, SampleAddress())))
-            .Content.ReadFromJsonAsync<OrderDetailResponse>())!;
+            .Content.ReadFromJsonAsync<OrderDetailResponse>(JsonOptions))!;
 
-        Assert.Equal(24, (await member.GetFromJsonAsync<MeResponse>("/api/v1/me"))!.PointsBalance); // 74 - 50 = 24
+        Assert.Equal(24, (await member.GetFromJsonAsync<MeResponse>("/api/v1/me", JsonOptions))!.PointsBalance); // 74 - 50 = 24
 
         // Advance points order to Delivered
         await admin.PutAsJsonAsync($"/api/v1/admin/orders/{pointsOrder.Id}/status", new UpdateOrderStatusRequest(OrderStatus.Confirmed));
@@ -274,7 +282,7 @@ public sealed class OrderTests(ApiFactory factory)
         await admin.PutAsJsonAsync($"/api/v1/admin/orders/{pointsOrder.Id}/status", new UpdateOrderStatusRequest(OrderStatus.Delivered));
 
         // Buyer received 12 reward points -> 24 + 12 = 36
-        Assert.Equal(36, (await member.GetFromJsonAsync<MeResponse>("/api/v1/me"))!.PointsBalance);
+        Assert.Equal(36, (await member.GetFromJsonAsync<MeResponse>("/api/v1/me", JsonOptions))!.PointsBalance);
     }
 
     [Fact]
@@ -286,7 +294,7 @@ public sealed class OrderTests(ApiFactory factory)
 
         await member.PostAsJsonAsync("/api/v1/cart/items", new AddToCartRequest(product.Variants[0].Id, 1));
         var order = (await (await member.PostAsJsonAsync("/api/v1/orders", new CheckoutRequest(PaymentMethod.Cod, SampleAddress())))
-            .Content.ReadFromJsonAsync<OrderDetailResponse>())!;
+            .Content.ReadFromJsonAsync<OrderDetailResponse>(JsonOptions))!;
 
         // Cannot skip directly Placed -> Delivered
         var skipResponse = await admin.PutAsJsonAsync($"/api/v1/admin/orders/{order.Id}/status", new UpdateOrderStatusRequest(OrderStatus.Delivered));
@@ -311,11 +319,11 @@ public sealed class OrderTests(ApiFactory factory)
 
         await member.PostAsJsonAsync("/api/v1/cart/items", new AddToCartRequest(product.Variants[0].Id, 1));
         var order = (await (await member.PostAsJsonAsync("/api/v1/orders", new CheckoutRequest(PaymentMethod.Cod, SampleAddress())))
-            .Content.ReadFromJsonAsync<OrderDetailResponse>())!;
+            .Content.ReadFromJsonAsync<OrderDetailResponse>(JsonOptions))!;
 
         await admin.PutAsJsonAsync($"/api/v1/admin/orders/{order.Id}/status", new UpdateOrderStatusRequest(OrderStatus.Confirmed));
 
-        var logs = await admin.GetFromJsonAsync<PagedResult<AuditLogResponse>>("/api/v1/admin/audit-logs?pageSize=100");
+        var logs = await admin.GetFromJsonAsync<PagedResult<AuditLogResponse>>("/api/v1/admin/audit-logs?pageSize=100", JsonOptions);
         Assert.NotNull(logs);
         Assert.Contains(logs.Items, l => l.Action == AuditActions.OrderStatusUpdate && l.EntityId == order.Id.ToString());
     }
@@ -328,17 +336,17 @@ public sealed class OrderTests(ApiFactory factory)
     private static async Task<AdminProductResponse> CreateProductAsync(
         HttpClient admin, string name, decimal price, int stock = 0, int? pricePoints = null, int rewardPoints = 0)
     {
-        var categories = await admin.GetFromJsonAsync<List<ProductCategoryResponse>>("/api/v1/admin/product-categories");
+        var categories = await admin.GetFromJsonAsync<List<ProductCategoryResponse>>("/api/v1/admin/product-categories", JsonOptions);
         var categoryId = categories!.First().Id;
         var request = new SaveProductRequest(categoryId, name, null, "Recycled item", price, pricePoints, rewardPoints, true);
         var response = await admin.PostAsJsonAsync("/api/v1/admin/products", request);
         Assert.Equal(HttpStatusCode.Created, response.StatusCode);
-        var product = (await response.Content.ReadFromJsonAsync<AdminProductResponse>())!;
+        var product = (await response.Content.ReadFromJsonAsync<AdminProductResponse>(JsonOptions))!;
 
         if (stock > 0)
         {
             await SetStockAsync(admin, product, stock);
-            product = (await admin.GetFromJsonAsync<AdminProductResponse>($"/api/v1/admin/products/{product.Id}"))!;
+            product = (await admin.GetFromJsonAsync<AdminProductResponse>($"/api/v1/admin/products/{product.Id}", JsonOptions))!;
         }
 
         return product;

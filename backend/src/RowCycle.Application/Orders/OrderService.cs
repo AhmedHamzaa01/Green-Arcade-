@@ -212,7 +212,7 @@ internal sealed class OrderService(
             }
 
             order.Status = OrderStatus.Cancelled;
-            order.StatusHistory.Add(new OrderStatusHistory
+            orderRepository.AddStatusHistory(new OrderStatusHistory
             {
                 Id = Guid.CreateVersion7(),
                 OrderId = order.Id,
@@ -312,7 +312,7 @@ internal sealed class OrderService(
             }
 
             order.Status = request.Status;
-            order.StatusHistory.Add(new OrderStatusHistory
+            orderRepository.AddStatusHistory(new OrderStatusHistory
             {
                 Id = Guid.CreateVersion7(),
                 OrderId = order.Id,

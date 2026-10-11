@@ -54,5 +54,7 @@ internal sealed class OrderRepository(AppDbContext db) : IOrderRepository
         await db.ProductVariants.FirstOrDefaultAsync(v => v.Id == variantId, cancellationToken);
 
     public void Add(Order order) => db.Orders.Add(order);
+
+    public void AddStatusHistory(OrderStatusHistory history) => db.OrderStatusHistory.Add(history);
 }
 

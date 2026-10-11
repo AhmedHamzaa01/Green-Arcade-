@@ -12,5 +12,6 @@ public interface IOrderRepository
     Task<bool> OrderNumberExistsAsync(string orderNumber, CancellationToken cancellationToken = default);
     Task<ProductVariant?> FindVariantAsync(Guid variantId, CancellationToken cancellationToken = default);
     void Add(Order order);
+    void AddStatusHistory(OrderStatusHistory history);
 }
 
