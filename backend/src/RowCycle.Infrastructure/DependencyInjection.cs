@@ -8,6 +8,7 @@ using RowCycle.Application.Audit;
 using RowCycle.Application.Auth;
 using RowCycle.Application.Catalog;
 using RowCycle.Application.Common;
+using RowCycle.Application.Orders;
 using RowCycle.Application.Points;
 using RowCycle.Application.Settings;
 using RowCycle.Application.Users;
@@ -51,6 +52,8 @@ public static class DependencyInjection
         services.AddScoped<IAuditLogRepository, AuditLogRepository>();
         services.AddScoped<IProductCategoryRepository, ProductCategoryRepository>();
         services.AddScoped<IProductRepository, ProductRepository>();
+        services.AddScoped<ICartRepository, CartRepository>();
+        services.AddScoped<IOrderRepository, OrderRepository>();
 
         services.AddOptions<StorageOptions>().Bind(configuration.GetSection(StorageOptions.SectionName));
         services.AddSingleton<IFileStorage, LocalFileStorage>();

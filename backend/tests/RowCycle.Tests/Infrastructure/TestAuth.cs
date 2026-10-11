@@ -20,6 +20,22 @@ public static class TestAuth
         return await LoggedInClientAsync(factory, email, "Secret123", client);
     }
 
+    /// <summary>A client logged in as a registered and email-verified member.</summary>
+    public static async Task<(HttpClient Client, Guid UserId)> VerifiedMemberClientAsync(ApiFactory factory, string? email = null)
+    {
+        var client = factory.CreateClient();
+        email ??= $"member-{Guid.NewGuid():N}@example.com";
+        (await client.PostAsJsonAsync("/api/v1/auth/register", new RegisterRequest("Test Member", email, "Secret123")))
+            .EnsureSuccessStatusCode();
+        var link = factory.Emails.LastLinkQuery(email, "verify-email");
+        (await client.PostAsJsonAsync("/api/v1/auth/verify-email",
+            new VerifyEmailRequest(Guid.Parse(link["userId"]), link["token"])))
+            .EnsureSuccessStatusCode();
+        var loggedIn = await LoggedInClientAsync(factory, email, "Secret123", client);
+        var me = await loggedIn.GetFromJsonAsync<MeResponse>("/api/v1/me");
+        return (loggedIn, me!.Id);
+    }
+
     private static async Task<HttpClient> LoggedInClientAsync(
         ApiFactory factory, string email, string password, HttpClient? client = null)
     {

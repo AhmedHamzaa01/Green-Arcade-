@@ -17,6 +17,7 @@ internal sealed class MappingProfile : Profile
         MapPoints();
         MapAudit();
         MapCatalog();
+        MapOrders();
     }
 
     private void MapAuth()
@@ -77,6 +78,21 @@ internal sealed class MappingProfile : Profile
             .ForCtorParam(nameof(AdminProductResponse.CategoryName), o => o.MapFrom(p => p.Category!.Name))
             .ForCtorParam(nameof(AdminProductResponse.Variants), o => o.MapFrom(p => p.Variants.OrderBy(v => v.Name)))
             .ForCtorParam(nameof(AdminProductResponse.Images), o => o.MapFrom(p => p.Images.OrderBy(i => i.SortOrder)));
+    }
+
+    private void MapOrders()
+    {
+        CreateMap<ShippingAddressSnapshot, ShippingAddressDto>();
+        CreateMap<OrderStatusHistory, OrderStatusHistoryResponse>();
+
+        CreateMap<OrderItem, OrderItemResponse>()
+            .ForCtorParam(nameof(OrderItemResponse.LineTotalEgp), o => o.MapFrom(i => i.UnitPriceEgp * i.Quantity))
+            .ForCtorParam(nameof(OrderItemResponse.LineTotalPoints), o => o.MapFrom(i => i.UnitPricePoints.HasValue ? (int?)(i.UnitPricePoints.Value * i.Quantity) : null));
+
+        CreateMap<Order, OrderSummaryResponse>()
+            .ForCtorParam(nameof(OrderSummaryResponse.ItemCount), o => o.MapFrom(s => s.Items.Sum(i => i.Quantity)));
+
+        CreateMap<Order, OrderDetailResponse>();
     }
 
     /// <summary>The first image in display order, or null.</summary>
