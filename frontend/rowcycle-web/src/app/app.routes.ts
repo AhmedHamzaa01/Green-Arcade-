@@ -8,6 +8,10 @@ export const routes: Routes = [
   { path: 'products', loadComponent: () => import('./features/store/product-list').then((m) => m.ProductList) },
   { path: 'products/:slug', loadComponent: () => import('./features/store/product-detail').then((m) => m.ProductDetailPage) },
 
+  // Cart and checkout (F6): logged-in members
+  { path: 'cart', canActivate: [authGuard], loadComponent: () => import('./features/store/cart').then((m) => m.CartPage) },
+  { path: 'checkout', canActivate: [authGuard], loadComponent: () => import('./features/store/checkout').then((m) => m.Checkout) },
+
   // Auth (F1)
   { path: 'login', canActivate: [guestGuard], loadComponent: () => import('./features/auth/login').then((m) => m.Login) },
   { path: 'register', canActivate: [guestGuard], loadComponent: () => import('./features/auth/register').then((m) => m.Register) },
@@ -24,6 +28,9 @@ export const routes: Routes = [
     children: [
       { path: 'profile', loadComponent: () => import('./features/account/profile').then((m) => m.Profile) },
       { path: 'points', loadComponent: () => import('./features/account/points-history').then((m) => m.PointsHistory) },
+      { path: 'orders', loadComponent: () => import('./features/account/my-orders').then((m) => m.MyOrders) },
+      { path: 'orders/:id', loadComponent: () => import('./features/account/my-order').then((m) => m.MyOrder) },
+      { path: 'addresses', loadComponent: () => import('./features/account/addresses').then((m) => m.Addresses) },
       { path: '', pathMatch: 'full', redirectTo: 'profile' },
     ],
   },

@@ -1,12 +1,16 @@
-import { Component, computed, inject, input, linkedSignal } from '@angular/core';
+import { Component, computed, inject, input, linkedSignal, signal } from '@angular/core';
 import { CurrencyPipe, DecimalPipe } from '@angular/common';
-import { RouterLink } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { rxResource } from '@angular/core/rxjs-interop';
-import { MatButton } from '@angular/material/button';
+import { MatButton, MatIconButton } from '@angular/material/button';
 import { MatButtonToggle, MatButtonToggleGroup } from '@angular/material/button-toggle';
 import { MatIcon } from '@angular/material/icon';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { CatalogApi } from '../../core/api/catalog-api';
+import { AuthSession } from '../../core/auth/auth-session';
+import { CartStore } from '../../core/cart/cart-store';
+import { MatSnackBar } from '@angular/material/snack-bar';
+import { TranslocoService } from '@jsverse/transloco';
 import { ProductVariant } from '../../core/api/api.models';
 import { EmptyState } from '../../shared/empty-state';
 import { Loading } from '../../shared/loading';
@@ -15,7 +19,7 @@ import { Loading } from '../../shared/loading';
 @Component({
   selector: 'app-product-detail',
   imports: [
-    RouterLink, CurrencyPipe, DecimalPipe, MatButton, MatButtonToggleGroup, MatButtonToggle, MatIcon, TranslocoPipe,
+    RouterLink, CurrencyPipe, DecimalPipe, MatButton, MatIconButton, MatButtonToggleGroup, MatButtonToggle, MatIcon, TranslocoPipe,
     Loading, EmptyState,
   ],
   template: `
@@ -72,9 +76,19 @@ import { Loading } from '../../shared/loading';
               <span class="row negative"><mat-icon>block</mat-icon>{{ 'store.outOfStock' | transloco }}</span>
             }
 
-            <!-- The cart arrives in Step 7. -->
-            <button mat-flat-button disabled>{{ 'store.addToCart' | transloco }}</button>
-            <span class="muted hint">{{ 'store.cartSoon' | transloco }}</span>
+            @if (variant()?.inStock) {
+              <div class="row">
+                <div class="qty">
+                  <button matIconButton (click)="quantity.set(quantity() - 1)" [disabled]="quantity() <= 1"><mat-icon>remove</mat-icon></button>
+                  <span>{{ quantity() }}</span>
+                  <button matIconButton (click)="quantity.set(quantity() + 1)" [disabled]="quantity() >= 99"><mat-icon>add</mat-icon></button>
+                </div>
+                <button mat-flat-button (click)="addToCart()" [disabled]="adding()">
+                  <mat-icon>add_shopping_cart</mat-icon>
+                  {{ (session.isLoggedIn() ? 'store.addToCart' : 'store.loginToBuy') | transloco }}
+                </button>
+              </div>
+            }
 
             @if (p.description) {
               <p class="description">{{ p.description }}</p>
@@ -104,10 +118,18 @@ import { Loading } from '../../shared/loading';
     .earn { display: flex; align-items: center; gap: 6px; color: var(--mat-sys-tertiary); font: var(--mat-sys-title-small); }
     .hint { font: var(--mat-sys-body-small); }
     .description { white-space: pre-line; }
+    .qty { display: flex; align-items: center; gap: 4px; }
   `,
 })
 export class ProductDetailPage {
   private readonly api = inject(CatalogApi);
+  private readonly router = inject(Router);
+  private readonly cart = inject(CartStore);
+  private readonly snackBar = inject(MatSnackBar);
+  private readonly transloco = inject(TranslocoService);
+  protected readonly session = inject(AuthSession);
+  protected readonly quantity = signal(1);
+  protected readonly adding = signal(false);
 
   /** From the URL: /products/:slug */
   readonly slug = input.required<string>();
@@ -128,4 +150,28 @@ export class ProductDetailPage {
   /** The photo shown large; starts at the main photo and resets when another product opens. */
   protected readonly imageUrl = linkedSignal<string | null>(() => this.product.value()?.images[0]?.url ?? null);
   protected readonly selectedImage = this.imageUrl;
+
+  protected async addToCart(): Promise<void> {
+    const variant = this.variant();
+    if (!variant) {
+      return;
+    }
+    if (!this.session.isLoggedIn()) {
+      await this.router.navigate(['/login'], { queryParams: { returnUrl: this.router.url } });
+      return;
+    }
+
+    this.adding.set(true);
+    try {
+      await this.cart.add(variant.id, this.quantity());
+      this.snackBar
+        .open(this.transloco.translate('store.added'), this.transloco.translate('store.viewCart'), { duration: 4000 })
+        .onAction()
+        .subscribe(() => void this.router.navigate(['/cart']));
+    } catch {
+      // e.g. "Not enough stock. Only 2 left." — shown by the error toast.
+    } finally {
+      this.adding.set(false);
+    }
+  }
 }

@@ -20,6 +20,12 @@
 
   <span class="spacer"></span>
 
+  @if (session.isLoggedIn()) {
+    <a mat-icon-button routerLink="/cart" [attr.aria-label]="'nav.cart' | transloco">
+      <mat-icon [matBadge]="cart.count() || null" matBadgeSize="small" matBadgeColor="primary" aria-hidden="false">shopping_cart</mat-icon>
+    </a>
+  }
+
   @if (session.user(); as user) {
     <button mat-button class="desktop-nav" [matMenuTriggerFor]="userMenu">
       <mat-icon>account_circle</mat-icon>{{ user.fullName }}
@@ -44,6 +50,7 @@
 <!-- Staff links, by role: store managers manage the catalog; admins see everything. -->
 <ng-template #staffLinks>
   @if (session.hasRole('Admin', 'StoreManager')) {
+    <a mat-menu-item routerLink="/admin/orders"><mat-icon>local_shipping</mat-icon>{{ 'nav.staffOrders' | transloco }}</a>
     <a mat-menu-item routerLink="/admin/products"><mat-icon>inventory_2</mat-icon>{{ 'nav.products' | transloco }}</a>
     <a mat-menu-item routerLink="/admin/categories"><mat-icon>category</mat-icon>{{ 'nav.categories' | transloco }}</a>
   }
@@ -55,6 +62,8 @@
 
 <mat-menu #userMenu="matMenu">
   <a mat-menu-item routerLink="/account/profile"><mat-icon>person</mat-icon>{{ 'nav.profile' | transloco }}</a>
+  <a mat-menu-item routerLink="/account/orders"><mat-icon>receipt_long</mat-icon>{{ 'nav.orders' | transloco }}</a>
+  <a mat-menu-item routerLink="/account/addresses"><mat-icon>home</mat-icon>{{ 'nav.addresses' | transloco }}</a>
   <button mat-menu-item (click)="logout()"><mat-icon>logout</mat-icon>{{ 'nav.logout' | transloco }}</button>
 </mat-menu>
 
@@ -64,6 +73,8 @@
   @if (session.isLoggedIn()) {
     <a mat-menu-item routerLink="/account/profile"><mat-icon>person</mat-icon>{{ 'nav.profile' | transloco }}</a>
     <a mat-menu-item routerLink="/account/points"><mat-icon>stars</mat-icon>{{ 'nav.points' | transloco }}</a>
+    <a mat-menu-item routerLink="/account/orders"><mat-icon>receipt_long</mat-icon>{{ 'nav.orders' | transloco }}</a>
+    <a mat-menu-item routerLink="/account/addresses"><mat-icon>home</mat-icon>{{ 'nav.addresses' | transloco }}</a>
   }
   @if (session.hasRole('Admin', 'StoreManager')) {
     <mat-divider />

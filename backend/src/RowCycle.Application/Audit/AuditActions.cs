@@ -20,4 +20,6 @@ public static class AuditActions
     public const string ImageUpload = "product_image.upload";
     public const string ImageDelete = "product_image.delete";
     public const string ImageReorder = "product_image.reorder";
+
+    public const string OrderStatusChange = "order.status";
 }

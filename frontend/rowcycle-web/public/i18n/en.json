@@ -16,7 +16,11 @@
     "menu": "Menu",
     "store": "Store",
     "products": "Products",
-    "categories": "Categories"
+    "categories": "Categories",
+    "cart": "Cart",
+    "orders": "My orders",
+    "addresses": "Addresses",
+    "staffOrders": "Orders"
   },
   "common": {
     "close": "Close",
@@ -34,7 +38,9 @@
     "active": "Active",
     "inactive": "Inactive",
     "search": "Search",
-    "actions": "Actions"
+    "actions": "Actions",
+    "next": "Next",
+    "change": "Change"
   },
   "errors": {
     "generic": "Something went wrong. Please try again.",
@@ -49,7 +55,8 @@
     "passwordLetter": "Must contain a letter.",
     "passwordDigit": "Must contain a digit.",
     "min": "Must be at least {{ min }}.",
-    "max": "Must be at most {{ max }}."
+    "max": "Must be at most {{ max }}.",
+    "pattern": "Use the expected format."
   },
   "home": {
     "title": "Welcome to RowCycle",
@@ -221,6 +228,20 @@
         "deleted": "Category deleted.",
         "deleteConfirm": "Delete category \"{{ name }}\"?"
       }
+    },
+    "orders": {
+      "title": "Orders",
+      "subtitle": "Confirm, ship and deliver orders.",
+      "search": "Order number or name",
+      "customer": "Customer",
+      "empty": "No orders found.",
+      "moveTo": "Move to",
+      "changeConfirm": "Mark {{ number }} as {{ status }}?",
+      "changed": "Order updated.",
+      "deliverHint": "Marking it Delivered gives the buyer {{ points }} reward points.",
+      "cancelHint": "Cancelling returns the stock, and refunds the points of a points order.",
+      "back": "All orders",
+      "final": "This order is finished."
     }
   },
   "notFound": {
@@ -245,8 +266,95 @@
     "orPoints": "or {{ points }} points",
     "variant": "Option",
     "addToCart": "Add to cart",
-    "cartSoon": "The cart is coming soon.",
     "backToStore": "Back to store",
-    "notFound": "This product is not available."
+    "notFound": "This product is not available.",
+    "quantity": "Quantity",
+    "added": "Added to cart.",
+    "viewCart": "View cart",
+    "loginToBuy": "Log in to buy"
+  },
+  "status": {
+    "Placed": "Placed",
+    "Confirmed": "Confirmed",
+    "Shipped": "Shipped",
+    "Delivered": "Delivered",
+    "Cancelled": "Cancelled"
+  },
+  "payment": {
+    "Cod": "Cash on delivery",
+    "Points": "Points"
+  },
+  "cart": {
+    "title": "Your cart",
+    "empty": "Your cart is empty.",
+    "browse": "Browse the store",
+    "unavailable": "No longer available. Remove it to continue.",
+    "notEnoughStock": "Not enough stock. Lower the quantity.",
+    "remove": "Remove",
+    "total": "Total",
+    "orPoints": "or {{ points }} points",
+    "earn": "You'll earn {{ points }} points when it's delivered.",
+    "checkout": "Checkout",
+    "fixIssues": "Fix the marked items to continue."
+  },
+  "checkout": {
+    "title": "Checkout",
+    "unverified": "Confirm your email before ordering. Open the link we emailed you.",
+    "steps": {
+      "address": "Address",
+      "payment": "Payment",
+      "review": "Review"
+    },
+    "noAddresses": "Add an address so we know where to deliver.",
+    "addAddress": "Add address",
+    "codHint": "Pay the courier in cash when it arrives.",
+    "pointsHint": "Pay {{ points }} points now. You have {{ balance }}.",
+    "pointsNoPrice": "Some items can only be bought with cash.",
+    "pointsNotEnough": "You need {{ points }} points; you have {{ balance }}.",
+    "items": "Items",
+    "deliverTo": "Deliver to",
+    "payWith": "Payment",
+    "total": "Total",
+    "free": "Delivery: free",
+    "confirm": "Place order",
+    "placed": "Thank you! Order {{ number }} is placed."
+  },
+  "orders": {
+    "title": "My orders",
+    "empty": "No orders yet.",
+    "date": "Date",
+    "total": "Total",
+    "itemCount": "{{ count }} items",
+    "items": "Items",
+    "address": "Delivery address",
+    "payment": "Payment",
+    "history": "Status history",
+    "cancel": "Cancel order",
+    "cancelConfirm": "Cancel order {{ number }}? Stock goes back, and points are refunded for a points order.",
+    "cancelled": "Order cancelled.",
+    "cancelConfirmButton": "Cancel order",
+    "rewardPending": "You'll earn {{ points }} points when this order is delivered.",
+    "rewardEarned": "{{ points }} reward points were added for this order.",
+    "paidPoints": "{{ points }} points",
+    "back": "All orders"
+  },
+  "addresses": {
+    "title": "Addresses",
+    "subtitle": "Where we deliver your orders.",
+    "add": "Add address",
+    "edit": "Edit address",
+    "empty": "No addresses yet.",
+    "default": "Default",
+    "makeDefault": "Use as my default address",
+    "saved": "Address saved.",
+    "deleted": "Address deleted.",
+    "deleteConfirm": "Delete this address?",
+    "fullName": "Recipient name",
+    "phone": "Phone",
+    "city": "City",
+    "area": "Area",
+    "street": "Street",
+    "building": "Building / floor / flat",
+    "notes": "Notes for the courier"
   }
 }

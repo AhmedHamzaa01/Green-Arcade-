@@ -9,6 +9,10 @@ public class OrderItem : INonDeletable
     public Guid OrderId { get; set; }
     public Guid VariantId { get; set; }
     public string ProductName { get; set; } = string.Empty;
+    public string VariantName { get; set; } = string.Empty;
+
+    /// <summary>Main product photo at checkout, so past orders still show it.</summary>
+    public string? ImageUrl { get; set; }
     public decimal UnitPriceEgp { get; set; }
     public int? UnitPricePoints { get; set; }
     public int UnitRewardPoints { get; set; }

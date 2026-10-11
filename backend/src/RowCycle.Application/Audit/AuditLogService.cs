@@ -1,4 +1,5 @@
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using AutoMapper;
 using FluentValidation;
 using RowCycle.Application.Common;
@@ -13,6 +14,9 @@ internal sealed class AuditLogService(
     IMapper mapper,
     TimeProvider timeProvider) : IAuditLogService
 {
+    /// <summary>camelCase, with enums as words ("Confirmed", not 1), so the log reads well.</summary>
+    private static readonly JsonSerializerOptions DataJson = new(JsonSerializerDefaults.Web) { Converters = { new JsonStringEnumConverter() } };
+
     public void Record(Guid? userId, string action, string entity, string? entityId, object? data = null) =>
         auditLogs.Add(new AuditLog
         {
@@ -21,7 +25,7 @@ internal sealed class AuditLogService(
             Action = action,
             Entity = entity,
             EntityId = entityId,
-            Data = data is null ? null : JsonSerializer.Serialize(data, JsonSerializerOptions.Web),
+            Data = data is null ? null : JsonSerializer.Serialize(data, DataJson),
             CreatedAt = timeProvider.GetUtcNow(),
         });
 

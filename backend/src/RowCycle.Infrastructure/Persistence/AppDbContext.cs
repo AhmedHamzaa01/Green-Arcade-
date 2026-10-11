@@ -32,6 +32,8 @@ public class AppDbContext(DbContextOptions<AppDbContext> options)
     public DbSet<AuditLog> AuditLogs => Set<AuditLog>();
     public DbSet<RefreshToken> RefreshTokens => Set<RefreshToken>();
 
+    public const string OrderNumberSequence = "order_number_seq";
+
     protected override void OnModelCreating(ModelBuilder builder)
     {
         base.OnModelCreating(builder);
@@ -49,6 +51,9 @@ public class AppDbContext(DbContextOptions<AppDbContext> options)
         builder.ApplyConfigurationsFromAssembly(typeof(AppDbContext).Assembly);
         SeedData.Apply(builder);
         ApplySoftDeleteFilters(builder);
+
+        // Readable order numbers: RC-10001, RC-10002, … (never reused, even if a checkout rolls back).
+        builder.HasSequence<int>(OrderNumberSequence).StartsAt(10001);
     }
 
     /// <summary>Hides soft-deleted rows from every query. Use <c>IgnoreQueryFilters()</c> to see them (e.g. history views).</summary>

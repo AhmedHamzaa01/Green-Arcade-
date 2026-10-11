@@ -69,7 +69,7 @@ Identity tables (`asp_net_users`, roles, claims) come from ASP.NET Core Identity
 | Table | Key columns | Notes |
 | --- | --- | --- |
 | `user_profiles` | user_id (PK, FK), full_name, photo_url, phone, points_balance int | Balance is a cache of the ledger sum, updated in the same transaction; `CHECK (points_balance >= 0)` |
-| `addresses` | id, user_id, city, area, street, building, notes, is_default | |
+| `addresses` | id, user_id, full_name, phone, city, area, street, building, notes, is_default | Recipient name and phone for the courier; one default per user |
 | `points_ledger` | id, user_id, amount int, type (earn/redeem/reverse/adjust), source_type, source_id, reason, created_by, created_at | Append-only; index on (user_id, created_at desc) |
 | `submission_categories` | id, name, points_reward, tracks_weight bool, is_active | tracks_weight = true for can collection, clean-up |
 | `submissions` | id, user_id, category_id, photo_url, note, weight_kg numeric(8,2) null, status, reviewed_by, reviewed_at, reject_reason, created_at | weight_kg feeds the future Rotahope tracker |
@@ -80,8 +80,8 @@ Identity tables (`asp_net_users`, roles, claims) come from ASP.NET Core Identity
 | `product_variants` | id, product_id, name, sku, stock int, price_override null | Every product has at least one variant; `CHECK (stock >= 0)` |
 | `product_images` | id, product_id, url, sort_order | |
 | `carts` / `cart_items` | cart: id, user_id · item: cart_id, variant_id, quantity | |
-| `orders` | id, order_number, user_id, payment_method (points/cod), status, total_egp, total_points, total_reward_points, shipping address snapshot (jsonb), created_at | |
-| `order_items` | id, order_id, variant_id, product_name, unit_price_egp, unit_price_points, unit_reward_points, quantity | Snapshot of prices and rewards at checkout |
+| `orders` | id, order_number (RC-10001… from sequence `order_number_seq`), user_id, payment_method (points/cod), status, total_egp, total_points, total_reward_points, shipping address snapshot (jsonb), created_at | |
+| `order_items` | id, order_id, variant_id, product_name, variant_name, image_url, unit_price_egp, unit_price_points, unit_reward_points, quantity | Snapshot of names, photo, prices and rewards at checkout |
 | `order_status_history` | id, order_id, from_status, to_status, changed_by, changed_at | |
 | `refresh_tokens` | id, user_id, token_hash, created_at, expires_at, revoked_at | Only the SHA-256 hash is stored; single use (FR-03) |
 | `settings` | key, value (jsonb) | daily_submission_limit |

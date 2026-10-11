@@ -4,9 +4,12 @@ using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using RowCycle.Application.Addresses;
 using RowCycle.Application.Audit;
 using RowCycle.Application.Auth;
+using RowCycle.Application.Cart;
 using RowCycle.Application.Catalog;
+using RowCycle.Application.Orders;
 using RowCycle.Application.Common;
 using RowCycle.Application.Points;
 using RowCycle.Application.Settings;
@@ -51,6 +54,9 @@ public static class DependencyInjection
         services.AddScoped<IAuditLogRepository, AuditLogRepository>();
         services.AddScoped<IProductCategoryRepository, ProductCategoryRepository>();
         services.AddScoped<IProductRepository, ProductRepository>();
+        services.AddScoped<IAddressRepository, AddressRepository>();
+        services.AddScoped<ICartRepository, CartRepository>();
+        services.AddScoped<IOrderRepository, OrderRepository>();
 
         services.AddOptions<StorageOptions>().Bind(configuration.GetSection(StorageOptions.SectionName));
         services.AddSingleton<IFileStorage, LocalFileStorage>();

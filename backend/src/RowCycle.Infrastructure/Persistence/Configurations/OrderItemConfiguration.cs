@@ -14,6 +14,8 @@ internal sealed class OrderItemConfiguration : IEntityTypeConfiguration<OrderIte
             t.HasCheckConstraint("ck_order_items_unit_reward_points_non_negative", "unit_reward_points >= 0");
         });
         builder.Property(x => x.ProductName).HasMaxLength(200);
+        builder.Property(x => x.VariantName).HasMaxLength(100);
+        builder.Property(x => x.ImageUrl).HasMaxLength(500);
         builder.HasOne<ProductVariant>().WithMany().HasForeignKey(x => x.VariantId).OnDelete(DeleteBehavior.Restrict);
     }
 }
