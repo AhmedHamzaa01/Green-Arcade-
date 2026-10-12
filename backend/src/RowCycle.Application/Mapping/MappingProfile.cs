@@ -20,6 +20,7 @@ internal sealed class MappingProfile : Profile
         MapAudit();
         MapCatalog();
         MapOrders();
+        MapSubmissions();
     }
 
     private void MapAuth()
@@ -117,6 +118,28 @@ internal sealed class MappingProfile : Profile
             .ForCtorParam(nameof(OrderSummaryResponse.ItemCount), o => o.MapFrom(order => order.Items.Sum(i => i.Quantity)))
             .ForCtorParam(nameof(OrderSummaryResponse.RecipientName), o => o.MapFrom(order => order.ShippingAddress.FullName))
             .ForCtorParam(nameof(OrderSummaryResponse.City), o => o.MapFrom(order => order.ShippingAddress.City));
+    }
+
+    private void MapSubmissions()
+    {
+        CreateMap<SubmissionCategory, SubmissionCategoryResponse>();
+
+        // Built by hand: the fields come from the submission, its category and the member's name.
+        CreateMap<Submissions.SubmissionView, SubmissionResponse>().ConvertUsing(v => new SubmissionResponse(
+            v.Submission.Id,
+            v.Submission.UserId,
+            v.MemberName,
+            v.Submission.CategoryId,
+            v.Submission.Category!.Name,
+            v.Submission.Category.PointsReward,
+            v.Submission.PhotoUrl,
+            v.Submission.Note,
+            v.Submission.WeightKg,
+            v.Submission.Status,
+            v.Submission.ReviewedBy,
+            v.Submission.ReviewedAt,
+            v.Submission.RejectReason,
+            v.Submission.CreatedAt));
     }
 
     /// <summary>The first image in display order, or null.</summary>

@@ -35,8 +35,19 @@ export const routes: Routes = [
     ],
   },
 
+  // Actions (F3): submitting needs a confirmed email; the page explains when it's missing.
+  {
+    path: 'actions',
+    canActivate: [authGuard],
+    children: [
+      { path: 'new', loadComponent: () => import('./features/actions/new-submission').then((m) => m.NewSubmission) },
+      { path: 'mine', loadComponent: () => import('./features/actions/my-submissions').then((m) => m.MySubmissions) },
+      { path: '', pathMatch: 'full', redirectTo: 'mine' },
+    ],
+  },
+
   // Staff area (F8): only staff even load this code; each page also checks its own roles.
-  { path: 'admin', canMatch: [roleGuard('Admin', 'StoreManager')], loadChildren: () => import('./features/admin/admin.routes').then((m) => m.adminRoutes) },
+  { path: 'admin', canMatch: [roleGuard('Admin', 'StoreManager', 'Moderator')], loadChildren: () => import('./features/admin/admin.routes').then((m) => m.adminRoutes) },
 
   { path: '**', loadComponent: () => import('./features/not-found').then((m) => m.NotFound) },
 ];

@@ -13,6 +13,7 @@ using RowCycle.Application.Orders;
 using RowCycle.Application.Common;
 using RowCycle.Application.Points;
 using RowCycle.Application.Settings;
+using RowCycle.Application.Submissions;
 using RowCycle.Application.Users;
 using RowCycle.Infrastructure.Auth;
 using RowCycle.Infrastructure.Email;
@@ -57,6 +58,7 @@ public static class DependencyInjection
         services.AddScoped<IAddressRepository, AddressRepository>();
         services.AddScoped<ICartRepository, CartRepository>();
         services.AddScoped<IOrderRepository, OrderRepository>();
+        services.AddScoped<ISubmissionRepository, SubmissionRepository>();
 
         services.AddOptions<StorageOptions>().Bind(configuration.GetSection(StorageOptions.SectionName));
         services.AddSingleton<IFileStorage, LocalFileStorage>();

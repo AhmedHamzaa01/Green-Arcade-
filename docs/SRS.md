@@ -106,7 +106,7 @@ Base path `/api/v1`. JSON in and out; errors use RFC 7807 Problem Details; lists
 | GET | /me/points | Member | Balance + ledger (paged) |
 | GET | /me/badges | Member | Earned badges |
 | GET | /submission-categories | Member | Categories + points |
-| POST | /submissions | Member | Create (multipart: photo + fields) |
+| POST | /submissions | Member | Create (multipart: `photo`, `categoryId`, `note`, `weightKg`); confirmed email required |
 | GET | /me/submissions | Member | Own submissions |
 | GET | /products, /products/{slug} | Public | Catalog |
 | GET | /product-categories | Public | Categories |
@@ -115,8 +115,8 @@ Base path `/api/v1`. JSON in and out; errors use RFC 7807 Problem Details; lists
 | GET | /me/orders, /me/orders/{id} | Member | Order history |
 | POST | /me/orders/{id}/cancel | Member | Cancel (Placed only) |
 | GET | /admin/dashboard | Staff | Counts |
-| GET | /admin/submissions | Moderator | Queue (filter by status) |
-| POST | /admin/submissions/{id}/approve, /reject | Moderator | Review |
+| GET | /admin/submissions, /admin/submissions/{id} | Moderator | Queue, oldest first (filter by status); one submission |
+| POST | /admin/submissions/{id}/approve, /reject | Moderator | Review (Pending only; reject needs a reason) |
 | CRUD | /admin/product-categories | StoreManager | Categories (delete refused while products remain) |
 | CRUD | /admin/products, /admin/products/{id}/variants/{variantId} | StoreManager | Products and variants (stock); a product always keeps one variant |
 | POST / DELETE / PUT | /admin/products/{id}/images, …/images/{imageId}, …/images/order | StoreManager | Product photos (JPG/PNG/WEBP ≤ 10 MB, checked by content), served read-only under `/media` |

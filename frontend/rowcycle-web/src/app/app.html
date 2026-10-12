@@ -8,10 +8,11 @@
   <nav class="desktop-nav">
     <a mat-button routerLink="/products" routerLinkActive="active">{{ 'nav.store' | transloco }}</a>
     @if (session.isLoggedIn()) {
+      <a mat-button routerLink="/actions" routerLinkActive="active">{{ 'nav.actions' | transloco }}</a>
       <a mat-button routerLink="/account/profile" routerLinkActive="active">{{ 'nav.profile' | transloco }}</a>
       <a mat-button routerLink="/account/points" routerLinkActive="active">{{ 'nav.points' | transloco }}</a>
     }
-    @if (session.hasRole('Admin', 'StoreManager')) {
+    @if (session.hasRole('Admin', 'StoreManager', 'Moderator')) {
       <button mat-button [matMenuTriggerFor]="adminMenu">
         {{ 'nav.admin' | transloco }}<mat-icon iconPositionEnd>expand_more</mat-icon>
       </button>
@@ -47,8 +48,11 @@
   <ng-container *ngTemplateOutlet="staffLinks" />
 </mat-menu>
 
-<!-- Staff links, by role: store managers manage the catalog; admins see everything. -->
+<!-- Staff links, by role: moderators review submissions; store managers manage the catalog; admins see everything. -->
 <ng-template #staffLinks>
+  @if (session.hasRole('Admin', 'Moderator')) {
+    <a mat-menu-item routerLink="/admin/submissions"><mat-icon>fact_check</mat-icon>{{ 'nav.submissions' | transloco }}</a>
+  }
   @if (session.hasRole('Admin', 'StoreManager')) {
     <a mat-menu-item routerLink="/admin/orders"><mat-icon>local_shipping</mat-icon>{{ 'nav.staffOrders' | transloco }}</a>
     <a mat-menu-item routerLink="/admin/products"><mat-icon>inventory_2</mat-icon>{{ 'nav.products' | transloco }}</a>
@@ -71,12 +75,14 @@
   <a mat-menu-item routerLink="/"><mat-icon>home</mat-icon>{{ 'nav.home' | transloco }}</a>
   <a mat-menu-item routerLink="/products"><mat-icon>storefront</mat-icon>{{ 'nav.store' | transloco }}</a>
   @if (session.isLoggedIn()) {
+    <a mat-menu-item routerLink="/actions/new"><mat-icon>add_a_photo</mat-icon>{{ 'nav.newAction' | transloco }}</a>
+    <a mat-menu-item routerLink="/actions/mine"><mat-icon>photo_library</mat-icon>{{ 'nav.myActions' | transloco }}</a>
     <a mat-menu-item routerLink="/account/profile"><mat-icon>person</mat-icon>{{ 'nav.profile' | transloco }}</a>
     <a mat-menu-item routerLink="/account/points"><mat-icon>stars</mat-icon>{{ 'nav.points' | transloco }}</a>
     <a mat-menu-item routerLink="/account/orders"><mat-icon>receipt_long</mat-icon>{{ 'nav.orders' | transloco }}</a>
     <a mat-menu-item routerLink="/account/addresses"><mat-icon>home</mat-icon>{{ 'nav.addresses' | transloco }}</a>
   }
-  @if (session.hasRole('Admin', 'StoreManager')) {
+  @if (session.hasRole('Admin', 'StoreManager', 'Moderator')) {
     <mat-divider />
     <ng-container *ngTemplateOutlet="staffLinks" />
   }

@@ -20,7 +20,11 @@
     "cart": "Cart",
     "orders": "My orders",
     "addresses": "Addresses",
-    "staffOrders": "Orders"
+    "staffOrders": "Orders",
+    "actions": "Actions",
+    "newAction": "New action",
+    "myActions": "My actions",
+    "submissions": "Submissions"
   },
   "common": {
     "close": "Close",
@@ -52,6 +56,7 @@
     "required": "This field is required.",
     "email": "Enter a valid email address.",
     "minlength": "Must be at least {{ requiredLength }} characters.",
+    "maxlength": "Must be at most {{ requiredLength }} characters.",
     "passwordLetter": "Must contain a letter.",
     "passwordDigit": "Must contain a digit.",
     "min": "Must be at least {{ min }}.",
@@ -139,7 +144,59 @@
       }
     }
   },
+  "actions": {
+    "points": "{{ points }} points",
+    "new": {
+      "title": "New action",
+      "subtitle": "Share a photo of what you did. A moderator checks it, then the points are yours.",
+      "unverified": "Confirm your email address before submitting actions. Check your inbox for the link.",
+      "category": "What did you do?",
+      "photo": "Photo",
+      "choosePhoto": "Choose photo",
+      "changePhoto": "Change photo",
+      "photoHint": "JPG, PNG or WEBP, up to 10 MB.",
+      "photoRequired": "Add a photo of the action.",
+      "photoType": "Use a JPG, PNG or WEBP photo.",
+      "photoSize": "The photo is larger than 10 MB.",
+      "weight": "Weight",
+      "weightHint": "Optional. Roughly how much you collected.",
+      "note": "Note",
+      "submit": "Submit",
+      "sent": "Sent! A moderator will review it soon."
+    },
+    "mine": {
+      "title": "My actions",
+      "empty": "No actions yet. Submit a photo to start earning points.",
+      "waiting": "Waiting for review.",
+      "earned": "Approved: you earned {{ points }} points.",
+      "rejected": "Not approved: {{ reason }}"
+    }
+  },
+  "submissionStatus": {
+    "Pending": "Pending",
+    "Approved": "Approved",
+    "Rejected": "Rejected"
+  },
   "admin": {
+    "submissions": {
+      "title": "Submissions",
+      "subtitle": "Check each photo, then approve it (the member gets the points) or reject it with a reason.",
+      "empty": "Nothing here. All caught up!",
+      "back": "All submissions",
+      "photoAlt": "Photo from {{ member }}",
+      "member": "Member",
+      "sent": "Sent",
+      "points": "Points",
+      "reviewed": "Reviewed",
+      "approve": "Approve",
+      "reject": "Reject",
+      "approveConfirm": "Approve this action? {{ member }} gets {{ points }} points.",
+      "approved": "Approved. The points were added.",
+      "rejectTitle": "Reject this action",
+      "reason": "Reason",
+      "reasonHint": "The member sees this.",
+      "rejected": "Rejected."
+    },
     "settings": {
       "title": "Settings",
       "dailySubmissionLimit": "Daily submission limit",

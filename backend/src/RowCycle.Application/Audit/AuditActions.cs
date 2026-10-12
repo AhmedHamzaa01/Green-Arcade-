@@ -22,4 +22,7 @@ public static class AuditActions
     public const string ImageReorder = "product_image.reorder";
 
     public const string OrderStatusChange = "order.status";
+
+    public const string SubmissionApprove = "submission.approve";
+    public const string SubmissionReject = "submission.reject";
 }

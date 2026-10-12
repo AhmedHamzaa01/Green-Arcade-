@@ -8,6 +8,7 @@ using RowCycle.Application.Catalog;
 using RowCycle.Application.Orders;
 using RowCycle.Application.Points;
 using RowCycle.Application.Settings;
+using RowCycle.Application.Submissions;
 
 namespace RowCycle.Application;
 
@@ -29,6 +30,8 @@ public static class DependencyInjection
         services.AddScoped<OrderWorkflow>();
         services.AddScoped<IOrderService, OrderService>();
         services.AddScoped<IOrderAdminService, OrderAdminService>();
+        services.AddScoped<ISubmissionService, SubmissionService>();
+        services.AddScoped<ISubmissionModerationService, SubmissionModerationService>();
         return services;
     }
 }

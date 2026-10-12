@@ -340,3 +340,36 @@ export interface OrderSummary {
   city: string;
   createdAt: string;
 }
+
+// Submissions (F3)
+export type SubmissionStatus = 'Pending' | 'Approved' | 'Rejected';
+
+export interface SubmissionCategory {
+  id: string;
+  name: string;
+  pointsReward: number;
+  tracksWeight: boolean;
+}
+
+export interface Submission {
+  id: string;
+  userId: string;
+  memberName: string;
+  categoryId: string;
+  categoryName: string;
+  categoryPoints: number;
+  photoUrl: string;
+  note: string | null;
+  weightKg: number | null;
+  status: SubmissionStatus;
+  reviewedBy: string | null;
+  reviewedAt: string | null;
+  rejectReason: string | null;
+  createdAt: string;
+}
+
+export interface CreateSubmissionRequest {
+  categoryId: string;
+  note: string | null;
+  weightKg: number | null;
+}
