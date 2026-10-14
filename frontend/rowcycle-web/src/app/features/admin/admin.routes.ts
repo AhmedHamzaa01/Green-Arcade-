@@ -19,6 +19,8 @@ export const adminRoutes: Routes = [
   // Admins only
   { path: 'settings', canMatch: [roleGuard('Admin')], loadComponent: () => import('./settings').then((m) => m.Settings) },
   { path: 'audit-log', canMatch: [roleGuard('Admin')], loadComponent: () => import('./audit-log').then((m) => m.AuditLog) },
+  { path: 'badges', canMatch: [roleGuard('Admin')], loadComponent: () => import('./badges').then((m) => m.AdminBadges) },
+  { path: 'submission-categories', canMatch: [roleGuard('Admin')], loadComponent: () => import('./submission-categories').then((m) => m.AdminSubmissionCategories) },
 
   // Each role lands on its own first page.
   { path: '', pathMatch: 'full', redirectTo: () => (inject(AuthSession).hasRole('Admin', 'StoreManager') ? 'products' : 'submissions') },

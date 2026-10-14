@@ -9,11 +9,19 @@ public sealed record SubmissionView(Submission Submission, string MemberName);
 
 public interface ISubmissionRepository
 {
-    /// <summary>Active categories, by name.</summary>
-    Task<IReadOnlyList<SubmissionCategory>> ListActiveCategoriesAsync(CancellationToken cancellationToken = default);
+    /// <summary>Categories that aren't deleted, by name; only active ones when <paramref name="activeOnly"/>.</summary>
+    Task<IReadOnlyList<SubmissionCategory>> ListCategoriesAsync(bool activeOnly, CancellationToken cancellationToken = default);
 
-    /// <summary>Includes soft-deleted categories, so an old submission can still be reviewed.</summary>
+    /// <summary>Tracked. Includes soft-deleted categories, so an old submission can still be reviewed; check <c>DeletedAt</c>.</summary>
     Task<SubmissionCategory?> FindCategoryAsync(Guid categoryId, CancellationToken cancellationToken = default);
+
+    /// <summary>Whether another category that isn't deleted has this name (case-insensitive).</summary>
+    Task<bool> CategoryNameTakenAsync(string name, Guid exceptId, CancellationToken cancellationToken = default);
+
+    void AddCategory(SubmissionCategory category);
+
+    /// <summary>Soft delete; past submissions keep pointing to it.</summary>
+    void RemoveCategory(SubmissionCategory category);
 
     /// <summary>
     /// Locks the member's profile row until the transaction ends, so two uploads at the same moment

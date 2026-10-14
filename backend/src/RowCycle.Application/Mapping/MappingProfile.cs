@@ -123,6 +123,7 @@ internal sealed class MappingProfile : Profile
     private void MapSubmissions()
     {
         CreateMap<SubmissionCategory, SubmissionCategoryResponse>();
+        CreateMap<SubmissionCategory, AdminSubmissionCategoryResponse>();
 
         // Built by hand: the fields come from the submission, its category and the member's name.
         CreateMap<Submissions.SubmissionView, SubmissionResponse>().ConvertUsing(v => new SubmissionResponse(

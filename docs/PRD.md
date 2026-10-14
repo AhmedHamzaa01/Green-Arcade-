@@ -75,7 +75,7 @@ Priority: **Must** = needed for the MVP launch, **Should** = in the MVP if time 
 
 *As a member, I want badges for milestones so progress feels visible.*
 
-- Admin defines badges with a rule: total approved submissions ≥ N, or approved submissions in a category ≥ N, or first order placed.
+- Admin defines badges with a rule: total approved submissions ≥ N, or approved submissions in a category ≥ N, or first order delivered (so a cancelled order doesn't count).
 - Badges are awarded automatically when the rule is met and shown on the profile.
 
 ### F5 — Store catalog (Must)

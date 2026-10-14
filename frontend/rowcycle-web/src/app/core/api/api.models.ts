@@ -373,3 +373,43 @@ export interface CreateSubmissionRequest {
   note: string | null;
   weightKg: number | null;
 }
+
+export interface AdminSubmissionCategory extends SubmissionCategory {
+  isActive: boolean;
+}
+
+export interface SaveSubmissionCategoryRequest {
+  name: string;
+  pointsReward: number;
+  tracksWeight: boolean;
+  isActive: boolean;
+}
+
+// Badges (F4)
+export type BadgeRuleType = 'TotalApproved' | 'CategoryApproved' | 'FirstOrder';
+
+export interface Badge {
+  id: string;
+  name: string;
+  /** A Material icon name from GET /admin/badges/icons. */
+  icon: string;
+  ruleType: BadgeRuleType;
+  ruleCategoryId: string | null;
+  ruleCategoryName: string | null;
+  threshold: number;
+}
+
+export interface SaveBadgeRequest {
+  name: string;
+  icon: string;
+  ruleType: BadgeRuleType;
+  ruleCategoryId: string | null;
+  threshold: number;
+}
+
+export interface MyBadge {
+  id: string;
+  name: string;
+  icon: string;
+  awardedAt: string;
+}

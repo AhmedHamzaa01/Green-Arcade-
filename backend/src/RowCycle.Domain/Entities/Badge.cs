@@ -7,7 +7,8 @@ public class Badge : ISoftDeletable
 {
     public Guid Id { get; set; }
     public string Name { get; set; } = string.Empty;
-    public string? IconUrl { get; set; }
+    /// <summary>A Material icon name from <see cref="Constants.BadgeIcons.All"/>.</summary>
+    public string Icon { get; set; } = Constants.BadgeIcons.Default;
     public BadgeRuleType RuleType { get; set; }
 
     /// <summary>Set only for <see cref="BadgeRuleType.CategoryApproved"/>.</summary>

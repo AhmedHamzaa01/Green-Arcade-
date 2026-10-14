@@ -25,4 +25,12 @@ public static class AuditActions
 
     public const string SubmissionApprove = "submission.approve";
     public const string SubmissionReject = "submission.reject";
+
+    public const string SubmissionCategoryCreate = "submission_category.create";
+    public const string SubmissionCategoryUpdate = "submission_category.update";
+    public const string SubmissionCategoryDelete = "submission_category.delete";
+
+    public const string BadgeCreate = "badge.create";
+    public const string BadgeUpdate = "badge.update";
+    public const string BadgeDelete = "badge.delete";
 }

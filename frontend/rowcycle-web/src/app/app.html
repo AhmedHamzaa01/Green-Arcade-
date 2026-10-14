@@ -59,6 +59,8 @@
     <a mat-menu-item routerLink="/admin/categories"><mat-icon>category</mat-icon>{{ 'nav.categories' | transloco }}</a>
   }
   @if (session.hasRole('Admin')) {
+    <a mat-menu-item routerLink="/admin/submission-categories"><mat-icon>checklist</mat-icon>{{ 'nav.actionCategories' | transloco }}</a>
+    <a mat-menu-item routerLink="/admin/badges"><mat-icon>emoji_events</mat-icon>{{ 'nav.badges' | transloco }}</a>
     <a mat-menu-item routerLink="/admin/settings"><mat-icon>tune</mat-icon>{{ 'nav.settings' | transloco }}</a>
     <a mat-menu-item routerLink="/admin/audit-log"><mat-icon>history</mat-icon>{{ 'nav.auditLog' | transloco }}</a>
   }

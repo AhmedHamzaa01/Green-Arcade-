@@ -20,7 +20,7 @@ internal sealed class SubmissionService(
     private const string PhotoFolder = "submissions";
 
     public async Task<IReadOnlyList<SubmissionCategoryResponse>> GetCategoriesAsync(CancellationToken cancellationToken = default) =>
-        mapper.Map<List<SubmissionCategoryResponse>>(await submissions.ListActiveCategoriesAsync(cancellationToken));
+        mapper.Map<List<SubmissionCategoryResponse>>(await submissions.ListCategoriesAsync(activeOnly: true, cancellationToken));
 
     public async Task<SubmissionResponse> CreateAsync(
         Guid userId, CreateSubmissionRequest request, FileUpload photo, CancellationToken cancellationToken = default)

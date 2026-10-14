@@ -7,6 +7,7 @@ using Microsoft.Extensions.DependencyInjection.Extensions;
 using RowCycle.Application.Addresses;
 using RowCycle.Application.Audit;
 using RowCycle.Application.Auth;
+using RowCycle.Application.Badges;
 using RowCycle.Application.Cart;
 using RowCycle.Application.Catalog;
 using RowCycle.Application.Orders;
@@ -59,6 +60,7 @@ public static class DependencyInjection
         services.AddScoped<ICartRepository, CartRepository>();
         services.AddScoped<IOrderRepository, OrderRepository>();
         services.AddScoped<ISubmissionRepository, SubmissionRepository>();
+        services.AddScoped<IBadgeRepository, BadgeRepository>();
 
         services.AddOptions<StorageOptions>().Bind(configuration.GetSection(StorageOptions.SectionName));
         services.AddSingleton<IFileStorage, LocalFileStorage>();

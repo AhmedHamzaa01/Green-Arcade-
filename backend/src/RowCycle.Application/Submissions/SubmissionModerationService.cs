@@ -1,6 +1,7 @@
 using AutoMapper;
 using FluentValidation;
 using RowCycle.Application.Audit;
+using RowCycle.Application.Badges;
 using RowCycle.Application.Common;
 using RowCycle.Application.Dtos;
 using RowCycle.Application.Points;
@@ -12,6 +13,7 @@ namespace RowCycle.Application.Submissions;
 internal sealed class SubmissionModerationService(
     ISubmissionRepository submissions,
     IPointsService points,
+    BadgeAwarder awarder,
     IAuditLogService audit,
     IUnitOfWork unitOfWork,
     IValidator<SubmissionQuery> queryValidator,
@@ -48,6 +50,9 @@ internal sealed class SubmissionModerationService(
                 await points.EarnAsync(submission.UserId, category.PointsReward, PointsSourceType.Submission, submission.Id,
                     $"Action approved: {category.Name}", moderatorId, ct);
             }
+
+            // FR-12: badges reached by this approval, in the same transaction.
+            await awarder.AwardAsync(submission.UserId, BadgeTrigger.SubmissionApproved, ct);
 
             audit.Record(moderatorId, AuditActions.SubmissionApprove, "submission", submissionId.ToString(),
                 new { submission.UserId, category = category.Name, points = category.PointsReward });

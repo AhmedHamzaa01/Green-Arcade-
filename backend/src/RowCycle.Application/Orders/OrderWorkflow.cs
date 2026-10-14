@@ -1,3 +1,4 @@
+using RowCycle.Application.Badges;
 using RowCycle.Application.Common;
 using RowCycle.Domain.Entities;
 using RowCycle.Domain.Enums;
@@ -9,7 +10,8 @@ namespace RowCycle.Application.Orders;
 /// Moves an order to a new status with everything that goes with it. Must run inside the caller's transaction
 /// with the order already locked (FR-16, FR-17, FR-18, rule 2).
 /// </summary>
-internal sealed class OrderWorkflow(IOrderRepository orders, Points.IPointsService points, TimeProvider timeProvider)
+internal sealed class OrderWorkflow(
+    IOrderRepository orders, Points.IPointsService points, BadgeAwarder awarder, TimeProvider timeProvider)
 {
     public async Task MoveAsync(Order order, OrderStatus to, Guid changedBy, CancellationToken cancellationToken)
     {
@@ -47,6 +49,12 @@ internal sealed class OrderWorkflow(IOrderRepository orders, Points.IPointsServi
             ChangedAt = timeProvider.GetUtcNow(),
         });
         order.Status = to;
+
+        // FR-12: after the status is set, so the "first order" rule sees this delivery. Any order counts, with or without rewards.
+        if (to == OrderStatus.Delivered)
+        {
+            await awarder.AwardAsync(order.UserId, BadgeTrigger.OrderDelivered, cancellationToken);
+        }
     }
 
     private async Task RestoreStockAsync(Order order, CancellationToken cancellationToken)

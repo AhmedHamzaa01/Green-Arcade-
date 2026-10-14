@@ -2,7 +2,10 @@ import { HttpClient, HttpContext, HttpParams } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import { Observable } from 'rxjs';
 import { SKIP_ERROR_TOAST } from '../http-context';
-import { CreateSubmissionRequest, PagedResult, Submission, SubmissionCategory, SubmissionStatus } from './api.models';
+import {
+  AdminSubmissionCategory, CreateSubmissionRequest, PagedResult, SaveSubmissionCategoryRequest, Submission, SubmissionCategory,
+  SubmissionStatus,
+} from './api.models';
 
 /** Photo-verified actions: the member side (F3). */
 @Injectable({ providedIn: 'root' })
@@ -57,5 +60,32 @@ export class ModerationApi {
 
   reject(id: string, reason: string): Observable<Submission> {
     return this.http.post<Submission>(`/api/v1/admin/submissions/${id}/reject`, { reason });
+  }
+}
+
+/** The actions members can submit and their points (Admin). */
+@Injectable({ providedIn: 'root' })
+export class SubmissionCategoriesAdminApi {
+  private readonly http = inject(HttpClient);
+
+  list(): Observable<AdminSubmissionCategory[]> {
+    return this.http.get<AdminSubmissionCategory[]>('/api/v1/admin/submission-categories');
+  }
+
+  // The form shows its own validation errors.
+  create(request: SaveSubmissionCategoryRequest): Observable<AdminSubmissionCategory> {
+    return this.http.post<AdminSubmissionCategory>('/api/v1/admin/submission-categories', request, {
+      context: new HttpContext().set(SKIP_ERROR_TOAST, true),
+    });
+  }
+
+  update(id: string, request: SaveSubmissionCategoryRequest): Observable<AdminSubmissionCategory> {
+    return this.http.put<AdminSubmissionCategory>(`/api/v1/admin/submission-categories/${id}`, request, {
+      context: new HttpContext().set(SKIP_ERROR_TOAST, true),
+    });
+  }
+
+  delete(id: string): Observable<void> {
+    return this.http.delete<void>(`/api/v1/admin/submission-categories/${id}`);
   }
 }

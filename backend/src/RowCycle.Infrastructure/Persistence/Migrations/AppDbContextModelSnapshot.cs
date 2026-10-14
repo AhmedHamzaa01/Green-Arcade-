@@ -289,10 +289,11 @@ namespace RowCycle.Infrastructure.Persistence.Migrations
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("deleted_at");
 
-                    b.Property<string>("IconUrl")
-                        .HasMaxLength(500)
-                        .HasColumnType("character varying(500)")
-                        .HasColumnName("icon_url");
+                    b.Property<string>("Icon")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)")
+                        .HasColumnName("icon");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -316,6 +317,11 @@ namespace RowCycle.Infrastructure.Persistence.Migrations
 
                     b.HasKey("Id")
                         .HasName("pk_badges");
+
+                    b.HasIndex("Name")
+                        .IsUnique()
+                        .HasDatabaseName("ix_badges_name")
+                        .HasFilter("deleted_at IS NULL");
 
                     b.HasIndex("RuleCategoryId")
                         .HasDatabaseName("ix_badges_rule_category_id");

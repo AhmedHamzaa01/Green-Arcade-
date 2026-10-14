@@ -73,7 +73,7 @@ Identity tables (`asp_net_users`, roles, claims) come from ASP.NET Core Identity
 | `points_ledger` | id, user_id, amount int, type (earn/redeem/reverse/adjust), source_type, source_id, reason, created_by, created_at | Append-only; index on (user_id, created_at desc) |
 | `submission_categories` | id, name, points_reward, tracks_weight bool, is_active | tracks_weight = true for can collection, clean-up |
 | `submissions` | id, user_id, category_id, photo_url, note, weight_kg numeric(8,2) null, status, reviewed_by, reviewed_at, reject_reason, created_at | weight_kg feeds the future Rotahope tracker |
-| `badges` | id, name, icon_url, rule_type, rule_category_id null, threshold | |
+| `badges` | id, name, icon, rule_type, rule_category_id null, threshold | icon = a Material icon name from a fixed list; name unique among non-deleted badges; threshold 1 for FirstOrder |
 | `user_badges` | user_id, badge_id, awarded_at | PK (user_id, badge_id) |
 | `product_categories` | id, name, slug, sort_order, is_active | |
 | `products` | id, category_id, name, slug, description, price_egp, price_points int null, reward_points int default 0, is_active, product_type, created_at | product_type keeps room for B2B items later; `CHECK (reward_points >= 0)` |
@@ -123,7 +123,8 @@ Base path `/api/v1`. JSON in and out; errors use RFC 7807 Problem Details; lists
 | GET / PUT | /admin/orders, /admin/orders/{id}/status | StoreManager | Orders |
 | GET / PUT | /admin/users, /admin/users/{id}/role, /block | Admin | Users |
 | POST | /admin/users/{id}/points-adjustments | Admin | Manual points |
-| CRUD | /admin/badges, /admin/submission-categories | Admin | Rules |
+| CRUD | /admin/badges, /admin/submission-categories | Admin | Rules (a category used by a badge can't be deleted) |
+| GET | /admin/badges/icons | Admin | Icon names a badge can use |
 | GET / PUT | /admin/settings | Admin | Settings |
 | GET | /admin/audit-logs | Admin | Audit log, newest first (filter by entity, entity id, user) |
 

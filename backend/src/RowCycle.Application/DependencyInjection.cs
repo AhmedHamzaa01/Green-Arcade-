@@ -3,6 +3,7 @@ using Microsoft.Extensions.DependencyInjection;
 using RowCycle.Application.Addresses;
 using RowCycle.Application.Audit;
 using RowCycle.Application.Auth;
+using RowCycle.Application.Badges;
 using RowCycle.Application.Cart;
 using RowCycle.Application.Catalog;
 using RowCycle.Application.Orders;
@@ -32,6 +33,9 @@ public static class DependencyInjection
         services.AddScoped<IOrderAdminService, OrderAdminService>();
         services.AddScoped<ISubmissionService, SubmissionService>();
         services.AddScoped<ISubmissionModerationService, SubmissionModerationService>();
+        services.AddScoped<ISubmissionCategoryAdminService, SubmissionCategoryAdminService>();
+        services.AddScoped<BadgeAwarder>();
+        services.AddScoped<IBadgeService, BadgeService>();
         return services;
     }
 }

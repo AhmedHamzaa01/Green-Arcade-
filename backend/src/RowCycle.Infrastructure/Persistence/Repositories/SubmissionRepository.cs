@@ -8,14 +8,21 @@ namespace RowCycle.Infrastructure.Persistence.Repositories;
 
 internal sealed class SubmissionRepository(AppDbContext db) : ISubmissionRepository
 {
-    public async Task<IReadOnlyList<SubmissionCategory>> ListActiveCategoriesAsync(CancellationToken cancellationToken = default) =>
+    public async Task<IReadOnlyList<SubmissionCategory>> ListCategoriesAsync(bool activeOnly, CancellationToken cancellationToken = default) =>
         await db.SubmissionCategories.AsNoTracking()
-            .Where(c => c.IsActive)
+            .Where(c => !activeOnly || c.IsActive)
             .OrderBy(c => c.Name)
             .ToListAsync(cancellationToken);
 
     public Task<SubmissionCategory?> FindCategoryAsync(Guid categoryId, CancellationToken cancellationToken = default) =>
         db.SubmissionCategories.IgnoreQueryFilters().SingleOrDefaultAsync(c => c.Id == categoryId, cancellationToken);
+
+    public Task<bool> CategoryNameTakenAsync(string name, Guid exceptId, CancellationToken cancellationToken = default) =>
+        db.SubmissionCategories.AnyAsync(c => c.Id != exceptId && c.Name.ToLower() == name.ToLower(), cancellationToken);
+
+    public void AddCategory(SubmissionCategory category) => db.SubmissionCategories.Add(category);
+
+    public void RemoveCategory(SubmissionCategory category) => db.SubmissionCategories.Remove(category);
 
     public async Task LockMemberAsync(Guid userId, CancellationToken cancellationToken = default)
     {
