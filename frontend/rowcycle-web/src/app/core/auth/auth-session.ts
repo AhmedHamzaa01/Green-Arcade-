@@ -53,6 +53,10 @@ export class AuthSession {
     this.refreshInFlight ??= this.api.refresh().pipe(
       map((response) => {
         this.accessToken.set(response.accessToken);
+        // A refresh mid-session can mean an admin changed this user's roles: update the menu in the background.
+        if (this.user()) {
+          void this.reloadUser().catch(() => undefined);
+        }
         return response.accessToken;
       }),
       finalize(() => (this.refreshInFlight = null)),

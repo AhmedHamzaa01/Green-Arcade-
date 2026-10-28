@@ -50,6 +50,7 @@
 
 <!-- Staff links, by role: moderators review submissions; store managers manage the catalog; admins see everything. -->
 <ng-template #staffLinks>
+  <a mat-menu-item routerLink="/admin/dashboard"><mat-icon>dashboard</mat-icon>{{ 'nav.dashboard' | transloco }}</a>
   @if (session.hasRole('Admin', 'Moderator')) {
     <a mat-menu-item routerLink="/admin/submissions"><mat-icon>fact_check</mat-icon>{{ 'nav.submissions' | transloco }}</a>
   }
@@ -59,6 +60,7 @@
     <a mat-menu-item routerLink="/admin/categories"><mat-icon>category</mat-icon>{{ 'nav.categories' | transloco }}</a>
   }
   @if (session.hasRole('Admin')) {
+    <a mat-menu-item routerLink="/admin/users"><mat-icon>group</mat-icon>{{ 'nav.users' | transloco }}</a>
     <a mat-menu-item routerLink="/admin/submission-categories"><mat-icon>checklist</mat-icon>{{ 'nav.actionCategories' | transloco }}</a>
     <a mat-menu-item routerLink="/admin/badges"><mat-icon>emoji_events</mat-icon>{{ 'nav.badges' | transloco }}</a>
     <a mat-menu-item routerLink="/admin/settings"><mat-icon>tune</mat-icon>{{ 'nav.settings' | transloco }}</a>

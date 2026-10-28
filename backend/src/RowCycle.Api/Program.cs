@@ -46,6 +46,20 @@ builder.Services.AddOptions<JwtBearerOptions>(JwtBearerDefaults.AuthenticationSc
             RoleClaimType = AppClaimTypes.Role,
             ClockSkew = TimeSpan.FromSeconds(30),
         };
+
+        // A valid signature isn't enough: a blocked user, or one whose roles changed, gets 401 right away.
+        // The web app then refreshes (new roles) or, if blocked, the refresh fails and it shows the login page.
+        options.Events = new JwtBearerEvents
+        {
+            OnTokenValidated = async context =>
+            {
+                var validator = context.HttpContext.RequestServices.GetRequiredService<TokenSessionValidator>();
+                if (await validator.ValidateAsync(context.Principal!, context.HttpContext.RequestAborted) is { } reason)
+                {
+                    context.Fail($"Access token no longer valid: {reason}.");
+                }
+            },
+        };
     });
 builder.Services.AddAppAuthorization();
 builder.Services.AddAppRateLimiting(builder.Configuration);

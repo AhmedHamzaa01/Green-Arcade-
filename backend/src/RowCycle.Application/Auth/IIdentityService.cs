@@ -28,7 +28,11 @@ public interface IIdentityService
     Task<IdentityOutcome> ResetPasswordAsync(Guid userId, string token, string newPassword, CancellationToken cancellationToken = default);
 }
 
-public sealed record UserAccount(Guid Id, string Email, bool EmailConfirmed, bool IsActive);
+/// <param name="SecurityStamp">
+/// Changes whenever the user's access must be re-checked (blocked, roles changed, password reset). Access tokens carry a copy;
+/// a token with an old copy is refused.
+/// </param>
+public sealed record UserAccount(Guid Id, string Email, bool EmailConfirmed, bool IsActive, string SecurityStamp);
 
 public enum PasswordCheck
 {

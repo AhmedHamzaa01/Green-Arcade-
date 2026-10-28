@@ -10,6 +10,7 @@ internal static class SeedData
 {
     private const int DefaultSubmissionPoints = 10; // DECISIONS 2026-10-04
     private const int DefaultDailySubmissionLimit = 5; // FR-09
+    private const int DefaultLowStockThreshold = 5; // DECISIONS 2026-10-14
 
     public static void Apply(ModelBuilder builder)
     {
@@ -36,7 +37,8 @@ internal static class SeedData
             ProductCategory("b3d85dc1-e1d2-4a6f-bf53-6fd374a3bce0", "Branded merch", "branded-merch", 4));
 
         builder.Entity<Setting>().HasData(
-            new Setting { Key = SettingKeys.DailySubmissionLimit, Value = DefaultDailySubmissionLimit.ToString() });
+            new Setting { Key = SettingKeys.DailySubmissionLimit, Value = DefaultDailySubmissionLimit.ToString() },
+            new Setting { Key = SettingKeys.LowStockThreshold, Value = DefaultLowStockThreshold.ToString() });
     }
 
     private static AppRole Role(string id, string name) => new()

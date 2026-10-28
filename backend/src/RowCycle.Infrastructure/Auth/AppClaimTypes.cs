@@ -9,4 +9,10 @@ public static class AppClaimTypes
 
     /// <summary>"true" once the user confirmed their email (FR-02).</summary>
     public const string EmailVerified = "email_verified";
+
+    /// <summary>
+    /// A copy of the user's security stamp when the token was issued. Checked on every request, so blocking a user
+    /// or changing their roles takes effect immediately instead of when the 15-minute token expires.
+    /// </summary>
+    public const string Stamp = "stamp";
 }

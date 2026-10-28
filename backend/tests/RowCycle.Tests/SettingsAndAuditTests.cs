@@ -22,7 +22,7 @@ public sealed class SettingsAndAuditTests(ApiFactory factory)
 
         try
         {
-            var response = await admin.PutAsJsonAsync("/api/v1/admin/settings", new UpdateSettingsRequest(newValue));
+            var response = await admin.PutAsJsonAsync("/api/v1/admin/settings", new UpdateSettingsRequest(newValue, 5));
 
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
             Assert.Equal(newValue, (await response.Content.ReadFromJsonAsync<SettingsResponse>())!.DailySubmissionLimit);
@@ -37,7 +37,7 @@ public sealed class SettingsAndAuditTests(ApiFactory factory)
         }
         finally
         {
-            await admin.PutAsJsonAsync("/api/v1/admin/settings", new UpdateSettingsRequest(before));
+            await admin.PutAsJsonAsync("/api/v1/admin/settings", new UpdateSettingsRequest(before, 5));
         }
     }
 
@@ -49,7 +49,7 @@ public sealed class SettingsAndAuditTests(ApiFactory factory)
         var admin = await TestAuth.AdminClientAsync(factory);
         var logsBefore = await CountSettingsLogsAsync(admin);
 
-        var response = await admin.PutAsJsonAsync("/api/v1/admin/settings", new UpdateSettingsRequest(value));
+        var response = await admin.PutAsJsonAsync("/api/v1/admin/settings", new UpdateSettingsRequest(value, 5));
 
         Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
         using var body = JsonDocument.Parse(await response.Content.ReadAsStringAsync());
@@ -64,7 +64,7 @@ public sealed class SettingsAndAuditTests(ApiFactory factory)
         var current = (await admin.GetFromJsonAsync<SettingsResponse>("/api/v1/admin/settings"))!.DailySubmissionLimit;
         var logsBefore = await CountSettingsLogsAsync(admin);
 
-        var response = await admin.PutAsJsonAsync("/api/v1/admin/settings", new UpdateSettingsRequest(current));
+        var response = await admin.PutAsJsonAsync("/api/v1/admin/settings", new UpdateSettingsRequest(current, 5));
 
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
         Assert.Equal(logsBefore, await CountSettingsLogsAsync(admin));
@@ -77,7 +77,7 @@ public sealed class SettingsAndAuditTests(ApiFactory factory)
         var anonymous = factory.CreateClient();
 
         Assert.Equal(HttpStatusCode.Forbidden, (await member.GetAsync("/api/v1/admin/settings")).StatusCode);
-        Assert.Equal(HttpStatusCode.Forbidden, (await member.PutAsJsonAsync("/api/v1/admin/settings", new UpdateSettingsRequest(3))).StatusCode);
+        Assert.Equal(HttpStatusCode.Forbidden, (await member.PutAsJsonAsync("/api/v1/admin/settings", new UpdateSettingsRequest(3, 5))).StatusCode);
         Assert.Equal(HttpStatusCode.Forbidden, (await member.GetAsync("/api/v1/admin/audit-logs")).StatusCode);
         Assert.Equal(HttpStatusCode.Unauthorized, (await anonymous.GetAsync("/api/v1/admin/settings")).StatusCode);
         Assert.Equal(HttpStatusCode.Unauthorized, (await anonymous.GetAsync("/api/v1/admin/audit-logs")).StatusCode);
@@ -90,8 +90,8 @@ public sealed class SettingsAndAuditTests(ApiFactory factory)
         var before = (await admin.GetFromJsonAsync<SettingsResponse>("/api/v1/admin/settings"))!.DailySubmissionLimit;
         try
         {
-            await admin.PutAsJsonAsync("/api/v1/admin/settings", new UpdateSettingsRequest(11));
-            await admin.PutAsJsonAsync("/api/v1/admin/settings", new UpdateSettingsRequest(12));
+            await admin.PutAsJsonAsync("/api/v1/admin/settings", new UpdateSettingsRequest(11, 5));
+            await admin.PutAsJsonAsync("/api/v1/admin/settings", new UpdateSettingsRequest(12, 5));
 
             var page = await admin.GetFromJsonAsync<PagedResult<AuditLogResponse>>(
                 "/api/v1/admin/audit-logs?entity=settings&pageSize=2", JsonOptions);
@@ -105,7 +105,7 @@ public sealed class SettingsAndAuditTests(ApiFactory factory)
         }
         finally
         {
-            await admin.PutAsJsonAsync("/api/v1/admin/settings", new UpdateSettingsRequest(before));
+            await admin.PutAsJsonAsync("/api/v1/admin/settings", new UpdateSettingsRequest(before, 5));
         }
     }
 

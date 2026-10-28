@@ -899,6 +899,11 @@ namespace RowCycle.Infrastructure.Persistence.Migrations
                         {
                             Key = "daily_submission_limit",
                             Value = "5"
+                        },
+                        new
+                        {
+                            Key = "low_stock_threshold",
+                            Value = "5"
                         });
                 });
 

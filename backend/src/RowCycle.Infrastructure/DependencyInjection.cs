@@ -10,6 +10,7 @@ using RowCycle.Application.Auth;
 using RowCycle.Application.Badges;
 using RowCycle.Application.Cart;
 using RowCycle.Application.Catalog;
+using RowCycle.Application.Dashboard;
 using RowCycle.Application.Orders;
 using RowCycle.Application.Common;
 using RowCycle.Application.Points;
@@ -61,11 +62,14 @@ public static class DependencyInjection
         services.AddScoped<IOrderRepository, OrderRepository>();
         services.AddScoped<ISubmissionRepository, SubmissionRepository>();
         services.AddScoped<IBadgeRepository, BadgeRepository>();
+        services.AddScoped<IUserDirectory, Users.UserDirectory>();
+        services.AddScoped<IDashboardQueries, DashboardQueries>();
 
         services.AddOptions<StorageOptions>().Bind(configuration.GetSection(StorageOptions.SectionName));
         services.AddSingleton<IFileStorage, LocalFileStorage>();
         services.AddScoped<IIdentityService, IdentityService>();
         services.AddScoped<IRefreshTokenStore, RefreshTokenStore>();
+        services.AddScoped<TokenSessionValidator>();
         services.AddSingleton<IAccessTokenIssuer, JwtAccessTokenIssuer>();
         services.AddSingleton<IEmailSender, LoggingEmailSender>();
 

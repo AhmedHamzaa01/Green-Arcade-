@@ -26,7 +26,15 @@
     "myActions": "My actions",
     "submissions": "Submissions",
     "badges": "Badges",
-    "actionCategories": "Action categories"
+    "actionCategories": "Action categories",
+    "dashboard": "Dashboard",
+    "users": "Users"
+  },
+  "roles": {
+    "Member": "Member",
+    "Moderator": "Moderator",
+    "StoreManager": "Store manager",
+    "Admin": "Admin"
   },
   "common": {
     "close": "Close",
@@ -182,6 +190,61 @@
     "Rejected": "Rejected"
   },
   "admin": {
+    "dashboard": {
+      "title": "Dashboard",
+      "pendingSubmissions": "Submissions waiting for review",
+      "newOrders": "Orders waiting to be confirmed",
+      "lowStock": "Variants with {{ threshold }} or fewer in stock",
+      "lowStockTitle": "Low stock",
+      "product": "Product",
+      "stock": "Stock",
+      "more": "…and {{ count }} more."
+    },
+    "users": {
+      "title": "Users",
+      "subtitle": "Find a member or staff account to change roles, block it, or adjust points.",
+      "search": "Search by name or email",
+      "role": "Role",
+      "status": "Status",
+      "active": "Active",
+      "blocked": "Blocked",
+      "unverified": "Email not confirmed",
+      "empty": "No users match.",
+      "name": "Name",
+      "roles": "Roles",
+      "points": "Points",
+      "back": "All users",
+      "approved": "Approved actions",
+      "pending": "Actions waiting",
+      "orders": "Orders",
+      "badges": "Badges",
+      "adjust": "Adjust points",
+      "block": "Block",
+      "unblock": "Unblock",
+      "blockConfirm": "Block {{ name }}? They are logged out everywhere at once and can't log in until unblocked.",
+      "unblockConfirm": "Unblock {{ name }}? They can log in again.",
+      "blockedDone": "User blocked.",
+      "unblockedDone": "User unblocked.",
+      "saveRoles": "Save roles",
+      "rolesSaved": "Roles saved. They apply on the user's next click.",
+      "rolesHint": "Changes apply immediately, without the user logging out.",
+      "oneRole": "Keep at least one role.",
+      "roleHints": {
+        "Member": "Submit actions, earn points, shop",
+        "Moderator": "Review submissions",
+        "StoreManager": "Products, stock and orders",
+        "Admin": "Everything, including users and settings"
+      },
+      "history": "Points history",
+      "noHistory": "No points movements yet.",
+      "adjustTitle": "Adjust points for {{ name }}",
+      "currentBalance": "Current balance: {{ points }} points.",
+      "amount": "Amount",
+      "amountHint": "Positive adds points, negative removes them. The balance can't go below 0.",
+      "reason": "Reason",
+      "reasonHint": "The member sees this in their points history.",
+      "adjusted": "Points adjusted."
+    },
     "badges": {
       "title": "Badges",
       "subtitle": "Milestones members earn automatically after an approved action or a delivered order.",
@@ -249,6 +312,8 @@
       "title": "Settings",
       "dailySubmissionLimit": "Daily submission limit",
       "dailySubmissionLimitHint": "How many photos a member can submit per day (1–50).",
+      "lowStockThreshold": "Low stock threshold",
+      "lowStockThresholdHint": "Variants with this stock or less show on the dashboard (0–1000).",
       "saved": "Settings saved."
     },
     "audit": {

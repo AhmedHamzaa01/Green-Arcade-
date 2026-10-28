@@ -13,6 +13,9 @@ public static class Policies
     public const string StoreManager = nameof(StoreManager);
     public const string Admin = nameof(Admin);
 
+    /// <summary>Any staff role: the dashboard (F8).</summary>
+    public const string Staff = nameof(Staff);
+
     public static IServiceCollection AddAppAuthorization(this IServiceCollection services)
     {
         services.AddAuthorizationBuilder()
@@ -21,7 +24,8 @@ public static class Policies
                 .RequireClaim(AppClaimTypes.EmailVerified, "true"))
             .AddPolicy(Moderator, p => p.RequireRole(Roles.Moderator, Roles.Admin))
             .AddPolicy(StoreManager, p => p.RequireRole(Roles.StoreManager, Roles.Admin))
-            .AddPolicy(Admin, p => p.RequireRole(Roles.Admin));
+            .AddPolicy(Admin, p => p.RequireRole(Roles.Admin))
+            .AddPolicy(Staff, p => p.RequireRole(Roles.Moderator, Roles.StoreManager, Roles.Admin));
         return services;
     }
 }

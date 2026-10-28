@@ -4,4 +4,7 @@ public static class SettingKeys
 {
     /// <summary>Max submissions per member per day (FR-09). Default 5.</summary>
     public const string DailySubmissionLimit = "daily_submission_limit";
+
+    /// <summary>Variants with this stock or less are listed as low stock on the staff dashboard (F8). Default 5.</summary>
+    public const string LowStockThreshold = "low_stock_threshold";
 }

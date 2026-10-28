@@ -71,6 +71,22 @@ describe('authInterceptor', () => {
     expect(retry.request.headers.get('Authorization')).toBe('Bearer fresh');
     retry.flush({ ok: true });
     expect(await result).toEqual({ ok: true });
+    (await vi.waitFor(() => httpMock.expectOne('/api/v1/me'))).flush(member);   // background user reload
+  });
+
+  it('reloads the user after a refresh, so roles an admin changed reach the menu', async () => {
+    await loginWithToken('expired');
+
+    const result = firstValueFrom(http.get('/api/v1/me/points'));
+    httpMock.expectOne('/api/v1/me/points').flush(null, { status: 401, statusText: 'Unauthorized' });
+    httpMock.expectOne('/api/v1/auth/refresh').flush({ accessToken: 'fresh', accessTokenExpiresAt: '' });
+    httpMock.expectOne('/api/v1/me/points').flush({});
+    await result;
+
+    const reload = await vi.waitFor(() => httpMock.expectOne('/api/v1/me'));
+    expect(reload.request.headers.get('Authorization')).toBe('Bearer fresh');
+    reload.flush({ ...member, roles: ['Member', 'Moderator'] });
+    await vi.waitFor(() => expect(session.hasRole('Moderator')).toBe(true));
   });
 
   it('shares one refresh between requests that fail at the same time', async () => {
@@ -84,7 +100,10 @@ describe('authInterceptor', () => {
     // Only one refresh call, because each refresh token works once.
     httpMock.expectOne('/api/v1/auth/refresh').flush({ accessToken: 'fresh', accessTokenExpiresAt: '' });
     httpMock.expectOne('/api/v1/me/points').flush({});
-    httpMock.expectOne('/api/v1/me').flush(member);
+    // The retried GET /me plus the background user reload after the refresh.
+    const meCalls = httpMock.match('/api/v1/me');
+    expect(meCalls).toHaveLength(2);
+    meCalls.forEach((call) => call.flush(member));
     await Promise.all([first, second]);
   });
 

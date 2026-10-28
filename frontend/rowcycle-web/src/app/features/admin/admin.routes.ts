@@ -1,7 +1,5 @@
-import { inject } from '@angular/core';
 import { Routes } from '@angular/router';
 import { roleGuard } from '../../core/auth/auth.guards';
-import { AuthSession } from '../../core/auth/auth-session';
 
 export const adminRoutes: Routes = [
   // Catalog: store managers and admins
@@ -21,7 +19,10 @@ export const adminRoutes: Routes = [
   { path: 'audit-log', canMatch: [roleGuard('Admin')], loadComponent: () => import('./audit-log').then((m) => m.AuditLog) },
   { path: 'badges', canMatch: [roleGuard('Admin')], loadComponent: () => import('./badges').then((m) => m.AdminBadges) },
   { path: 'submission-categories', canMatch: [roleGuard('Admin')], loadComponent: () => import('./submission-categories').then((m) => m.AdminSubmissionCategories) },
+  { path: 'users', canMatch: [roleGuard('Admin')], loadComponent: () => import('./users').then((m) => m.AdminUsers) },
+  { path: 'users/:id', canMatch: [roleGuard('Admin')], loadComponent: () => import('./user-detail').then((m) => m.AdminUserDetailPage) },
 
-  // Each role lands on its own first page.
-  { path: '', pathMatch: 'full', redirectTo: () => (inject(AuthSession).hasRole('Admin', 'StoreManager') ? 'products' : 'submissions') },
+  // Every staff role starts on the dashboard.
+  { path: 'dashboard', loadComponent: () => import('./dashboard').then((m) => m.AdminDashboard) },
+  { path: '', pathMatch: 'full', redirectTo: 'dashboard' },
 ];

@@ -36,6 +36,12 @@ import { PageHeader } from '../../shared/page-header';
                 <mat-hint>{{ 'admin.settings.dailySubmissionLimitHint' | transloco }}</mat-hint>
                 <mat-error>{{ form.controls.dailySubmissionLimit | fieldError }}</mat-error>
               </mat-form-field>
+              <mat-form-field>
+                <mat-label>{{ 'admin.settings.lowStockThreshold' | transloco }}</mat-label>
+                <input matInput type="number" min="0" max="1000" formControlName="lowStockThreshold" />
+                <mat-hint>{{ 'admin.settings.lowStockThresholdHint' | transloco }}</mat-hint>
+                <mat-error>{{ form.controls.lowStockThreshold | fieldError }}</mat-error>
+              </mat-form-field>
               @if (error()) {
                 <p class="form-error" role="alert">{{ error() }}</p>
               }
@@ -59,6 +65,7 @@ export class Settings implements OnInit {
 
   protected readonly form = inject(FormBuilder).nonNullable.group({
     dailySubmissionLimit: [5, [Validators.required, Validators.min(1), Validators.max(50)]],
+    lowStockThreshold: [5, [Validators.required, Validators.min(0), Validators.max(1000)]],
   });
   protected readonly loaded = signal(false);
   protected readonly saving = signal(false);

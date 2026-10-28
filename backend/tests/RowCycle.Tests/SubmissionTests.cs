@@ -223,7 +223,7 @@ public sealed class SubmissionTests(ApiFactory factory)
     }
 
     private static async Task SetDailyLimitAsync(HttpClient admin, int limit) =>
-        Assert.Equal(HttpStatusCode.OK, (await admin.PutAsJsonAsync("/api/v1/admin/settings", new UpdateSettingsRequest(limit))).StatusCode);
+        Assert.Equal(HttpStatusCode.OK, (await admin.PutAsJsonAsync("/api/v1/admin/settings", new UpdateSettingsRequest(limit, 5))).StatusCode);
 
     private static async Task<int> AuditCountAsync(HttpClient admin, Guid submissionId) =>
         (await admin.GetFromJsonAsync<PagedResult<AuditLogResponse>>(

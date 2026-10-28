@@ -33,4 +33,9 @@ public static class AuditActions
     public const string BadgeCreate = "badge.create";
     public const string BadgeUpdate = "badge.update";
     public const string BadgeDelete = "badge.delete";
+
+    public const string UserRoles = "user.roles";
+    public const string UserBlock = "user.block";
+    public const string UserUnblock = "user.unblock";
+    public const string PointsAdjust = "points.adjust";
 }

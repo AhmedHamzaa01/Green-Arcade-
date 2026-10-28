@@ -6,10 +6,12 @@ using RowCycle.Application.Auth;
 using RowCycle.Application.Badges;
 using RowCycle.Application.Cart;
 using RowCycle.Application.Catalog;
+using RowCycle.Application.Dashboard;
 using RowCycle.Application.Orders;
 using RowCycle.Application.Points;
 using RowCycle.Application.Settings;
 using RowCycle.Application.Submissions;
+using RowCycle.Application.Users;
 
 namespace RowCycle.Application;
 
@@ -36,6 +38,8 @@ public static class DependencyInjection
         services.AddScoped<ISubmissionCategoryAdminService, SubmissionCategoryAdminService>();
         services.AddScoped<BadgeAwarder>();
         services.AddScoped<IBadgeService, BadgeService>();
+        services.AddScoped<IUserAdminService, UserAdminService>();
+        services.AddScoped<IDashboardService, DashboardService>();
         return services;
     }
 }

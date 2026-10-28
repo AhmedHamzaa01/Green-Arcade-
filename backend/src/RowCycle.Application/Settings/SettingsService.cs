@@ -16,21 +16,27 @@ internal sealed class SettingsService(
 {
     /// <summary>Used when a setting row is missing.</summary>
     public const int DefaultDailySubmissionLimit = 5;
+    public const int DefaultLowStockThreshold = 5;
 
     public async Task<SettingsResponse> GetAsync(CancellationToken cancellationToken = default) =>
-        new(await GetDailySubmissionLimitAsync(cancellationToken));
+        new(await GetDailySubmissionLimitAsync(cancellationToken), await GetLowStockThresholdAsync(cancellationToken));
 
     public Task<int> GetDailySubmissionLimitAsync(CancellationToken cancellationToken = default) =>
         GetIntAsync(SettingKeys.DailySubmissionLimit, DefaultDailySubmissionLimit, cancellationToken);
+
+    public Task<int> GetLowStockThresholdAsync(CancellationToken cancellationToken = default) =>
+        GetIntAsync(SettingKeys.LowStockThreshold, DefaultLowStockThreshold, cancellationToken);
 
     public async Task<SettingsResponse> UpdateAsync(
         UpdateSettingsRequest request, Guid adminId, CancellationToken cancellationToken = default)
     {
         await validator.ValidateAndThrowAsync(request, cancellationToken);
 
-        await unitOfWork.ExecuteInTransactionAsync(
-            ct => SetIntAsync(SettingKeys.DailySubmissionLimit, request.DailySubmissionLimit, DefaultDailySubmissionLimit, adminId, ct),
-            cancellationToken);
+        await unitOfWork.ExecuteInTransactionAsync(async ct =>
+        {
+            await SetIntAsync(SettingKeys.DailySubmissionLimit, request.DailySubmissionLimit, DefaultDailySubmissionLimit, adminId, ct);
+            await SetIntAsync(SettingKeys.LowStockThreshold, request.LowStockThreshold, DefaultLowStockThreshold, adminId, ct);
+        }, cancellationToken);
 
         return await GetAsync(cancellationToken);
     }
@@ -66,6 +72,9 @@ internal sealed class SettingsService(
 
 public sealed class UpdateSettingsRequestValidator : AbstractValidator<UpdateSettingsRequest>
 {
-    public UpdateSettingsRequestValidator() =>
+    public UpdateSettingsRequestValidator()
+    {
         RuleFor(x => x.DailySubmissionLimit).InclusiveBetween(1, 50);
+        RuleFor(x => x.LowStockThreshold).InclusiveBetween(0, 1000);
+    }
 }

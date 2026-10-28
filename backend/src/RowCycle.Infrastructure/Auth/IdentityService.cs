@@ -84,7 +84,7 @@ internal sealed class IdentityService(UserManager<AppUser> userManager) : IIdent
         ?? throw new InvalidOperationException($"User {userId} not found.");
 
     private static UserAccount? ToAccount(AppUser? user) =>
-        user is null ? null : new UserAccount(user.Id, user.Email!, user.EmailConfirmed, user.IsActive);
+        user is null ? null : new UserAccount(user.Id, user.Email!, user.EmailConfirmed, user.IsActive, user.SecurityStamp ?? string.Empty);
 
     private static IdentityOutcome ToOutcome(IdentityResult result)
     {

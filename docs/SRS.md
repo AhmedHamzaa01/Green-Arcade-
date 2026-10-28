@@ -84,7 +84,7 @@ Identity tables (`asp_net_users`, roles, claims) come from ASP.NET Core Identity
 | `order_items` | id, order_id, variant_id, product_name, variant_name, image_url, unit_price_egp, unit_price_points, unit_reward_points, quantity | Snapshot of names, photo, prices and rewards at checkout |
 | `order_status_history` | id, order_id, from_status, to_status, changed_by, changed_at | |
 | `refresh_tokens` | id, user_id, token_hash, created_at, expires_at, revoked_at | Only the SHA-256 hash is stored; single use (FR-03) |
-| `settings` | key, value (jsonb) | daily_submission_limit |
+| `settings` | key, value (jsonb) | daily_submission_limit (default 5), low_stock_threshold (default 5) |
 | `audit_logs` | id, user_id, action, entity, entity_id text, data jsonb, created_at | entity_id is text so it can hold a uuid or a settings key |
 
 **Deleting data.** Rows in `products`, `product_variants`, `product_images`, `product_categories`, `submission_categories`, `badges` and `addresses` are soft-deleted: a nullable `deleted_at` is set and the row is hidden from queries. Unique slugs, SKUs and names apply only to rows that are not deleted. `points_ledger`, `orders`, `order_items`, `order_status_history`, `submissions` and `audit_logs` are never deleted. Users are deactivated with `asp_net_users.is_active = false`, which blocks login.
@@ -114,15 +114,16 @@ Base path `/api/v1`. JSON in and out; errors use RFC 7807 Problem Details; lists
 | POST | /orders | Member | Checkout |
 | GET | /me/orders, /me/orders/{id} | Member | Order history |
 | POST | /me/orders/{id}/cancel | Member | Cancel (Placed only) |
-| GET | /admin/dashboard | Staff | Counts |
+| GET | /admin/dashboard | Staff (Moderator, StoreManager, Admin) | Pending submissions, Placed orders, low-stock variants |
 | GET | /admin/submissions, /admin/submissions/{id} | Moderator | Queue, oldest first (filter by status); one submission |
 | POST | /admin/submissions/{id}/approve, /reject | Moderator | Review (Pending only; reject needs a reason) |
 | CRUD | /admin/product-categories | StoreManager | Categories (delete refused while products remain) |
 | CRUD | /admin/products, /admin/products/{id}/variants/{variantId} | StoreManager | Products and variants (stock); a product always keeps one variant |
 | POST / DELETE / PUT | /admin/products/{id}/images, …/images/{imageId}, …/images/order | StoreManager | Product photos (JPG/PNG/WEBP ≤ 10 MB, checked by content), served read-only under `/media` |
 | GET / PUT | /admin/orders, /admin/orders/{id}/status | StoreManager | Orders |
-| GET / PUT | /admin/users, /admin/users/{id}/role, /block | Admin | Users |
-| POST | /admin/users/{id}/points-adjustments | Admin | Manual points |
+| GET | /admin/users, /admin/users/{id}, /admin/users/{id}/points | Admin | Search (name/email, role, blocked); one user with counts; their ledger |
+| PUT | /admin/users/{id}/roles, /admin/users/{id}/block | Admin | Set roles (any combination, at least one); block/unblock — both take effect immediately |
+| POST | /admin/users/{id}/points-adjustments | Admin | Manual points (reason required) |
 | CRUD | /admin/badges, /admin/submission-categories | Admin | Rules (a category used by a badge can't be deleted) |
 | GET | /admin/badges/icons | Admin | Icon names a badge can use |
 | GET / PUT | /admin/settings | Admin | Settings |
