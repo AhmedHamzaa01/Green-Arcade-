@@ -1,6 +1,6 @@
 import { HttpErrorResponse } from '@angular/common/http';
 import { AbstractControl, FormGroup } from '@angular/forms';
-import { ProblemDetails } from '../api/api.models';
+import { ProblemDetails } from '../api/models';
 
 /** Reads the API's Problem Details from a failed call; falls back to a generic message. */
 export function toProblem(error: unknown): ProblemDetails {

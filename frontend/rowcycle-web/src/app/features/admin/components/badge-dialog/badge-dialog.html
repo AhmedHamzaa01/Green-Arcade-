@@ -1,0 +1,60 @@
+<form [formGroup]="form" (ngSubmit)="save()">
+  <app-form-dialog [title]="(badge ? 'admin.badges.edit' : 'admin.badges.new') | transloco" [error]="error()" [saving]="saving()">
+    <mat-form-field>
+      <mat-label>{{ 'admin.badges.name' | transloco }}</mat-label>
+      <input matInput formControlName="name" />
+      <mat-error>{{ form.controls.name | fieldError }}</mat-error>
+    </mat-form-field>
+
+    <div>
+      <div class="muted label">{{ 'admin.badges.icon' | transloco }}</div>
+      <div class="icons" role="radiogroup" [attr.aria-label]="'admin.badges.icon' | transloco">
+        @for (icon of icons.value() ?? []; track icon) {
+          <button type="button" class="icon" role="radio" [class.selected]="selectedIcon() === icon"
+                  [attr.aria-checked]="selectedIcon() === icon" [attr.aria-label]="icon" (click)="form.controls.icon.setValue(icon)">
+            <mat-icon>{{ icon }}</mat-icon>
+          </button>
+        }
+      </div>
+      @if (form.controls.icon.errors?.['server']; as message) {
+        <p class="form-error">{{ message }}</p>
+      }
+    </div>
+
+    <mat-form-field>
+      <mat-label>{{ 'admin.badges.rule' | transloco }}</mat-label>
+      <mat-select formControlName="ruleType">
+        @for (rule of rules; track rule) {
+          <mat-option [value]="rule">{{ 'admin.badges.rules.' + rule | transloco }}</mat-option>
+        }
+      </mat-select>
+    </mat-form-field>
+
+    @if (ruleType() === 'CategoryApproved') {
+      <mat-form-field>
+        <mat-label>{{ 'admin.badges.category' | transloco }}</mat-label>
+        <mat-select formControlName="ruleCategoryId">
+          @for (c of categories.value() ?? []; track c.id) {
+            <mat-option [value]="c.id">{{ c.name }}</mat-option>
+          }
+        </mat-select>
+        <mat-error>{{ form.controls.ruleCategoryId | fieldError }}</mat-error>
+      </mat-form-field>
+    }
+
+    @if (ruleType() !== 'FirstOrder') {
+      <mat-form-field>
+        <mat-label>{{ 'admin.badges.threshold' | transloco }}</mat-label>
+        <input matInput type="number" min="1" max="10000" formControlName="threshold" />
+        <mat-hint>{{ 'admin.badges.thresholdHint' | transloco }}</mat-hint>
+        <mat-error>{{ form.controls.threshold | fieldError }}</mat-error>
+      </mat-form-field>
+    } @else {
+      <p class="muted">{{ 'admin.badges.firstOrderHint' | transloco }}</p>
+    }
+
+    @if (!badge) {
+      <p class="muted small">{{ 'admin.badges.newHint' | transloco }}</p>
+    }
+  </app-form-dialog>
+</form>

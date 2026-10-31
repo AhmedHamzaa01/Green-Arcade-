@@ -1,0 +1,6 @@
+import { Routes } from '@angular/router';
+
+/** The landing page. Public. */
+export const homeRoutes: Routes = [
+  { path: '', loadComponent: () => import('./pages/home/home').then((m) => m.Home) },
+];

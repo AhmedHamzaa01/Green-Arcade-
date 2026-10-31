@@ -1,0 +1,36 @@
+:host {
+  display: block;
+  margin-bottom: var(--rc-space-4);
+}
+
+// Search and selects on one row that wraps on narrow screens.
+.row-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--rc-space-3);
+
+  &:empty { display: none; }
+
+  ::ng-deep > mat-form-field { flex: 1 1 180px; max-width: 260px; }
+  .search { flex: 1 1 260px; max-width: none; }
+}
+
+.chips {
+  margin-top: var(--rc-space-3);
+
+  &:empty { display: none; }
+}
+
+// Phones: chips stay on one line and scroll sideways instead of wrapping onto several rows.
+@media (max-width: 719px) {
+  .row-filters ::ng-deep > mat-form-field { max-width: none; }
+
+  .chips {
+    overflow-x: auto;
+    margin-inline: calc(-1 * var(--rc-space-4));
+    padding-inline: var(--rc-space-4);
+    scrollbar-width: none;
+
+    ::ng-deep .mdc-evolution-chip-set__chips { flex-wrap: nowrap; }
+  }
+}

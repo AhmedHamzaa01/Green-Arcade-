@@ -1,0 +1,54 @@
+<div class="page">
+  <app-page-header [title]="'admin.audit.title' | transloco" [subtitle]="'admin.audit.intro' | transloco" />
+
+  <mat-form-field class="filter">
+    <mat-label>{{ 'admin.audit.filter' | transloco }}</mat-label>
+    <mat-select [value]="entity()" (valueChange)="onEntity($event)">
+      <mat-option value="">{{ 'common.all' | transloco }}</mat-option>
+      @for (option of entities; track option) {
+        <mat-option [value]="option">{{ option }}</mat-option>
+      }
+    </mat-select>
+  </mat-form-field>
+
+  @if (logs.value(); as data) {
+    @if (data.total === 0) {
+      <app-empty-state icon="history" [message]="'admin.audit.empty' | transloco" />
+    } @else {
+      <div class="table-wrap">
+        <table mat-table [dataSource]="data.items">
+          <ng-container matColumnDef="when">
+            <th mat-header-cell *matHeaderCellDef>{{ 'admin.audit.when' | transloco }}</th>
+            <td mat-cell *matCellDef="let row">{{ row.createdAt | date: 'short' }}</td>
+          </ng-container>
+          <ng-container matColumnDef="action">
+            <th mat-header-cell *matHeaderCellDef>{{ 'admin.audit.action' | transloco }}</th>
+            <td mat-cell *matCellDef="let row"><code>{{ row.action }}</code></td>
+          </ng-container>
+          <ng-container matColumnDef="item">
+            <th mat-header-cell *matHeaderCellDef>{{ 'admin.audit.item' | transloco }}</th>
+            <td mat-cell *matCellDef="let row">{{ row.entity }} / {{ row.entityId }}</td>
+          </ng-container>
+          <ng-container matColumnDef="user">
+            <th mat-header-cell *matHeaderCellDef>{{ 'admin.audit.user' | transloco }}</th>
+            <td mat-cell *matCellDef="let row" [title]="row.userId">{{ row.userId | slice: 0 : 8 }}</td>
+          </ng-container>
+          <ng-container matColumnDef="details">
+            <th mat-header-cell *matHeaderCellDef>{{ 'admin.audit.details' | transloco }}</th>
+            <td mat-cell *matCellDef="let row"><code>{{ row.data | json }}</code></td>
+          </ng-container>
+          <tr mat-header-row *matHeaderRowDef="columns"></tr>
+          <tr mat-row *matRowDef="let row; columns: columns"></tr>
+        </table>
+      </div>
+      <mat-paginator
+        [length]="data.total"
+        [pageIndex]="page() - 1"
+        [pageSize]="pageSize()"
+        [pageSizeOptions]="[10, 20, 50]"
+        (page)="onPage($event)" />
+    }
+  } @else if (logs.isLoading()) {
+    <app-loading />
+  }
+</div>

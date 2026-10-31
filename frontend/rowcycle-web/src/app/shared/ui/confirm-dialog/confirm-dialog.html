@@ -1,0 +1,5 @@
+<mat-dialog-content><p>{{ data.message }}</p></mat-dialog-content>
+<mat-dialog-actions align="end">
+  <button mat-button [mat-dialog-close]="false">{{ 'common.cancel' | transloco }}</button>
+  <button mat-flat-button class="danger" [mat-dialog-close]="true">{{ (data.confirmKey ?? 'common.delete') | transloco }}</button>
+</mat-dialog-actions>

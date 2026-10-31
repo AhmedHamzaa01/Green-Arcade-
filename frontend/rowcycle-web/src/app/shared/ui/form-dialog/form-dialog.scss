@@ -1,0 +1,21 @@
+// The host adds no box of its own, so Material's dialog title/content/actions lay out as usual.
+:host { display: contents; }
+
+.stack {
+  display: flex;
+  flex-direction: column;
+  gap: var(--rc-space-3);
+}
+
+// Two columns on wide screens; projected fields with class "wide" span both.
+.grid {
+  display: grid;
+  gap: 0 var(--rc-space-3);
+  grid-template-columns: 1fr;
+
+  @media (min-width: 600px) {
+    grid-template-columns: 1fr 1fr;
+
+    ::ng-deep .wide { grid-column: 1 / -1; }
+  }
+}

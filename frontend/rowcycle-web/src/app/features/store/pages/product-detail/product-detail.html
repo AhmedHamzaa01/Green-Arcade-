@@ -1,0 +1,78 @@
+<div class="page">
+  <a mat-button routerLink="/products"><mat-icon>arrow_back</mat-icon>{{ 'store.backToStore' | transloco }}</a>
+
+  @if (product.value(); as p) {
+    <div class="layout">
+      <div class="gallery">
+        <div class="main-image">
+          @if (selectedImage(); as url) {
+            <img [src]="url" [alt]="p.name" />
+          } @else {
+            <mat-icon>image</mat-icon>
+          }
+        </div>
+        @if (p.images.length > 1) {
+          <div class="thumbs">
+            @for (image of p.images; track image.id) {
+              <button type="button" class="thumb" [class.selected]="image.url === selectedImage()" (click)="showImage(image.url)">
+                <img [src]="image.url" alt="" />
+              </button>
+            }
+          </div>
+        }
+      </div>
+
+      <div class="info stack">
+        <span class="muted category">{{ p.categoryName }}</span>
+        <h1>{{ p.name }}</h1>
+
+        <div class="price">{{ (variant()?.priceEgp ?? p.priceEgp) | currency: 'EGP' : 'symbol' : '1.0-2' }}</div>
+        @if (p.pricePoints) {
+          <div class="muted">{{ 'store.orPoints' | transloco: { points: (p.pricePoints | number) } }}</div>
+        }
+        @if (p.rewardPoints > 0) {
+          <div class="earn"><mat-icon>stars</mat-icon>{{ 'store.earnPoints' | transloco: { points: p.rewardPoints } }}</div>
+        }
+
+        @if (p.variants.length > 1) {
+          <div>
+            <div class="muted">{{ 'store.variant' | transloco }}</div>
+            <mat-button-toggle-group [value]="variant()?.id" (change)="selectVariant($event.value)">
+              @for (v of p.variants; track v.id) {
+                <mat-button-toggle [value]="v.id" [disabled]="!v.inStock">{{ v.name }}</mat-button-toggle>
+              }
+            </mat-button-toggle-group>
+          </div>
+        }
+
+        @if (variant()?.inStock) {
+          <span class="row positive"><mat-icon>check_circle</mat-icon>{{ 'store.inStock' | transloco }}</span>
+        } @else {
+          <span class="row negative"><mat-icon>block</mat-icon>{{ 'store.outOfStock' | transloco }}</span>
+        }
+
+        @if (variant()?.inStock) {
+          <div class="row">
+            <div class="qty">
+              <button matIconButton (click)="decreaseQuantity()" [disabled]="quantity() <= 1"><mat-icon>remove</mat-icon></button>
+              <span>{{ quantity() }}</span>
+              <button matIconButton (click)="increaseQuantity()" [disabled]="quantity() >= maxQuantity"><mat-icon>add</mat-icon></button>
+            </div>
+            <button mat-flat-button (click)="addToCart()" [disabled]="adding()">
+              <mat-icon>add_shopping_cart</mat-icon>
+              {{ (session.isLoggedIn() ? 'store.addToCart' : 'store.loginToBuy') | transloco }}
+            </button>
+          </div>
+        }
+
+        @if (p.description) {
+          <p class="description">{{ p.description }}</p>
+        }
+      </div>
+    </div>
+  } @else if (product.isLoading()) {
+    <app-loading />
+  } @else if (product.error()) {
+    <app-empty-state icon="search_off" [message]="'store.notFound' | transloco" />
+  }
+</div>

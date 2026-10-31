@@ -1,0 +1,95 @@
+<div class="page">
+  <app-page-header [title]="'checkout.title' | transloco" />
+
+  @if (!session.user()?.emailVerified) {
+    <mat-card><mat-card-content class="row negative"><mat-icon>warning</mat-icon>{{ 'checkout.unverified' | transloco }}</mat-card-content></mat-card>
+  } @else if (cart.cart(); as c) {
+    @if (c.items.length === 0) {
+      <p>{{ 'cart.empty' | transloco }} <a routerLink="/products">{{ 'cart.browse' | transloco }}</a></p>
+    } @else {
+      <mat-stepper linear #stepper orientation="vertical">
+        <!-- 1. Address -->
+        <mat-step [completed]="!!address()" [label]="'checkout.steps.address' | transloco">
+          @if (addresses.value(); as list) {
+            @if (list.length === 0) {
+              <p class="muted">{{ 'checkout.noAddresses' | transloco }}</p>
+            }
+            <mat-radio-group class="stack" [value]="addressId()" (change)="selectAddress($event.value)">
+              @for (a of list; track a.id) {
+                <mat-radio-button [value]="a.id">
+                  <strong>{{ a.fullName }}</strong> · {{ a.phone }}<br />
+                  <span class="muted">{{ a.street }}, {{ a.building }} — {{ a.area }}, {{ a.city }}</span>
+                </mat-radio-button>
+              }
+            </mat-radio-group>
+          }
+          <div class="row actions">
+            <button mat-stroked-button (click)="addAddress()"><mat-icon>add</mat-icon>{{ 'checkout.addAddress' | transloco }}</button>
+            <button mat-flat-button matStepperNext [disabled]="!address()">{{ 'common.next' | transloco }}</button>
+          </div>
+        </mat-step>
+
+        <!-- 2. Payment -->
+        <mat-step [completed]="!!paymentMethod()" [label]="'checkout.steps.payment' | transloco">
+          <mat-radio-group class="stack" [value]="paymentMethod()" (change)="selectPayment($event.value)">
+            <mat-radio-button value="Cod">
+              <strong>{{ 'payment.Cod' | transloco }}</strong><br />
+              <span class="muted">{{ 'checkout.codHint' | transloco }}</span>
+            </mat-radio-button>
+            <mat-radio-button value="Points" [disabled]="!canPayWithPoints()">
+              <strong>{{ 'payment.Points' | transloco }}</strong><br />
+              <span class="muted">
+                @if (!c.canPayWithPoints) {
+                  {{ 'checkout.pointsNoPrice' | transloco }}
+                } @else if (!canPayWithPoints()) {
+                  {{ 'checkout.pointsNotEnough' | transloco: { points: (c.totalPoints | number), balance: (balance() | number) } }}
+                } @else {
+                  {{ 'checkout.pointsHint' | transloco: { points: (c.totalPoints | number), balance: (balance() | number) } }}
+                }
+              </span>
+            </mat-radio-button>
+          </mat-radio-group>
+          <div class="row actions">
+            <button mat-button matStepperPrevious>{{ 'common.back' | transloco }}</button>
+            <button mat-flat-button matStepperNext [disabled]="!paymentMethod()">{{ 'common.next' | transloco }}</button>
+          </div>
+        </mat-step>
+
+        <!-- 3. Review and place -->
+        <mat-step [label]="'checkout.steps.review' | transloco">
+          <div class="review stack">
+            <div>
+              <h3>{{ 'checkout.items' | transloco }}</h3>
+              @for (item of c.items; track item.variantId) {
+                <div class="row between"><span>{{ item.quantity }} × {{ item.productName }} ({{ item.variantName }})</span>
+                  <span>{{ item.lineTotalEgp | currency: 'EGP' : 'symbol' : '1.0-2' }}</span></div>
+              }
+              <div class="muted small">{{ 'checkout.free' | transloco }}</div>
+            </div>
+            @if (address(); as a) {
+              <div><h3>{{ 'checkout.deliverTo' | transloco }}</h3>{{ a.fullName }} · {{ a.phone }}<br /><span class="muted">{{ a.street }}, {{ a.building }} — {{ a.area }}, {{ a.city }}</span></div>
+            }
+            <div><h3>{{ 'checkout.payWith' | transloco }}</h3>{{ 'payment.' + paymentMethod() | transloco }}</div>
+            <div class="row between total">
+              <span>{{ 'checkout.total' | transloco }}</span>
+              @if (paymentMethod() === 'Points') {
+                <strong>{{ 'orders.paidPoints' | transloco: { points: (c.totalPoints | number) } }}</strong>
+              } @else {
+                <strong>{{ c.totalEgp | currency: 'EGP' : 'symbol' : '1.0-2' }}</strong>
+              }
+            </div>
+            @if (c.totalRewardPoints > 0) {
+              <div class="earn"><mat-icon>stars</mat-icon>{{ 'cart.earn' | transloco: { points: c.totalRewardPoints } }}</div>
+            }
+          </div>
+          <div class="row actions">
+            <button mat-button matStepperPrevious>{{ 'common.back' | transloco }}</button>
+            <button mat-flat-button (click)="place()" [disabled]="placing() || c.hasIssues">{{ 'checkout.confirm' | transloco }}</button>
+          </div>
+        </mat-step>
+      </mat-stepper>
+    }
+  } @else {
+    <app-loading />
+  }
+</div>

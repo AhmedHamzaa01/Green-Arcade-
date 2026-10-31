@@ -28,7 +28,21 @@
     "badges": "Badges",
     "actionCategories": "Action categories",
     "dashboard": "Dashboard",
-    "users": "Users"
+    "users": "Users",
+    "main": "Main navigation",
+    "account": "Account",
+    "newActionShort": "Submit",
+    "staffArea": "Staff area"
+  },
+  "staff": {
+    "title": "Staff area",
+    "backToSite": "Back to the site",
+    "groups": {
+      "overview": "Overview",
+      "moderation": "Moderation",
+      "store": "Store",
+      "admin": "Administration"
+    }
   },
   "roles": {
     "Member": "Member",
@@ -54,7 +68,15 @@
     "search": "Search",
     "actions": "Actions",
     "next": "Next",
-    "change": "Change"
+    "change": "Change",
+    "photo": {
+      "alt": "Selected photo",
+      "choose": "Choose photo",
+      "change": "Change photo",
+      "hint": "JPG, PNG or WEBP, up to 10 MB.",
+      "wrongType": "Use a JPG, PNG or WEBP photo.",
+      "tooLarge": "The photo is larger than 10 MB."
+    }
   },
   "errors": {
     "generic": "Something went wrong. Please try again.",
@@ -74,12 +96,27 @@
     "pattern": "Use the expected format."
   },
   "home": {
-    "title": "Welcome to RowCycle",
+    "eyebrow": "Alexandria's green rewards",
+    "title": "Do good for the planet. Get rewarded for it.",
     "intro": "Collect cans, clean the coast, recycle — upload a photo, get points, and spend them on medals, trophies and recycled-aluminium goods.",
-    "storeSoon": "The store is coming soon.",
-    "start": "Create an account",
+    "welcomeBack": "Welcome back, {{ name }}",
+    "memberIntro": "Every approved action adds points to your balance. Keep going — your next reward is closer than you think.",
+    "submitAction": "Submit an action",
+    "start": "Create a free account",
     "goToProfile": "Go to your profile",
-    "browse": "Browse the store"
+    "browse": "Browse the store",
+    "yourPoints": "Your points",
+    "yourBadges": "Badges earned",
+    "yourActions": "Your actions",
+    "howTitle": "How it works",
+    "steps": {
+      "act": { "title": "Do a green action", "text": "Collect cans, join a clean-up, recycle, help animals or people." },
+      "photo": { "title": "Snap a photo", "text": "Upload it in seconds from your phone, with a short note." },
+      "earn": { "title": "Get approved, earn points", "text": "A Row-Cycle moderator checks it and the points land in your balance." },
+      "spend": { "title": "Spend in the store", "text": "Medals, trophies and goods made from recycled aluminium." }
+    },
+    "newInStore": "New in the store",
+    "seeAll": "See all"
   },
   "auth": {
     "email": "Email",
@@ -137,7 +174,8 @@
       "roles": "Roles",
       "viewPoints": "View points history",
       "badges": "Badges",
-      "noBadges": "No badges yet. Approved actions and delivered orders earn them."
+      "noBadges": "No badges yet. Approved actions and delivered orders earn them.",
+      "manage": "Your account"
     },
     "points": {
       "title": "Points history",
@@ -163,13 +201,7 @@
       "subtitle": "Share a photo of what you did. A moderator checks it, then the points are yours.",
       "unverified": "Confirm your email address before submitting actions. Check your inbox for the link.",
       "category": "What did you do?",
-      "photo": "Photo",
-      "choosePhoto": "Choose photo",
-      "changePhoto": "Change photo",
-      "photoHint": "JPG, PNG or WEBP, up to 10 MB.",
       "photoRequired": "Add a photo of the action.",
-      "photoType": "Use a JPG, PNG or WEBP photo.",
-      "photoSize": "The photo is larger than 10 MB.",
       "weight": "Weight",
       "weightHint": "Optional. Roughly how much you collected.",
       "note": "Note",

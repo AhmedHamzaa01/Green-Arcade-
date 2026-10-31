@@ -1,0 +1,75 @@
+<div class="page">
+  <app-page-header [title]="'admin.catalog.products.title' | transloco" [subtitle]="'admin.catalog.products.subtitle' | transloco">
+    <a mat-flat-button class="new" routerLink="/admin/products/new"><mat-icon>add</mat-icon>{{ 'admin.catalog.products.new' | transloco }}</a>
+  </app-page-header>
+
+  <app-filter-bar [searchLabel]="'common.search' | transloco" [searchValue]="search()"
+                  (searchChange)="onSearch($event)">
+    <mat-form-field subscriptSizing="dynamic">
+      <mat-label>{{ 'admin.catalog.products.category' | transloco }}</mat-label>
+      <mat-select [value]="categoryId()" (valueChange)="onCategoryChange($event)">
+        <mat-option value="">{{ 'common.all' | transloco }}</mat-option>
+        @for (c of categories.value() ?? []; track c.id) {
+          <mat-option [value]="c.id">{{ c.name }}</mat-option>
+        }
+      </mat-select>
+    </mat-form-field>
+  </app-filter-bar>
+
+  @if (products.value(); as data) {
+    @if (data.total === 0) {
+      <app-empty-state icon="inventory_2" [message]="'admin.catalog.products.empty' | transloco" />
+    } @else {
+      <div class="table-wrap">
+        <table mat-table [dataSource]="data.items">
+          <ng-container matColumnDef="image">
+            <th mat-header-cell *matHeaderCellDef></th>
+            <td mat-cell *matCellDef="let p">
+              @if (p.imageUrl) { <img class="thumb" [src]="p.imageUrl" alt="" /> } @else { <mat-icon class="muted">image</mat-icon> }
+            </td>
+          </ng-container>
+          <ng-container matColumnDef="name">
+            <th mat-header-cell *matHeaderCellDef>{{ 'admin.catalog.products.name' | transloco }}</th>
+            <td mat-cell *matCellDef="let p">
+              <a [routerLink]="['/admin/products', p.id]">{{ p.name }}</a>
+              <div class="muted small">{{ p.categoryName }}</div>
+            </td>
+          </ng-container>
+          <ng-container matColumnDef="price">
+            <th mat-header-cell *matHeaderCellDef>{{ 'admin.catalog.products.price' | transloco }}</th>
+            <td mat-cell *matCellDef="let p">
+              {{ p.priceEgp | currency: 'EGP' : 'symbol' : '1.0-2' }}
+              @if (p.pricePoints) { <div class="muted small">{{ p.pricePoints }} pts</div> }
+            </td>
+          </ng-container>
+          <ng-container matColumnDef="stock">
+            <th mat-header-cell *matHeaderCellDef>{{ 'admin.catalog.products.stock' | transloco }}</th>
+            <td mat-cell *matCellDef="let p" [class.negative]="p.totalStock === 0">
+              {{ p.totalStock }}
+              <div class="muted small">{{ 'admin.catalog.products.variants' | transloco: { count: p.variantCount } }}</div>
+            </td>
+          </ng-container>
+          <ng-container matColumnDef="status">
+            <th mat-header-cell *matHeaderCellDef>{{ 'admin.catalog.products.status' | transloco }}</th>
+            <td mat-cell *matCellDef="let p" [class]="p.isActive ? 'positive' : 'muted'">
+              {{ (p.isActive ? 'common.active' : 'common.inactive') | transloco }}
+            </td>
+          </ng-container>
+          <ng-container matColumnDef="actions">
+            <th mat-header-cell *matHeaderCellDef></th>
+            <td mat-cell *matCellDef="let p" class="actions">
+              <a matIconButton [routerLink]="['/admin/products', p.id]" [attr.aria-label]="'common.edit' | transloco"><mat-icon>edit</mat-icon></a>
+              <button matIconButton (click)="remove(p)" [attr.aria-label]="'common.delete' | transloco"><mat-icon>delete</mat-icon></button>
+            </td>
+          </ng-container>
+          <tr mat-header-row *matHeaderRowDef="columns"></tr>
+          <tr mat-row *matRowDef="let row; columns: columns"></tr>
+        </table>
+      </div>
+      <mat-paginator [length]="data.total" [pageIndex]="page() - 1" [pageSize]="pageSize()"
+        [pageSizeOptions]="[10, 20, 50]" (page)="onPage($event)" />
+    }
+  } @else if (products.isLoading()) {
+    <app-loading />
+  }
+</div>

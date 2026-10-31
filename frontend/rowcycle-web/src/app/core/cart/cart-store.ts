@@ -1,6 +1,6 @@
 import { Injectable, computed, effect, inject, signal } from '@angular/core';
 import { firstValueFrom } from 'rxjs';
-import { Cart } from '../api/api.models';
+import { Cart } from '../api/models';
 import { ShopApi } from '../api/shop-api';
 import { AuthSession } from '../auth/auth-session';
 

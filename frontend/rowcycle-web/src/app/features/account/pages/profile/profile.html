@@ -1,0 +1,68 @@
+@if (session.user(); as user) {
+  <div class="page-form">
+    <!-- Identity -->
+    <section class="identity">
+      <span class="avatar">{{ user.fullName.charAt(0) }}</span>
+      <div class="who">
+        <h1>{{ user.fullName }}</h1>
+        <div class="muted">{{ user.email }}</div>
+        <div class="row tags">
+          @if (user.emailVerified) {
+            <span class="tag ok"><mat-icon>verified</mat-icon>{{ 'account.profile.verified' | transloco }}</span>
+          } @else {
+            <span class="tag warn"><mat-icon>warning</mat-icon>{{ 'account.profile.notVerified' | transloco }}</span>
+          }
+          @for (role of user.roles; track role) {
+            <span class="tag">{{ 'roles.' + role | transloco }}</span>
+          }
+        </div>
+      </div>
+    </section>
+    @if (!user.emailVerified) {
+      <p class="hint">{{ 'account.profile.notVerifiedHint' | transloco }}</p>
+    }
+
+    <!-- Numbers -->
+    <div class="stats">
+      <app-stat-card icon="stars" [value]="(user.pointsBalance | number) ?? '0'" [label]="'account.profile.points' | transloco" link="/account/points" />
+      <app-stat-card icon="emoji_events" [value]="badges.value()?.length ?? 0" [label]="'account.profile.badges' | transloco" />
+    </div>
+
+    <!-- F4: earned badges, newest first -->
+    <h2 class="section-title">{{ 'account.profile.badges' | transloco }}</h2>
+    @if (badges.value(); as list) {
+      @if (list.length === 0) {
+        <mat-card><mat-card-content class="no-badges">
+          <span class="muted">{{ 'account.profile.noBadges' | transloco }}</span>
+          <a mat-stroked-button routerLink="/actions/new">{{ 'nav.newAction' | transloco }}</a>
+        </mat-card-content></mat-card>
+      } @else {
+        <ul class="badge-list">
+          @for (b of list; track b.id) {
+            <li>
+              <span class="badge-icon"><mat-icon>{{ b.icon }}</mat-icon></span>
+              <span class="badge-name">{{ b.name }}</span>
+              <span class="muted small">{{ b.awardedAt | date: 'mediumDate' }}</span>
+            </li>
+          }
+        </ul>
+      }
+    }
+
+    <!-- Everything else about the account -->
+    <h2 class="section-title">{{ 'account.profile.manage' | transloco }}</h2>
+    <mat-card>
+      <mat-card-content class="link-list">
+        <a routerLink="/actions/mine"><mat-icon>photo_library</mat-icon>{{ 'nav.myActions' | transloco }}<mat-icon class="chevron">chevron_right</mat-icon></a>
+        <a routerLink="/account/orders"><mat-icon>receipt_long</mat-icon>{{ 'nav.orders' | transloco }}<mat-icon class="chevron">chevron_right</mat-icon></a>
+        <a routerLink="/account/addresses"><mat-icon>home_pin</mat-icon>{{ 'nav.addresses' | transloco }}<mat-icon class="chevron">chevron_right</mat-icon></a>
+        <a routerLink="/account/points"><mat-icon>stars</mat-icon>{{ 'account.profile.viewPoints' | transloco }}<mat-icon class="chevron">chevron_right</mat-icon></a>
+        @if (session.hasRole('Admin', 'StoreManager', 'Moderator')) {
+          <a routerLink="/admin"><mat-icon>space_dashboard</mat-icon>{{ 'nav.staffArea' | transloco }}<mat-icon class="chevron">chevron_right</mat-icon></a>
+        }
+      </mat-card-content>
+    </mat-card>
+
+    <button mat-stroked-button class="logout danger" (click)="logout()"><mat-icon>logout</mat-icon>{{ 'nav.logout' | transloco }}</button>
+  </div>
+}

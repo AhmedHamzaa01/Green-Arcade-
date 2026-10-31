@@ -1,0 +1,65 @@
+<div class="page">
+  <a mat-button routerLink="/admin/users"><mat-icon>arrow_back</mat-icon>{{ 'admin.users.back' | transloco }}</a>
+  @if (user.value(); as u) {
+    <div class="grid">
+      <mat-card>
+        <mat-card-content class="stack">
+          <div>
+            <h2>{{ u.fullName }}</h2>
+            <div class="muted">{{ u.email }}@if (u.phone) { · {{ u.phone }} }</div>
+          </div>
+          <div class="row">
+            <span [class]="u.isActive ? 'positive' : 'negative'">
+              {{ (u.isActive ? 'admin.users.active' : 'admin.users.blocked') | transloco }}
+            </span>
+            @if (!u.emailVerified) { <span class="muted">· {{ 'admin.users.unverified' | transloco }}</span> }
+          </div>
+          <dl>
+            <dt>{{ 'admin.users.points' | transloco }}</dt><dd>{{ u.pointsBalance | number }}</dd>
+            <dt>{{ 'admin.users.approved' | transloco }}</dt><dd>{{ u.approvedSubmissions }}</dd>
+            <dt>{{ 'admin.users.pending' | transloco }}</dt><dd>{{ u.pendingSubmissions }}</dd>
+            <dt>{{ 'admin.users.orders' | transloco }}</dt><dd>{{ u.orders }}</dd>
+            <dt>{{ 'admin.users.badges' | transloco }}</dt><dd>{{ u.badges }}</dd>
+          </dl>
+          <div class="row actions">
+            <button mat-stroked-button (click)="adjust(u)" [disabled]="busy()"><mat-icon>tune</mat-icon>{{ 'admin.users.adjust' | transloco }}</button>
+            <button mat-stroked-button [class.danger]="u.isActive" (click)="toggleBlock(u)" [disabled]="busy()">
+              <mat-icon>{{ u.isActive ? 'block' : 'lock_open' }}</mat-icon>{{ (u.isActive ? 'admin.users.block' : 'admin.users.unblock') | transloco }}
+            </button>
+          </div>
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card>
+        <mat-card-content class="stack">
+          <div class="muted">{{ 'admin.users.roles' | transloco }}</div>
+          @for (r of roles; track r) {
+            <mat-checkbox [checked]="selected().includes(r)" (change)="toggleRole(r, $event.checked)">
+              {{ 'roles.' + r | transloco }}
+              <div class="muted small">{{ 'admin.users.roleHints.' + r | transloco }}</div>
+            </mat-checkbox>
+          }
+          @if (selected().length === 0) { <p class="form-error">{{ 'admin.users.oneRole' | transloco }}</p> }
+          <div class="row">
+            <button mat-flat-button (click)="saveRoles(u)" [disabled]="busy() || selected().length === 0 || !rolesChanged(u)">
+              {{ 'admin.users.saveRoles' | transloco }}
+            </button>
+          </div>
+          <p class="muted small">{{ 'admin.users.rolesHint' | transloco }}</p>
+        </mat-card-content>
+      </mat-card>
+    </div>
+
+    <h3 class="section">{{ 'admin.users.history' | transloco }}</h3>
+    @if (points.value(); as h) {
+      @if (h.total === 0) {
+        <p class="muted">{{ 'admin.users.noHistory' | transloco }}</p>
+      } @else {
+        <app-points-ledger [entries]="h.items" [total]="h.total" [page]="pointsPage()" [pageSize]="10"
+                           (pageChange)="onPointsPage($event)" />
+      }
+    }
+  } @else if (user.isLoading()) {
+    <app-loading />
+  }
+</div>

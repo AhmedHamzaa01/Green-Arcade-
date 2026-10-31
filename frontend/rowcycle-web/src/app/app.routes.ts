@@ -1,53 +1,30 @@
 import { Routes } from '@angular/router';
-import { authGuard, guestGuard, roleGuard } from './core/auth/auth.guards';
+import { roleGuard } from './core/guards';
+import { accountRoutes } from './features/account/account.routes';
+import { actionsRoutes } from './features/actions/actions.routes';
+import { authRoutes } from './features/auth/auth.routes';
+import { homeRoutes } from './features/home/home.routes';
+import { notFoundRoutes } from './features/not-found/not-found.routes';
+import { storeRoutes } from './features/store/store.routes';
 
+/**
+ * All routes. Each feature lists its own pages and the guards that protect them in `features/<area>/<area>.routes.ts`;
+ * this file only puts them together. Guards decide which pages to show; the API checks every request again.
+ */
 export const routes: Routes = [
-  { path: '', loadComponent: () => import('./features/home/home').then((m) => m.Home) },
+  ...homeRoutes,
+  ...storeRoutes,
+  ...authRoutes,
+  ...accountRoutes,
+  ...actionsRoutes,
 
-  // Store (F5)
-  { path: 'products', loadComponent: () => import('./features/store/product-list').then((m) => m.ProductList) },
-  { path: 'products/:slug', loadComponent: () => import('./features/store/product-detail').then((m) => m.ProductDetailPage) },
-
-  // Cart and checkout (F6): logged-in members
-  { path: 'cart', canActivate: [authGuard], loadComponent: () => import('./features/store/cart').then((m) => m.CartPage) },
-  { path: 'checkout', canActivate: [authGuard], loadComponent: () => import('./features/store/checkout').then((m) => m.Checkout) },
-
-  // Auth (F1)
-  { path: 'login', canActivate: [guestGuard], loadComponent: () => import('./features/auth/login').then((m) => m.Login) },
-  { path: 'register', canActivate: [guestGuard], loadComponent: () => import('./features/auth/register').then((m) => m.Register) },
-  { path: 'check-email', loadComponent: () => import('./features/auth/check-email').then((m) => m.CheckEmail) },
-  // Opened from the emailed links; the API builds them as /verify-email?userId=…&token=… and /reset-password?email=…&token=…
-  { path: 'verify-email', loadComponent: () => import('./features/auth/verify-email').then((m) => m.VerifyEmail) },
-  { path: 'forgot-password', canActivate: [guestGuard], loadComponent: () => import('./features/auth/forgot-password').then((m) => m.ForgotPassword) },
-  { path: 'reset-password', loadComponent: () => import('./features/auth/reset-password').then((m) => m.ResetPassword) },
-
-  // Account (F1, F2)
+  // Staff area (F8): only staff even download this code; each page also checks its own roles (admin.routes.ts).
   {
-    path: 'account',
-    canActivate: [authGuard],
-    children: [
-      { path: 'profile', loadComponent: () => import('./features/account/profile').then((m) => m.Profile) },
-      { path: 'points', loadComponent: () => import('./features/account/points-history').then((m) => m.PointsHistory) },
-      { path: 'orders', loadComponent: () => import('./features/account/my-orders').then((m) => m.MyOrders) },
-      { path: 'orders/:id', loadComponent: () => import('./features/account/my-order').then((m) => m.MyOrder) },
-      { path: 'addresses', loadComponent: () => import('./features/account/addresses').then((m) => m.Addresses) },
-      { path: '', pathMatch: 'full', redirectTo: 'profile' },
-    ],
+    path: 'admin',
+    canMatch: [roleGuard('Admin', 'StoreManager', 'Moderator')],
+    loadChildren: () => import('./features/admin/admin.routes').then((m) => m.adminRoutes),
   },
 
-  // Actions (F3): submitting needs a confirmed email; the page explains when it's missing.
-  {
-    path: 'actions',
-    canActivate: [authGuard],
-    children: [
-      { path: 'new', loadComponent: () => import('./features/actions/new-submission').then((m) => m.NewSubmission) },
-      { path: 'mine', loadComponent: () => import('./features/actions/my-submissions').then((m) => m.MySubmissions) },
-      { path: '', pathMatch: 'full', redirectTo: 'mine' },
-    ],
-  },
-
-  // Staff area (F8): only staff even load this code; each page also checks its own roles.
-  { path: 'admin', canMatch: [roleGuard('Admin', 'StoreManager', 'Moderator')], loadChildren: () => import('./features/admin/admin.routes').then((m) => m.adminRoutes) },
-
-  { path: '**', loadComponent: () => import('./features/not-found').then((m) => m.NotFound) },
+  // Last: anything no route above matches.
+  ...notFoundRoutes,
 ];

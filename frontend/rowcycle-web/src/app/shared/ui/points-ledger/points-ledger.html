@@ -1,0 +1,27 @@
+<ul class="ledger">
+  @for (entry of entries(); track entry.id) {
+    <li>
+      <span class="icon" [class.plus]="entry.amount > 0">
+        <mat-icon>{{ entry.amount > 0 ? 'add' : 'remove' }}</mat-icon>
+      </span>
+      <span class="text">
+        <span class="title">
+          {{ 'account.points.types.' + entry.type | transloco }} · {{ 'account.points.sources.' + entry.sourceType | transloco }}
+        </span>
+        <span class="meta">
+          @if (entry.reason) { {{ entry.reason }} · }{{ entry.createdAt | date: 'medium' }}
+        </span>
+      </span>
+      <strong class="amount" [class.plus]="entry.amount > 0">
+        {{ entry.amount > 0 ? '+' : '' }}{{ entry.amount | number }}
+      </strong>
+    </li>
+  }
+</ul>
+<mat-paginator
+  [length]="total()"
+  [pageIndex]="page() - 1"
+  [pageSize]="pageSize()"
+  [pageSizeOptions]="[10, 20, 50]"
+  [hidePageSize]="!choosePageSize()"
+  (page)="onPage($event)" />

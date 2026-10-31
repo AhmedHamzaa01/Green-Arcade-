@@ -1,0 +1,33 @@
+<div class="page-form">
+  <app-page-header [title]="'addresses.title' | transloco" [subtitle]="'addresses.subtitle' | transloco">
+    <button mat-flat-button class="add" (click)="edit(null)"><mat-icon>add</mat-icon>{{ 'addresses.add' | transloco }}</button>
+  </app-page-header>
+  @if (addresses.value(); as list) {
+    @if (list.length === 0) {
+      <app-empty-state icon="home" [message]="'addresses.empty' | transloco" />
+    } @else {
+      <div class="grid">
+        @for (a of list; track a.id) {
+          <mat-card [class.default]="a.isDefault">
+            <mat-card-content>
+              <div class="row between">
+                <strong>{{ a.fullName }}</strong>
+                @if (a.isDefault) { <span class="badge">{{ 'addresses.default' | transloco }}</span> }
+              </div>
+              <div>{{ a.phone }}</div>
+              <div class="muted">{{ a.street }}, {{ a.building }}</div>
+              <div class="muted">{{ a.area }}, {{ a.city }}</div>
+              @if (a.notes) { <div class="muted small">{{ a.notes }}</div> }
+              <div class="row end">
+                <button matIconButton (click)="edit(a)" [attr.aria-label]="'common.edit' | transloco"><mat-icon>edit</mat-icon></button>
+                <button matIconButton (click)="remove(a)" [attr.aria-label]="'common.delete' | transloco"><mat-icon>delete</mat-icon></button>
+              </div>
+            </mat-card-content>
+          </mat-card>
+        }
+      </div>
+    }
+  } @else {
+    <app-loading />
+  }
+</div>

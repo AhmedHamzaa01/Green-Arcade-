@@ -1,0 +1,3 @@
+.photo { display: block; margin-bottom: var(--rc-space-4); }
+.submit { height: 46px; }
+@media (max-width: 599px) { .submit { width: 100%; } }

@@ -1,0 +1,23 @@
+<div class="page-narrow auth-page">
+  <app-page-header [title]="'auth.verify.title' | transloco" />
+  <mat-card class="auth-card">
+    <mat-card-content class="stack">
+      @switch (state()) {
+        @case ('working') {
+          <app-loading />
+          <p class="muted">{{ 'auth.verify.working' | transloco }}</p>
+        }
+        @case ('success') {
+          <mat-icon class="positive">verified</mat-icon>
+          <p>{{ 'auth.verify.success' | transloco }}</p>
+          <a mat-flat-button [routerLink]="session.isLoggedIn() ? '/account/profile' : '/login'">{{ 'auth.verify.continue' | transloco }}</a>
+        }
+        @case ('failed') {
+          <mat-icon class="negative">error</mat-icon>
+          <p>{{ 'auth.verify.failed' | transloco }}</p>
+          <a mat-button routerLink="/login">{{ 'auth.checkEmail.login' | transloco }}</a>
+        }
+      }
+    </mat-card-content>
+  </mat-card>
+</div>

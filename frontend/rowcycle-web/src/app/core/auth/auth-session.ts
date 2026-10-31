@@ -1,7 +1,7 @@
 import { Injectable, computed, inject, signal } from '@angular/core';
 import { Observable, finalize, firstValueFrom, map, shareReplay } from 'rxjs';
 import { AuthApi } from '../api/auth-api';
-import { LoginRequest, MeResponse, Role } from '../api/api.models';
+import { LoginRequest, MeResponse, Role } from '../api/models';
 
 /**
  * Who is logged in. The access token is kept in memory only (never in localStorage);

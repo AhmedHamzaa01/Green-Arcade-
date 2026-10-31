@@ -1,0 +1,36 @@
+<mat-sidenav-container class="container">
+  <mat-sidenav #drawer class="sidenav" [mode]="wide() ? 'side' : 'over'" [opened]="wide()" [attr.role]="wide() ? 'navigation' : 'dialog'">
+    <a class="brand" routerLink="/admin/dashboard" (click)="closeOnPhone()">
+      <span class="logo"><mat-icon>recycling</mat-icon></span>
+      <span>{{ 'app.name' | transloco }}<small>{{ 'staff.title' | transloco }}</small></span>
+    </a>
+    <nav>
+      @for (group of groups(); track group.label) {
+        <div class="group">{{ group.label | transloco }}</div>
+        @for (link of group.links; track link.path) {
+          <a [routerLink]="link.path" routerLinkActive="active" (click)="closeOnPhone()">
+            <mat-icon>{{ link.icon }}</mat-icon>{{ link.label | transloco }}
+          </a>
+        }
+      }
+    </nav>
+    <a class="back" routerLink="/"><mat-icon>arrow_back</mat-icon>{{ 'staff.backToSite' | transloco }}</a>
+  </mat-sidenav>
+
+  <mat-sidenav-content>
+    <header class="bar">
+      @if (!wide()) {
+        <button matIconButton (click)="drawer.toggle()" [attr.aria-label]="'nav.menu' | transloco"><mat-icon>menu</mat-icon></button>
+        <span class="bar-title">{{ 'staff.title' | transloco }}</span>
+      }
+      <span class="spacer"></span>
+      @if (session.user(); as user) {
+        <span class="who"><span class="avatar">{{ user.fullName.charAt(0) }}</span><span class="name">{{ user.fullName }}</span></span>
+      }
+      <button matIconButton (click)="logout()" [attr.aria-label]="'nav.logout' | transloco"><mat-icon>logout</mat-icon></button>
+    </header>
+    <main>
+      <router-outlet />
+    </main>
+  </mat-sidenav-content>
+</mat-sidenav-container>

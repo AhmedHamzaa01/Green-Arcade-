@@ -1,0 +1,34 @@
+<div class="page-form">
+  <app-page-header [title]="'orders.title' | transloco" />
+  @if (orders.value(); as data) {
+    @if (data.total === 0) {
+      <app-empty-state icon="receipt_long" [message]="'orders.empty' | transloco" />
+    } @else {
+      <div class="stack">
+        @for (o of data.items; track o.id) {
+          <a class="card-link" [routerLink]="['/account/orders', o.id]">
+            <mat-card>
+              <mat-card-content class="row between">
+                <div>
+                  <div class="row"><strong>{{ o.orderNumber }}</strong><app-order-status [status]="o.status" /></div>
+                  <div class="muted small">{{ o.createdAt | date: 'mediumDate' }} · {{ 'orders.itemCount' | transloco: { count: o.itemCount } }}</div>
+                </div>
+                <div class="row">
+                  @if (o.paymentMethod === 'Points') {
+                    <strong>{{ 'orders.paidPoints' | transloco: { points: (o.totalPoints | number) } }}</strong>
+                  } @else {
+                    <strong>{{ o.totalEgp | currency: 'EGP' : 'symbol' : '1.0-2' }}</strong>
+                  }
+                  <mat-icon class="muted">chevron_right</mat-icon>
+                </div>
+              </mat-card-content>
+            </mat-card>
+          </a>
+        }
+      </div>
+      <mat-paginator [length]="data.total" [pageIndex]="page() - 1" [pageSize]="10" [hidePageSize]="true" (page)="onPage($event)" />
+    }
+  } @else if (orders.isLoading()) {
+    <app-loading />
+  }
+</div>

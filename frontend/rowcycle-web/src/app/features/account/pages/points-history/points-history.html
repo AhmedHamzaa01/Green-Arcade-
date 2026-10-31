@@ -1,0 +1,23 @@
+<div class="page-form">
+  <app-page-header [title]="'account.points.title' | transloco" />
+
+  @if (history.value(); as data) {
+    <div class="balance-card">
+      <span class="icon"><mat-icon>stars</mat-icon></span>
+      <div>
+        <div class="label">{{ 'account.points.balance' | transloco }}</div>
+        <div class="balance">{{ data.balance | number }}</div>
+      </div>
+    </div>
+
+    @if (data.total === 0) {
+      <app-empty-state icon="stars" [message]="'account.points.empty' | transloco"
+                       [actionLabel]="'nav.newAction' | transloco" actionLink="/actions/new" />
+    } @else {
+      <app-points-ledger [entries]="data.items" [total]="data.total" [page]="page()" [pageSize]="pageSize()"
+                         [choosePageSize]="true" (pageChange)="onPage($event)" />
+    }
+  } @else if (history.isLoading()) {
+    <app-loading />
+  }
+</div>

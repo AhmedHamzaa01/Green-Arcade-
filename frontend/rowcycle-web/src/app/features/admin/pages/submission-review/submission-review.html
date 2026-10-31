@@ -1,0 +1,44 @@
+<div class="page">
+  <a mat-button routerLink="/admin/submissions"><mat-icon>arrow_back</mat-icon>{{ 'admin.submissions.back' | transloco }}</a>
+  @if (submission.value(); as s) {
+    <div class="layout">
+      <a class="photo" [href]="s.photoUrl" target="_blank" rel="noopener">
+        <img [src]="s.photoUrl" [alt]="'admin.submissions.photoAlt' | transloco: { member: s.memberName }" />
+      </a>
+      <mat-card>
+        <mat-card-content class="stack">
+          <div class="row"><h2>{{ s.categoryName }}</h2><app-submission-status [status]="s.status" /></div>
+          <dl>
+            <dt>{{ 'admin.submissions.member' | transloco }}</dt><dd>{{ s.memberName }}</dd>
+            <dt>{{ 'admin.submissions.sent' | transloco }}</dt><dd>{{ s.createdAt | date: 'medium' }}</dd>
+            <dt>{{ 'admin.submissions.points' | transloco }}</dt><dd>{{ s.categoryPoints }}</dd>
+            @if (s.weightKg !== null) {
+              <dt>{{ 'actions.new.weight' | transloco }}</dt><dd>{{ s.weightKg }} kg</dd>
+            }
+            @if (s.note) {
+              <dt>{{ 'actions.new.note' | transloco }}</dt><dd class="note">{{ s.note }}</dd>
+            }
+            @if (s.reviewedAt) {
+              <dt>{{ 'admin.submissions.reviewed' | transloco }}</dt><dd>{{ s.reviewedAt | date: 'medium' }}</dd>
+            }
+            @if (s.rejectReason) {
+              <dt>{{ 'admin.submissions.reason' | transloco }}</dt><dd class="note">{{ s.rejectReason }}</dd>
+            }
+          </dl>
+          @if (s.status === 'Pending') {
+            <div class="row">
+              <button mat-flat-button (click)="approve(s)" [disabled]="busy()">
+                <mat-icon>check</mat-icon>{{ 'admin.submissions.approve' | transloco }}
+              </button>
+              <button mat-stroked-button class="danger" (click)="reject(s)" [disabled]="busy()">
+                <mat-icon>close</mat-icon>{{ 'admin.submissions.reject' | transloco }}
+              </button>
+            </div>
+          }
+        </mat-card-content>
+      </mat-card>
+    </div>
+  } @else if (submission.isLoading()) {
+    <app-loading />
+  }
+</div>

@@ -69,7 +69,19 @@ npm test -- --watch=false    # unit tests (Vitest)
 npm run build                # production build
 ```
 
-Frontend layout: `core/` (API services + models, `AuthSession`, interceptors, guards, errors), `shared/` (reusable components), `features/<area>/` (pages). All UI text lives in `public/i18n/en.json` (Transloco). The access token is kept in memory; the refresh token is an httpOnly cookie the browser handles.
+Frontend layout (`src/app/`):
+- `core/api/`: one service per API area (`shop-api.ts`, `users-admin-api.ts`, …). **Only services call `HttpClient`.** Each service starts with its URL constants built from `environment.apiBaseUrl` (e.g. `const user = (id) => \`${USERS}/${id}\``); no URL strings inside methods. Models are in `core/api/models/<area>.models.ts`; import them from `core/api/models`.
+- `core/guards/`: `authGuard`, `guestGuard`, `roleGuard` (one file + spec each).
+- `core/auth/` (`AuthSession`, auth interceptor), `core/errors/`, `core/cart/`, `core/i18n/`.
+- `src/environments/environment.ts` (production) and `environment.development.ts` (`npm start`): `apiBaseUrl`.
+- `layout/`: the app shell pieces (`bottom-nav/` for phones, `staff-layout/` with the staff side panel).
+- `shared/ui/<name>/`: reusable components with no API calls (`page-header`, `empty-state`, `stat-card`, `status-chip`, `form-dialog`, `filter-bar`, `points-ledger`, `photo-picker`, …); `shared/pipes/`, `shared/validators/`.
+- `features/<area>/pages/<name>/`: components a route opens; `features/<area>/components/<name>/`: dialogs and pieces used only in that area.
+- `features/<area>/<area>.routes.ts`: that area's pages **with their guards**. `app.routes.ts` only combines them (and guards `/admin` with `roleGuard`).
+- Every component has its own folder with `<name>.ts` + `<name>.html` + `<name>.scss` (no `.scss` if it has no styles); no inline `template:`/`styles:`. File names have no `.component` suffix.
+- Templates only show data and call **one** component method per event (`(click)="onSearch($event)"`); the logic lives in the `.ts`.
+
+All UI text lives in `public/i18n/en.json` (Transloco). Global design tokens and utility classes are in `src/styles.scss`. The access token is kept in memory; the refresh token is an httpOnly cookie the browser handles.
 
 ## Stack (fixed — do not substitute)
 

@@ -1,0 +1,14 @@
+.page-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--rc-space-3);
+  margin: var(--rc-space-2) 0 var(--rc-space-5);
+}
+.titles { min-width: 0; flex: 1 1 280px; }
+h1 { font: 700 24px/1.25 var(--rc-heading); margin: 0; }
+p { margin: 6px 0 0; max-width: 60ch; }
+.actions { display: flex; flex-wrap: wrap; gap: var(--rc-space-2); }
+.actions:empty { display: none; }
+@media (min-width: 720px) { h1 { font-size: 28px; } }

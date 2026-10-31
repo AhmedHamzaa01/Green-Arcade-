@@ -1,0 +1,13 @@
+<div class="page-narrow auth-page">
+  <app-page-header [title]="'auth.checkEmail.title' | transloco" />
+  <mat-card class="auth-card">
+    <mat-card-content class="stack">
+      <mat-icon class="positive">mark_email_unread</mat-icon>
+      <p>{{ 'auth.checkEmail.body' | transloco: { email: email() ?? '' } }}</p>
+      @if (dev) {
+        <p class="muted">{{ 'auth.checkEmail.devHint' | transloco }}</p>
+      }
+      <a mat-flat-button routerLink="/login">{{ 'auth.checkEmail.login' | transloco }}</a>
+    </mat-card-content>
+  </mat-card>
+</div>

@@ -1,11 +1,23 @@
 import { HttpClient, HttpContext, HttpParams } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import { Observable } from 'rxjs';
+import { environment } from '../../../environments/environment';
 import { SKIP_ERROR_TOAST } from '../http-context';
 import {
   AdminSubmissionCategory, CreateSubmissionRequest, PagedResult, SaveSubmissionCategoryRequest, Submission, SubmissionCategory,
   SubmissionStatus,
-} from './api.models';
+} from './models';
+
+// ---- API URLs used by these services ----
+const CATEGORIES = `${environment.apiBaseUrl}/submission-categories`;
+const SUBMISSIONS = `${environment.apiBaseUrl}/submissions`;
+const MY_SUBMISSIONS = `${environment.apiBaseUrl}/me/submissions`;
+const QUEUE = `${environment.apiBaseUrl}/admin/submissions`;
+const queued = (id: string) => `${QUEUE}/${id}`;
+const approve = (id: string) => `${queued(id)}/approve`;
+const reject = (id: string) => `${queued(id)}/reject`;
+const ADMIN_CATEGORIES = `${environment.apiBaseUrl}/admin/submission-categories`;
+const adminCategory = (id: string) => `${ADMIN_CATEGORIES}/${id}`;
 
 /** Photo-verified actions: the member side (F3). */
 @Injectable({ providedIn: 'root' })
@@ -13,7 +25,7 @@ export class SubmissionsApi {
   private readonly http = inject(HttpClient);
 
   categories(): Observable<SubmissionCategory[]> {
-    return this.http.get<SubmissionCategory[]>('/api/v1/submission-categories');
+    return this.http.get<SubmissionCategory[]>(CATEGORIES);
   }
 
   /** Multipart upload. The form shows the API's errors itself (e.g. daily limit reached). */
@@ -27,13 +39,13 @@ export class SubmissionsApi {
     if (request.weightKg !== null) {
       form.append('weightKg', String(request.weightKg));
     }
-    return this.http.post<Submission>('/api/v1/submissions', form, {
+    return this.http.post<Submission>(SUBMISSIONS, form, {
       context: new HttpContext().set(SKIP_ERROR_TOAST, true),
     });
   }
 
   mine(page: number, pageSize: number): Observable<PagedResult<Submission>> {
-    return this.http.get<PagedResult<Submission>>('/api/v1/me/submissions', { params: { page, pageSize } });
+    return this.http.get<PagedResult<Submission>>(MY_SUBMISSIONS, { params: { page, pageSize } });
   }
 }
 
@@ -47,19 +59,19 @@ export class ModerationApi {
     if (query.status) {
       params = params.set('status', query.status);
     }
-    return this.http.get<PagedResult<Submission>>('/api/v1/admin/submissions', { params });
+    return this.http.get<PagedResult<Submission>>(QUEUE, { params });
   }
 
   get(id: string): Observable<Submission> {
-    return this.http.get<Submission>(`/api/v1/admin/submissions/${id}`);
+    return this.http.get<Submission>(queued(id));
   }
 
   approve(id: string): Observable<Submission> {
-    return this.http.post<Submission>(`/api/v1/admin/submissions/${id}/approve`, null);
+    return this.http.post<Submission>(approve(id), null);
   }
 
   reject(id: string, reason: string): Observable<Submission> {
-    return this.http.post<Submission>(`/api/v1/admin/submissions/${id}/reject`, { reason });
+    return this.http.post<Submission>(reject(id), { reason });
   }
 }
 
@@ -67,25 +79,22 @@ export class ModerationApi {
 @Injectable({ providedIn: 'root' })
 export class SubmissionCategoriesAdminApi {
   private readonly http = inject(HttpClient);
+  private readonly formCall = { context: new HttpContext().set(SKIP_ERROR_TOAST, true) };
 
   list(): Observable<AdminSubmissionCategory[]> {
-    return this.http.get<AdminSubmissionCategory[]>('/api/v1/admin/submission-categories');
+    return this.http.get<AdminSubmissionCategory[]>(ADMIN_CATEGORIES);
   }
 
   // The form shows its own validation errors.
   create(request: SaveSubmissionCategoryRequest): Observable<AdminSubmissionCategory> {
-    return this.http.post<AdminSubmissionCategory>('/api/v1/admin/submission-categories', request, {
-      context: new HttpContext().set(SKIP_ERROR_TOAST, true),
-    });
+    return this.http.post<AdminSubmissionCategory>(ADMIN_CATEGORIES, request, this.formCall);
   }
 
   update(id: string, request: SaveSubmissionCategoryRequest): Observable<AdminSubmissionCategory> {
-    return this.http.put<AdminSubmissionCategory>(`/api/v1/admin/submission-categories/${id}`, request, {
-      context: new HttpContext().set(SKIP_ERROR_TOAST, true),
-    });
+    return this.http.put<AdminSubmissionCategory>(adminCategory(id), request, this.formCall);
   }
 
   delete(id: string): Observable<void> {
-    return this.http.delete<void>(`/api/v1/admin/submission-categories/${id}`);
+    return this.http.delete<void>(adminCategory(id));
   }
 }

@@ -1,0 +1,57 @@
+<div class="page">
+  <app-page-header [title]="'cart.title' | transloco" />
+  @if (store.cart(); as cart) {
+    @if (cart.items.length === 0) {
+      <app-empty-state icon="shopping_cart" [message]="'cart.empty' | transloco" />
+      <div class="center"><a mat-flat-button routerLink="/products">{{ 'cart.browse' | transloco }}</a></div>
+    } @else {
+      <div class="layout">
+        <mat-card>
+          <mat-card-content>
+            @for (item of cart.items; track item.variantId) {
+              <div class="line" [class.problem]="!item.isAvailable || !item.hasEnoughStock">
+                <a [routerLink]="['/products', item.productSlug]" class="thumb">
+                  @if (item.imageUrl) { <img [src]="item.imageUrl" alt="" /> } @else { <mat-icon class="muted">image</mat-icon> }
+                </a>
+                <div class="grow">
+                  <a [routerLink]="['/products', item.productSlug]">{{ item.productName }}</a>
+                  <div class="muted small">{{ item.variantName }} · {{ item.unitPriceEgp | currency: 'EGP' : 'symbol' : '1.0-2' }}</div>
+                  @if (!item.isAvailable) {
+                    <div class="negative small">{{ 'cart.unavailable' | transloco }}</div>
+                  } @else if (!item.hasEnoughStock) {
+                    <div class="negative small">{{ 'cart.notEnoughStock' | transloco }}</div>
+                  }
+                  <div class="qty">
+                    <button matIconButton (click)="change(item, -1)" [disabled]="item.quantity <= 1"><mat-icon>remove</mat-icon></button>
+                    <span>{{ item.quantity }}</span>
+                    <button matIconButton (click)="change(item, 1)" [disabled]="!item.isAvailable"><mat-icon>add</mat-icon></button>
+                    <button mat-button (click)="remove(item)">{{ 'cart.remove' | transloco }}</button>
+                  </div>
+                </div>
+                <strong>{{ item.lineTotalEgp | currency: 'EGP' : 'symbol' : '1.0-2' }}</strong>
+              </div>
+            }
+          </mat-card-content>
+        </mat-card>
+
+        <mat-card class="summary">
+          <mat-card-content class="stack">
+            <div class="row between"><span>{{ 'cart.total' | transloco }}</span><strong class="total">{{ cart.totalEgp | currency: 'EGP' : 'symbol' : '1.0-2' }}</strong></div>
+            @if (cart.totalPoints) {
+              <div class="muted">{{ 'cart.orPoints' | transloco: { points: (cart.totalPoints | number) } }}</div>
+            }
+            @if (cart.totalRewardPoints > 0) {
+              <div class="earn"><mat-icon>stars</mat-icon>{{ 'cart.earn' | transloco: { points: cart.totalRewardPoints } }}</div>
+            }
+            @if (cart.hasIssues) {
+              <div class="negative small">{{ 'cart.fixIssues' | transloco }}</div>
+            }
+            <a mat-flat-button routerLink="/checkout" [disabled]="cart.hasIssues">{{ 'cart.checkout' | transloco }}</a>
+          </mat-card-content>
+        </mat-card>
+      </div>
+    }
+  } @else {
+    <app-loading />
+  }
+</div>

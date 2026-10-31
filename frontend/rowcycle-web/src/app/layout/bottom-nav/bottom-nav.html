@@ -1,0 +1,26 @@
+<nav class="bottom-nav" [attr.aria-label]="'nav.main' | transloco">
+  <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
+    <mat-icon>home</mat-icon><span>{{ 'nav.home' | transloco }}</span>
+  </a>
+  <a routerLink="/products" routerLinkActive="active">
+    <mat-icon>storefront</mat-icon><span>{{ 'nav.store' | transloco }}</span>
+  </a>
+  @if (session.isLoggedIn()) {
+    <a routerLink="/actions/new" class="primary" [attr.aria-label]="'nav.newAction' | transloco">
+      <span class="fab"><mat-icon>add_a_photo</mat-icon></span><span>{{ 'nav.newActionShort' | transloco }}</span>
+    </a>
+    <a routerLink="/account/points" routerLinkActive="active">
+      <mat-icon>stars</mat-icon><span>{{ 'nav.points' | transloco }}</span>
+    </a>
+    <a routerLink="/account/profile" routerLinkActive="active">
+      <mat-icon>person</mat-icon><span>{{ 'nav.account' | transloco }}</span>
+    </a>
+  } @else {
+    <a routerLink="/login" routerLinkActive="active">
+      <mat-icon>login</mat-icon><span>{{ 'nav.login' | transloco }}</span>
+    </a>
+    <a routerLink="/register" routerLinkActive="active">
+      <mat-icon>person_add</mat-icon><span>{{ 'nav.register' | transloco }}</span>
+    </a>
+  }
+</nav>

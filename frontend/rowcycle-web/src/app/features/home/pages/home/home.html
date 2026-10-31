@@ -1,0 +1,66 @@
+<div class="page">
+  <!-- Hero -->
+  <section class="hero">
+    <div class="hero-text">
+      <span class="eyebrow"><mat-icon>eco</mat-icon>{{ 'home.eyebrow' | transloco }}</span>
+      @if (session.user(); as user) {
+        <h1>{{ 'home.welcomeBack' | transloco: { name: user.fullName.split(' ')[0] } }}</h1>
+        <p>{{ 'home.memberIntro' | transloco }}</p>
+        <div class="cta">
+          <a mat-flat-button routerLink="/actions/new"><mat-icon>add_a_photo</mat-icon>{{ 'home.submitAction' | transloco }}</a>
+          <a mat-stroked-button routerLink="/products">{{ 'home.browse' | transloco }}</a>
+        </div>
+      } @else {
+        <h1>{{ 'home.title' | transloco }}</h1>
+        <p>{{ 'home.intro' | transloco }}</p>
+        <div class="cta">
+          <a mat-flat-button routerLink="/register">{{ 'home.start' | transloco }}</a>
+          <a mat-stroked-button routerLink="/products">{{ 'home.browse' | transloco }}</a>
+        </div>
+      }
+    </div>
+    <div class="hero-art" aria-hidden="true">
+      <span class="ring"><mat-icon>recycling</mat-icon></span>
+      <span class="float a"><mat-icon>water_drop</mat-icon></span>
+      <span class="float b"><mat-icon>stars</mat-icon></span>
+      <span class="float c"><mat-icon>park</mat-icon></span>
+    </div>
+  </section>
+
+  <!-- Member summary -->
+  @if (session.user(); as user) {
+    <section class="stats">
+      <app-stat-card icon="stars" [value]="(user.pointsBalance | number) ?? '0'" [label]="'home.yourPoints' | transloco" link="/account/points" />
+      <app-stat-card icon="emoji_events" [value]="badges.value()?.length ?? 0" [label]="'home.yourBadges' | transloco" link="/account/profile" />
+      <app-stat-card icon="photo_library" value="→" [label]="'home.yourActions' | transloco" link="/actions/mine" />
+    </section>
+  }
+
+  <!-- How it works -->
+  <h2 class="section-title">{{ 'home.howTitle' | transloco }}</h2>
+  <ol class="steps">
+    @for (step of steps; track step.key; let i = $index) {
+      <li>
+        <span class="step-icon"><mat-icon>{{ step.icon }}</mat-icon></span>
+        <span class="step-number">{{ i + 1 }}</span>
+        <h3>{{ 'home.steps.' + step.key + '.title' | transloco }}</h3>
+        <p class="muted">{{ 'home.steps.' + step.key + '.text' | transloco }}</p>
+      </li>
+    }
+  </ol>
+
+  <!-- New in the store -->
+  @if (products.value(); as data) {
+    @if (data.items.length > 0) {
+      <div class="section-head">
+        <h2 class="section-title">{{ 'home.newInStore' | transloco }}</h2>
+        <a mat-button routerLink="/products">{{ 'home.seeAll' | transloco }}<mat-icon iconPositionEnd>arrow_forward</mat-icon></a>
+      </div>
+      <div class="products">
+        @for (p of data.items; track p.id) {
+          <app-product-card [product]="p" />
+        }
+      </div>
+    }
+  }
+</div>

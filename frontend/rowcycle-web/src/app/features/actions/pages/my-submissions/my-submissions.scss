@@ -1,0 +1,6 @@
+.item { display: flex; gap: 12px; align-items: flex-start; }
+.item img { width: 88px; height: 88px; object-fit: cover; border-radius: 8px; flex: none; }
+.details { min-width: 0; }
+.details p { margin: 4px 0 0; }
+.note { overflow-wrap: anywhere; }
+.small { font-size: 12px; }

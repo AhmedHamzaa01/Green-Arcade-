@@ -1,0 +1,12 @@
+<form [formGroup]="form" (ngSubmit)="save()">
+  <app-form-dialog layout="grid" [title]="(address ? 'addresses.edit' : 'addresses.add') | transloco" [error]="error()" [saving]="saving()">
+    @for (field of fields; track field) {
+      <mat-form-field [class.wide]="field === 'notes' || field === 'street'">
+        <mat-label>{{ 'addresses.' + field | transloco }}</mat-label>
+        <input matInput [formControlName]="field" [type]="field === 'phone' ? 'tel' : 'text'" />
+        <mat-error>{{ form.get(field) | fieldError }}</mat-error>
+      </mat-form-field>
+    }
+    <mat-checkbox class="wide" formControlName="isDefault">{{ 'addresses.makeDefault' | transloco }}</mat-checkbox>
+  </app-form-dialog>
+</form>

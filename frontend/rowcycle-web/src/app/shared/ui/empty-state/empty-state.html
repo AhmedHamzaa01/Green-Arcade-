@@ -1,0 +1,7 @@
+<div class="empty">
+  <span class="icon"><mat-icon>{{ icon() }}</mat-icon></span>
+  <p>{{ message() }}</p>
+  @if (actionLabel() && actionLink()) {
+    <a mat-flat-button [routerLink]="actionLink()">{{ actionLabel() }}</a>
+  }
+</div>

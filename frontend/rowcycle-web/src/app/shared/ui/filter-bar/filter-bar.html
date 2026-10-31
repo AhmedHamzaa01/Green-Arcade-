@@ -1,0 +1,16 @@
+<div class="row-filters">
+  @if (searchLabel()) {
+    <mat-form-field class="search" subscriptSizing="dynamic">
+      <mat-label>{{ searchLabel() }}</mat-label>
+      <mat-icon matPrefix>search</mat-icon>
+      <input #box matInput [value]="searchValue() ?? ''" (keyup.enter)="submit(box.value)" />
+      @if (searchValue()) {
+        <button matIconButton matSuffix type="button" (click)="clear(box)" aria-label="Clear">
+          <mat-icon>close</mat-icon>
+        </button>
+      }
+    </mat-form-field>
+  }
+  <ng-content />
+</div>
+<div class="chips"><ng-content select="[chips]" /></div>

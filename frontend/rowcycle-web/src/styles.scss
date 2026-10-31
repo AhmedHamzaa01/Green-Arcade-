@@ -1,16 +1,106 @@
 @use '@angular/material' as mat;
+@use './theme-colors' as rc;
 
-// Material 3 theme: green for RowCycle.
+// ---------------------------------------------------------------------------
+// Theme: "fresh eco green". Palettes are generated from the brand colors in _theme-colors.scss
+// (primary #1F6F5C teal-green, tertiary #C8A96A sand). Fonts: Plus Jakarta Sans (headings), Inter (text).
+// ---------------------------------------------------------------------------
 html {
   color-scheme: light;
   @include mat.theme((
     color: (
-      primary: mat.$green-palette,
-      tertiary: mat.$cyan-palette,
+      primary: rc.$primary-palette,
+      tertiary: rc.$tertiary-palette,
     ),
-    typography: Roboto,
+    typography: (
+      plain-family: Inter,
+      brand-family: 'Plus Jakarta Sans',
+      bold-weight: 700,
+      medium-weight: 600,
+      regular-weight: 400,
+    ),
     density: 0,
   ));
+
+  // Flat, rounded surfaces with a hairline border instead of shadows.
+  @include mat.card-overrides((
+    elevated-container-color: var(--rc-surface),
+    elevated-container-elevation: none,
+    elevated-container-shape: var(--rc-radius-lg),
+    outlined-container-shape: var(--rc-radius-lg),
+    outlined-outline-color: var(--rc-border),
+  ));
+  @include mat.button-overrides((
+    filled-container-shape: var(--rc-radius),
+    outlined-container-shape: var(--rc-radius),
+    text-container-shape: var(--rc-radius),
+    tonal-container-shape: var(--rc-radius),
+    protected-container-shape: var(--rc-radius),
+    outlined-outline-color: var(--rc-border-strong),
+    filled-label-text-weight: 600,
+    outlined-label-text-weight: 600,
+    text-label-text-weight: 600,
+    tonal-label-text-weight: 600,
+  ));
+  @include mat.form-field-overrides((
+    outlined-container-shape: var(--rc-radius),
+    outlined-outline-color: var(--rc-border-strong),
+  ));
+  @include mat.chips-overrides((
+    container-shape-radius: 999px,
+  ));
+  @include mat.dialog-overrides((
+    container-shape: var(--rc-radius-lg),
+  ));
+  @include mat.table-overrides((
+    background-color: transparent,
+    header-headline-color: var(--mat-sys-on-surface-variant),
+    row-item-outline-color: var(--rc-border),
+  ));
+  @include mat.toolbar-overrides((
+    container-background-color: var(--rc-surface),
+    standard-height: 64px,
+    mobile-height: 56px,
+  ));
+  @include mat.paginator-overrides((
+    container-background-color: transparent,
+  ));
+  @include mat.sidenav-overrides((
+    container-background-color: var(--rc-surface),
+    container-shape: 0,
+    content-background-color: var(--rc-bg),
+  ));
+}
+
+// ---------------------------------------------------------------------------
+// Design tokens
+// ---------------------------------------------------------------------------
+:root {
+  --rc-bg: #f7f8f5;
+  --rc-surface: #ffffff;
+  --rc-surface-soft: #eef4f1;
+  --rc-border: #e3e7e2;
+  --rc-border-strong: #c9d1cb;
+  --rc-sand: #f4ecdc;
+
+  --rc-radius: 10px;
+  --rc-radius-lg: 16px;
+
+  --rc-space-1: 4px;
+  --rc-space-2: 8px;
+  --rc-space-3: 12px;
+  --rc-space-4: 16px;
+  --rc-space-5: 24px;
+  --rc-space-6: 32px;
+  --rc-space-7: 48px;
+
+  --rc-page: 1120px;
+  --rc-page-form: 720px;
+  --rc-page-narrow: 440px;
+
+  // Height of the phone bottom bar, so pages can leave room for it.
+  --rc-bottom-nav: 64px;
+  --rc-heading: 'Plus Jakarta Sans', Inter, system-ui, sans-serif;
 }
 
 * {
@@ -24,76 +114,114 @@ body {
 
 body {
   margin: 0;
-  font-family: Roboto, 'Helvetica Neue', sans-serif;
-  background: var(--mat-sys-surface-container-lowest);
+  font-family: Inter, system-ui, -apple-system, 'Segoe UI', sans-serif;
+  background: var(--rc-bg);
   color: var(--mat-sys-on-surface);
+  -webkit-font-smoothing: antialiased;
 }
 
-// Page content width; mobile-first (360px and up).
-.page {
-  max-width: 960px;
-  margin: 0 auto;
-  padding: 16px;
-}
-
-.page-narrow {
-  max-width: 440px;
-  margin: 0 auto;
-  padding: 24px 16px;
-}
-
-.full-width {
-  width: 100%;
-}
-
-.stack {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-.row {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  flex-wrap: wrap;
-}
-
-.muted {
-  color: var(--mat-sys-on-surface-variant);
-}
-
-.positive {
-  color: var(--mat-sys-primary);
-}
-
-.negative {
-  color: var(--mat-sys-error);
-}
-
-.snack-error {
-  --mat-snack-bar-container-color: var(--mat-sys-error-container);
-  --mat-snack-bar-supporting-text-color: var(--mat-sys-on-error-container);
+h1, h2, h3 {
+  font-family: var(--rc-heading);
+  letter-spacing: -0.01em;
 }
 
 a {
   color: var(--mat-sys-primary);
 }
 
-// Auth pages: one card in the middle of the screen (below the 64px top bar).
-.auth-page {
-  min-height: calc(100vh - 64px);
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-
-  app-page-header {
-    text-align: center;
-  }
+// Cards get a hairline border (elevation is turned off above).
+.mat-mdc-card {
+  border: 1px solid var(--rc-border);
 }
 
-.auth-card {
-  padding: 8px;
+// ---------------------------------------------------------------------------
+// Page widths (mobile-first: 360px and up)
+// ---------------------------------------------------------------------------
+.page,
+.page-form,
+.page-narrow {
+  margin-inline: auto;
+  padding: var(--rc-space-4);
+  width: 100%;
+}
+
+.page { max-width: var(--rc-page); }
+.page-form { max-width: var(--rc-page-form); }
+.page-narrow { max-width: var(--rc-page-narrow); padding-block: var(--rc-space-5); }
+
+@media (min-width: 720px) {
+  .page,
+  .page-form { padding: var(--rc-space-5); }
+}
+
+// ---------------------------------------------------------------------------
+// Layout helpers
+// ---------------------------------------------------------------------------
+.full-width { width: 100%; }
+
+.stack {
+  display: flex;
+  flex-direction: column;
+  gap: var(--rc-space-3);
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  gap: var(--rc-space-2);
+  flex-wrap: wrap;
+}
+
+.spacer { flex: 1; }
+
+// Responsive card grid: as many ~240px columns as fit.
+.grid-cards {
+  display: grid;
+  gap: var(--rc-space-4);
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 220px), 1fr));
+}
+
+// A filter bar: search + selects that wrap onto new lines on phones.
+.toolbar-filters {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--rc-space-3);
+  margin-bottom: var(--rc-space-4);
+
+  .grow { flex: 1 1 240px; }
+}
+
+// Tables live inside a bordered card and scroll sideways on narrow screens.
+// (.table-wrap is the older name used by the admin pages; both look the same.)
+.table-card,
+.table-wrap {
+  background: var(--rc-surface);
+  border: 1px solid var(--rc-border);
+  border-radius: var(--rc-radius-lg);
+  overflow-x: auto;
+
+  table { width: 100%; }
+  th.mat-mdc-header-cell { font-weight: 600; font-size: 12px; text-transform: uppercase; letter-spacing: 0.04em; }
+  tr.mat-mdc-row:last-child td { border-bottom: none; }
+  tr.mat-mdc-row:hover { background: var(--rc-surface-soft); }
+  td a { font-weight: 600; text-decoration: none; }
+  td a:hover { text-decoration: underline; }
+}
+
+.section-title {
+  font: 600 18px/1.3 var(--rc-heading);
+  margin: var(--rc-space-6) 0 var(--rc-space-3);
+}
+
+.muted { color: var(--mat-sys-on-surface-variant); }
+.small { font-size: 12px; }
+.positive { color: var(--mat-sys-primary); }
+.negative { color: var(--mat-sys-error); }
+
+.snack-error {
+  --mat-snack-bar-container-color: var(--mat-sys-error-container);
+  --mat-snack-bar-supporting-text-color: var(--mat-sys-on-error-container);
 }
 
 .form-error {
@@ -101,9 +229,73 @@ a {
   margin: 0;
 }
 
+// Buttons that act on something destructive.
+.danger {
+  --mat-button-filled-container-color: var(--mat-sys-error);
+  --mat-button-filled-label-text-color: var(--mat-sys-on-error);
+  --mat-button-outlined-label-text-color: var(--mat-sys-error);
+}
+
+// ---------------------------------------------------------------------------
+// Auth pages: one card in the middle of the screen, logo on top.
+// ---------------------------------------------------------------------------
+.auth-page {
+  min-height: calc(100dvh - 64px - var(--rc-bottom-nav));
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+
+  app-page-header { text-align: center; }
+  .page-header { justify-content: center; }
+
+  // The logo above every auth card, drawn with the icon font's "recycling" ligature (no template changes needed).
+  &::before {
+    content: 'recycling';
+    font-family: 'Material Symbols Outlined';
+    font-size: 30px;
+    line-height: 52px;
+    width: 52px;
+    height: 52px;
+    margin: 0 auto var(--rc-space-3);
+    border-radius: 14px;
+    text-align: center;
+    background: var(--mat-sys-primary);
+    color: var(--mat-sys-on-primary);
+    font-feature-settings: 'liga';
+  }
+}
+
+.auth-card {
+  padding: var(--rc-space-3);
+
+  button[type='submit'] { width: 100%; height: 44px; }
+}
+
 .card-links {
   display: flex;
   flex-direction: column;
-  gap: 8px;
-  margin-top: 16px;
+  align-items: center;
+  gap: var(--rc-space-2);
+  margin-top: var(--rc-space-4);
+  text-align: center;
+}
+
+// A card wrapping a list of links (account hub, settings lists).
+.link-list {
+  display: flex;
+  flex-direction: column;
+
+  a {
+    display: flex;
+    align-items: center;
+    gap: var(--rc-space-3);
+    padding: var(--rc-space-3) var(--rc-space-2);
+    color: inherit;
+    text-decoration: none;
+    border-radius: var(--rc-radius);
+
+    &:hover { background: var(--rc-surface-soft); }
+    mat-icon { color: var(--mat-sys-primary); }
+    .chevron { margin-inline-start: auto; color: var(--mat-sys-outline); }
+  }
 }

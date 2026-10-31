@@ -1,0 +1,17 @@
+<div class="photo">
+  @let message = ownError() ?? (file() ? null : error());
+  <button type="button" class="drop" [class.has-photo]="preview()" [class.invalid]="message" (click)="fileInput.click()">
+    @if (preview(); as url) {
+      <img [src]="url" [alt]="'common.photo.alt' | transloco" />
+      <span class="change"><mat-icon>photo_camera</mat-icon>{{ 'common.photo.change' | transloco }}</span>
+    } @else {
+      <span class="drop-icon"><mat-icon>add_a_photo</mat-icon></span>
+      <strong>{{ 'common.photo.choose' | transloco }}</strong>
+      <span class="hint">{{ 'common.photo.hint' | transloco }}</span>
+    }
+  </button>
+  <input #fileInput hidden type="file" accept="image/jpeg,image/png,image/webp" (change)="pick(fileInput)" />
+  @if (message) {
+    <p class="form-error" role="alert">{{ message | transloco }}</p>
+  }
+</div>

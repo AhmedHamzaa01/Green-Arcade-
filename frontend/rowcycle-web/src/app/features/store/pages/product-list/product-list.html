@@ -1,0 +1,43 @@
+<div class="page">
+  <app-page-header [title]="'store.title' | transloco" [subtitle]="'store.subtitle' | transloco" />
+
+  <app-filter-bar [searchLabel]="'store.search' | transloco" [searchValue]="search() ?? ''"
+                  (searchChange)="go({ search: $event, page: null })">
+    <mat-form-field subscriptSizing="dynamic">
+      <mat-label>{{ 'store.sort.label' | transloco }}</mat-label>
+      <mat-select [value]="currentSort()" (valueChange)="go({ sort: $event, page: null })">
+        @for (option of sorts; track option) {
+          <mat-option [value]="option">{{ 'store.sort.' + option | transloco }}</mat-option>
+        }
+      </mat-select>
+    </mat-form-field>
+    @if (categories.value(); as list) {
+      <mat-chip-listbox chips [value]="category() ?? ''" (change)="go({ category: $event.value || null, page: null })">
+        <mat-chip-option value="">{{ 'store.allCategories' | transloco }}</mat-chip-option>
+        @for (c of list; track c.id) {
+          <mat-chip-option [value]="c.slug">{{ c.name }}</mat-chip-option>
+        }
+      </mat-chip-listbox>
+    }
+  </app-filter-bar>
+
+  @if (products.value(); as data) {
+    @if (data.total === 0) {
+      <app-empty-state icon="search_off" [message]="'store.empty' | transloco" />
+    } @else {
+      <div class="grid">
+        @for (product of data.items; track product.id) {
+          <app-product-card [product]="product" />
+        }
+      </div>
+      <mat-paginator
+        [length]="data.total"
+        [pageIndex]="currentPage() - 1"
+        [pageSize]="pageSize"
+        [hidePageSize]="true"
+        (page)="onPage($event)" />
+    }
+  } @else if (products.isLoading()) {
+    <app-loading />
+  }
+</div>

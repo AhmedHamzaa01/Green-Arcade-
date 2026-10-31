@@ -1,0 +1,11 @@
+<h2 mat-dialog-title>{{ title() }}</h2>
+<mat-dialog-content [class]="layout()">
+  <ng-content />
+  @if (error()) {
+    <p class="form-error wide" role="alert">{{ error() }}</p>
+  }
+</mat-dialog-content>
+<mat-dialog-actions align="end">
+  <button mat-button type="button" mat-dialog-close>{{ 'common.cancel' | transloco }}</button>
+  <button mat-flat-button type="submit" [class.danger]="danger()" [disabled]="saving()">{{ submitKey() | transloco }}</button>
+</mat-dialog-actions>

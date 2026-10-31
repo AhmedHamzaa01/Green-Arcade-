@@ -1,0 +1,15 @@
+@if (link()) {
+  <a class="stat" [class]="tone()" [routerLink]="link()">
+    <ng-container *ngTemplateOutlet="body" />
+    <mat-icon class="chevron">chevron_right</mat-icon>
+  </a>
+} @else {
+  <div class="stat" [class]="tone()"><ng-container *ngTemplateOutlet="body" /></div>
+}
+<ng-template #body>
+  <span class="icon"><mat-icon>{{ icon() }}</mat-icon></span>
+  <span class="text">
+    <span class="value">{{ value() }}</span>
+    <span class="label">{{ label() }}</span>
+  </span>
+</ng-template>

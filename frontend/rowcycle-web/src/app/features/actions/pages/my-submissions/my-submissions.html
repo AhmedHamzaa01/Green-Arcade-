@@ -1,0 +1,38 @@
+<div class="page-form">
+  <app-page-header [title]="'actions.mine.title' | transloco">
+    <a mat-flat-button routerLink="/actions/new"><mat-icon>add_a_photo</mat-icon>{{ 'nav.newAction' | transloco }}</a>
+  </app-page-header>
+  @if (submissions.value(); as data) {
+    @if (data.total === 0) {
+      <app-empty-state icon="photo_camera" [message]="'actions.mine.empty' | transloco" />
+    } @else {
+      <div class="stack">
+        @for (s of data.items; track s.id) {
+          <mat-card>
+            <mat-card-content class="item">
+              <img [src]="s.photoUrl" alt="" loading="lazy" />
+              <div class="details">
+                <div class="row"><strong>{{ s.categoryName }}</strong><app-submission-status [status]="s.status" /></div>
+                <div class="muted small">
+                  {{ s.createdAt | date: 'medium' }}
+                  @if (s.weightKg !== null) { · {{ s.weightKg }} kg }
+                </div>
+                @if (s.note) {
+                  <p class="note">{{ s.note }}</p>
+                }
+                @switch (s.status) {
+                  @case ('Approved') { <p class="positive">{{ 'actions.mine.earned' | transloco: { points: s.categoryPoints } }}</p> }
+                  @case ('Rejected') { <p class="negative">{{ 'actions.mine.rejected' | transloco: { reason: s.rejectReason } }}</p> }
+                  @default { <p class="muted">{{ 'actions.mine.waiting' | transloco }}</p> }
+                }
+              </div>
+            </mat-card-content>
+          </mat-card>
+        }
+      </div>
+      <mat-paginator [length]="data.total" [pageIndex]="page() - 1" [pageSize]="10" [hidePageSize]="true" (page)="onPage($event)" />
+    }
+  } @else if (submissions.isLoading()) {
+    <app-loading />
+  }
+</div>

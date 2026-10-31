@@ -1,0 +1,11 @@
+<div class="page-form">
+  <a mat-button routerLink="/account/orders"><mat-icon>arrow_back</mat-icon>{{ 'orders.back' | transloco }}</a>
+  @if (order.value(); as o) {
+    <app-order-view [order]="o" />
+    @if (o.canCancel) {
+      <div class="cancel"><button mat-stroked-button (click)="cancel(o.id, o.orderNumber)">{{ 'orders.cancel' | transloco }}</button></div>
+    }
+  } @else if (order.isLoading()) {
+    <app-loading />
+  }
+</div>

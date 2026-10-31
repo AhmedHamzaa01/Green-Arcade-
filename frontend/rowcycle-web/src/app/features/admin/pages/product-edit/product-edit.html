@@ -1,0 +1,146 @@
+<div class="page">
+  <a mat-button routerLink="/admin/products"><mat-icon>arrow_back</mat-icon>{{ 'nav.products' | transloco }}</a>
+  <app-page-header [title]="(id() ? 'admin.catalog.edit.editTitle' : 'admin.catalog.edit.newTitle') | transloco">
+    @if (product(); as p) {
+      @if (p.isActive) {
+        <a mat-button [routerLink]="['/products', p.slug]" target="_blank"><mat-icon>open_in_new</mat-icon>{{ 'admin.catalog.edit.viewInStore' | transloco }}</a>
+      }
+    }
+  </app-page-header>
+
+  @if (ready()) {
+    <!-- Details -->
+    <mat-card>
+      <mat-card-content>
+        <h2>{{ 'admin.catalog.edit.details' | transloco }}</h2>
+        <form class="form-grid" [formGroup]="form" (ngSubmit)="save()">
+          <mat-form-field class="wide">
+            <mat-label>{{ 'admin.catalog.edit.name' | transloco }}</mat-label>
+            <input matInput formControlName="name" />
+            <mat-error>{{ form.controls.name | fieldError }}</mat-error>
+          </mat-form-field>
+          <mat-form-field>
+            <mat-label>{{ 'admin.catalog.edit.category' | transloco }}</mat-label>
+            <mat-select formControlName="categoryId">
+              @for (c of categories(); track c.id) {
+                <mat-option [value]="c.id">{{ c.name }}</mat-option>
+              }
+            </mat-select>
+            <mat-error>{{ form.controls.categoryId | fieldError }}</mat-error>
+          </mat-form-field>
+          <mat-form-field>
+            <mat-label>{{ 'admin.catalog.edit.slug' | transloco }}</mat-label>
+            <input matInput formControlName="slug" />
+            <mat-hint>{{ 'admin.catalog.edit.slugHint' | transloco }}</mat-hint>
+            <mat-error>{{ form.controls.slug | fieldError }}</mat-error>
+          </mat-form-field>
+          <mat-form-field class="wide">
+            <mat-label>{{ 'admin.catalog.edit.description' | transloco }}</mat-label>
+            <textarea matInput rows="4" formControlName="description"></textarea>
+            <mat-error>{{ form.controls.description | fieldError }}</mat-error>
+          </mat-form-field>
+          <mat-form-field>
+            <mat-label>{{ 'admin.catalog.edit.priceEgp' | transloco }}</mat-label>
+            <input matInput type="number" min="0" step="0.01" formControlName="priceEgp" />
+            <mat-error>{{ form.controls.priceEgp | fieldError }}</mat-error>
+          </mat-form-field>
+          <mat-form-field>
+            <mat-label>{{ 'admin.catalog.edit.pricePoints' | transloco }}</mat-label>
+            <input matInput type="number" min="1" formControlName="pricePoints" />
+            <mat-hint>{{ 'admin.catalog.edit.pricePointsHint' | transloco }}</mat-hint>
+            <mat-error>{{ form.controls.pricePoints | fieldError }}</mat-error>
+          </mat-form-field>
+          <mat-form-field>
+            <mat-label>{{ 'admin.catalog.edit.rewardPoints' | transloco }}</mat-label>
+            <input matInput type="number" min="0" formControlName="rewardPoints" />
+            <mat-hint>{{ 'admin.catalog.edit.rewardPointsHint' | transloco }}</mat-hint>
+            <mat-error>{{ form.controls.rewardPoints | fieldError }}</mat-error>
+          </mat-form-field>
+          <mat-slide-toggle class="wide" formControlName="isActive">{{ 'admin.catalog.edit.active' | transloco }}</mat-slide-toggle>
+          @if (error()) {
+            <p class="form-error wide" role="alert">{{ error() }}</p>
+          }
+          <div class="wide">
+            <button mat-flat-button type="submit" [disabled]="saving()">{{ (id() ? 'common.save' : 'common.create') | transloco }}</button>
+          </div>
+        </form>
+      </mat-card-content>
+    </mat-card>
+
+    @if (product(); as p) {
+      <!-- Variants and stock -->
+      <mat-card>
+        <mat-card-content>
+          <div class="section-head">
+            <div>
+              <h2>{{ 'admin.catalog.edit.variants' | transloco }}</h2>
+              <p class="muted">{{ 'admin.catalog.edit.variantsHint' | transloco }}</p>
+            </div>
+            <button mat-stroked-button (click)="editVariant(null)"><mat-icon>add</mat-icon>{{ 'admin.catalog.edit.addVariant' | transloco }}</button>
+          </div>
+          <div class="table-wrap">
+            <table mat-table [dataSource]="p.variants">
+              <ng-container matColumnDef="name">
+                <th mat-header-cell *matHeaderCellDef>{{ 'admin.catalog.edit.variantName' | transloco }}</th>
+                <td mat-cell *matCellDef="let v">{{ v.name }}<div class="muted small">{{ v.sku }}</div></td>
+              </ng-container>
+              <ng-container matColumnDef="stock">
+                <th mat-header-cell *matHeaderCellDef>{{ 'admin.catalog.edit.stock' | transloco }}</th>
+                <td mat-cell *matCellDef="let v" [class.negative]="v.stock === 0">{{ v.stock }}</td>
+              </ng-container>
+              <ng-container matColumnDef="price">
+                <th mat-header-cell *matHeaderCellDef>{{ 'admin.catalog.products.price' | transloco }}</th>
+                <td mat-cell *matCellDef="let v">{{ (v.priceOverride ?? p.priceEgp) | currency: 'EGP' : 'symbol' : '1.0-2' }}</td>
+              </ng-container>
+              <ng-container matColumnDef="actions">
+                <th mat-header-cell *matHeaderCellDef></th>
+                <td mat-cell *matCellDef="let v" class="actions">
+                  <button matIconButton (click)="editVariant(v)" [attr.aria-label]="'common.edit' | transloco"><mat-icon>edit</mat-icon></button>
+                  <button matIconButton (click)="deleteVariant(v)" [disabled]="p.variants.length === 1" [attr.aria-label]="'common.delete' | transloco"><mat-icon>delete</mat-icon></button>
+                </td>
+              </ng-container>
+              <tr mat-header-row *matHeaderRowDef="variantColumns"></tr>
+              <tr mat-row *matRowDef="let row; columns: variantColumns"></tr>
+            </table>
+          </div>
+        </mat-card-content>
+      </mat-card>
+
+      <!-- Photos -->
+      <mat-card>
+        <mat-card-content>
+          <div class="section-head">
+            <div>
+              <h2>{{ 'admin.catalog.edit.images' | transloco }}</h2>
+              <p class="muted">{{ 'admin.catalog.edit.imagesHint' | transloco }}</p>
+            </div>
+            <button mat-stroked-button (click)="fileInput.click()" [disabled]="uploading()">
+              <mat-icon>upload</mat-icon>{{ 'admin.catalog.edit.upload' | transloco }}
+            </button>
+            <input #fileInput hidden type="file" accept="image/jpeg,image/png,image/webp" (change)="upload(fileInput)" />
+          </div>
+          @if (p.images.length === 0) {
+            <p class="muted">{{ 'admin.catalog.edit.noImages' | transloco }}</p>
+          } @else {
+            <div class="images">
+              @for (image of p.images; track image.id; let i = $index; let last = $last) {
+                <div class="image" [class.main]="i === 0">
+                  <img [src]="image.url" alt="" />
+                  <div class="image-actions">
+                    <button matIconButton [disabled]="i === 0" (click)="move(i, -1)" [attr.aria-label]="'admin.catalog.edit.moveLeft' | transloco"><mat-icon>chevron_left</mat-icon></button>
+                    <button matIconButton (click)="deleteImage(image.id)" [attr.aria-label]="'common.delete' | transloco"><mat-icon>delete</mat-icon></button>
+                    <button matIconButton [disabled]="last" (click)="move(i, 1)" [attr.aria-label]="'admin.catalog.edit.moveRight' | transloco"><mat-icon>chevron_right</mat-icon></button>
+                  </div>
+                </div>
+              }
+            </div>
+          }
+        </mat-card-content>
+      </mat-card>
+    } @else {
+      <p class="muted">{{ 'admin.catalog.edit.saveFirst' | transloco }}</p>
+    }
+  } @else {
+    <app-loading />
+  }
+</div>

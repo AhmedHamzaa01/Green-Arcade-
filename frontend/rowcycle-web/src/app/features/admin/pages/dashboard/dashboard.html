@@ -1,0 +1,44 @@
+<div class="page">
+  <app-page-header [title]="'admin.dashboard.title' | transloco" />
+  @if (dashboard.value(); as d) {
+    <!-- Each card links to where the work is done, if this person may open that page. -->
+    <div class="cards">
+      <app-stat-card icon="fact_check" [value]="(d.pendingSubmissions | number) ?? '0'"
+                     [label]="'admin.dashboard.pendingSubmissions' | transloco"
+                     [link]="canModerate() ? '/admin/submissions' : undefined" />
+      <app-stat-card icon="local_shipping" [value]="(d.newOrders | number) ?? '0'"
+                     [label]="'admin.dashboard.newOrders' | transloco"
+                     [link]="canManageStore() ? '/admin/orders' : undefined" />
+      <app-stat-card icon="inventory_2" [value]="(d.lowStockCount | number) ?? '0'" [tone]="d.lowStockCount > 0 ? 'warn' : 'default'"
+                     [label]="'admin.dashboard.lowStock' | transloco: { threshold: d.lowStockThreshold }"
+                     [link]="canManageStore() ? '/admin/products' : undefined" />
+    </div>
+
+    @if (d.lowStock.length > 0) {
+      <h2 class="section">{{ 'admin.dashboard.lowStockTitle' | transloco }}</h2>
+      <div class="table-wrap">
+        <table mat-table [dataSource]="d.lowStock">
+          <ng-container matColumnDef="product">
+            <th mat-header-cell *matHeaderCellDef>{{ 'admin.dashboard.product' | transloco }}</th>
+            <td mat-cell *matCellDef="let i">
+              @if (canManageStore()) { <a [routerLink]="['/admin/products', i.productId]">{{ i.productName }}</a> }
+              @else { {{ i.productName }} }
+              <div class="muted small">{{ i.variantName }} · {{ i.sku }}</div>
+            </td>
+          </ng-container>
+          <ng-container matColumnDef="stock">
+            <th mat-header-cell *matHeaderCellDef>{{ 'admin.dashboard.stock' | transloco }}</th>
+            <td mat-cell *matCellDef="let i" [class.negative]="i.stock === 0">{{ i.stock }}</td>
+          </ng-container>
+          <tr mat-header-row *matHeaderRowDef="columns"></tr>
+          <tr mat-row *matRowDef="let row; columns: columns"></tr>
+        </table>
+      </div>
+      @if (d.lowStockCount > d.lowStock.length) {
+        <p class="muted small">{{ 'admin.dashboard.more' | transloco: { count: d.lowStockCount - d.lowStock.length } }}</p>
+      }
+    }
+  } @else if (dashboard.isLoading()) {
+    <app-loading />
+  }
+</div>

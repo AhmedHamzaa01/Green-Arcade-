@@ -1,0 +1,28 @@
+@let p = product();
+<a class="card-link" [routerLink]="['/products', p.slug]">
+  <mat-card class="card" [class.sold-out]="!p.inStock">
+    <div class="image">
+      @if (p.imageUrl) {
+        <img [src]="p.imageUrl" [alt]="p.name" loading="lazy" />
+      } @else {
+        <mat-icon>image</mat-icon>
+      }
+      @if (!p.inStock) {
+        <span class="badge out">{{ 'store.outOfStock' | transloco }}</span>
+      }
+    </div>
+    <div class="body">
+      <span class="category">{{ p.categoryName }}</span>
+      <span class="name">{{ p.name }}</span>
+      <div class="prices">
+        <span class="price">{{ p.priceEgp | currency: 'EGP' : 'symbol' : '1.0-2' }}</span>
+        @if (p.pricePoints) {
+          <span class="or-points">{{ 'store.orPoints' | transloco: { points: (p.pricePoints | number) } }}</span>
+        }
+      </div>
+      @if (p.rewardPoints > 0) {
+        <span class="earn"><mat-icon>stars</mat-icon>{{ 'store.earnPoints' | transloco: { points: p.rewardPoints } }}</span>
+      }
+    </div>
+  </mat-card>
+</a>

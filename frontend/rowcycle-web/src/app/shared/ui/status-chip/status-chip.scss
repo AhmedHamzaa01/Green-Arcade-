@@ -1,0 +1,8 @@
+.chip { display: inline-flex; align-items: center; gap: 6px; padding: 3px 10px; border-radius: 999px;
+        font: 600 12px/1.4 Inter, sans-serif; white-space: nowrap; }
+.dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+.neutral { background: #eef0ed; color: #4b524d; }
+.info { background: #e3eefb; color: #1d5aa6; }
+.warning { background: #fbf1dc; color: #8a5a00; }
+.success { background: #dff3ea; color: #13664f; }
+.danger { background: #fde6e4; color: #b3261e; }

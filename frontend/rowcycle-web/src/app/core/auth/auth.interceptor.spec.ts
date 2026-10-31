@@ -3,7 +3,7 @@ import { HttpTestingController, provideHttpClientTesting } from '@angular/common
 import { TestBed } from '@angular/core/testing';
 import { Router, provideRouter } from '@angular/router';
 import { firstValueFrom } from 'rxjs';
-import { MeResponse } from '../api/api.models';
+import { MeResponse } from '../api/models';
 import { authInterceptor } from './auth.interceptor';
 import { AuthSession } from './auth-session';
 

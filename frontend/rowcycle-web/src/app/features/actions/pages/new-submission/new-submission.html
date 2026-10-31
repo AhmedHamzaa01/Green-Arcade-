@@ -1,0 +1,50 @@
+<div class="page-form">
+  <app-page-header [title]="'actions.new.title' | transloco" [subtitle]="'actions.new.subtitle' | transloco">
+    <a mat-button routerLink="/actions/mine">{{ 'nav.myActions' | transloco }}</a>
+  </app-page-header>
+
+  @if (!session.user()?.emailVerified) {
+    <mat-card><mat-card-content class="row negative"><mat-icon>warning</mat-icon>{{ 'actions.new.unverified' | transloco }}</mat-card-content></mat-card>
+  } @else if (categories.value(); as list) {
+    <mat-card>
+      <mat-card-content>
+        <form class="stack submission-form" [formGroup]="form" (ngSubmit)="submit()">
+          <mat-form-field>
+            <mat-label>{{ 'actions.new.category' | transloco }}</mat-label>
+            <mat-select formControlName="categoryId">
+              @for (c of list; track c.id) {
+                <mat-option [value]="c.id">{{ c.name }} · {{ 'actions.points' | transloco: { points: c.pointsReward } }}</mat-option>
+              }
+            </mat-select>
+            <mat-error>{{ form.controls.categoryId | fieldError }}</mat-error>
+          </mat-form-field>
+
+          <app-photo-picker class="photo" [(file)]="photo" [error]="photoError()" />
+
+          @if (selectedCategory()?.tracksWeight) {
+            <mat-form-field>
+              <mat-label>{{ 'actions.new.weight' | transloco }}</mat-label>
+              <input matInput type="number" min="0" step="0.1" formControlName="weightKg" />
+              <span matTextSuffix>kg</span>
+              <mat-hint>{{ 'actions.new.weightHint' | transloco }}</mat-hint>
+              <mat-error>{{ form.controls.weightKg | fieldError }}</mat-error>
+            </mat-form-field>
+          }
+
+          <mat-form-field>
+            <mat-label>{{ 'actions.new.note' | transloco }}</mat-label>
+            <textarea matInput rows="3" formControlName="note"></textarea>
+            <mat-error>{{ form.controls.note | fieldError }}</mat-error>
+          </mat-form-field>
+
+          @if (error()) {
+            <p class="form-error" role="alert">{{ error() }}</p>
+          }
+          <button mat-flat-button class="submit" type="submit" [disabled]="saving()">{{ 'actions.new.submit' | transloco }}</button>
+        </form>
+      </mat-card-content>
+    </mat-card>
+  } @else if (categories.isLoading()) {
+    <app-loading />
+  }
+</div>

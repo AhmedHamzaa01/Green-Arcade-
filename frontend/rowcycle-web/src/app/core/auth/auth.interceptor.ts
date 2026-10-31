@@ -2,6 +2,7 @@ import { HttpErrorResponse, HttpInterceptorFn, HttpRequest } from '@angular/comm
 import { inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { catchError, switchMap, throwError } from 'rxjs';
+import { environment } from '../../../environments/environment';
 import { SKIP_AUTH } from '../http-context';
 import { AuthSession } from './auth-session';
 
@@ -10,7 +11,8 @@ import { AuthSession } from './auth-session';
  * it refreshes the token once and retries. If the refresh fails too, the user is sent to the login page.
  */
 export const authInterceptor: HttpInterceptorFn = (request, next) => {
-  if (request.context.get(SKIP_AUTH) || !request.url.startsWith('/api/')) {
+  // Only our API gets the token (never a third-party URL).
+  if (request.context.get(SKIP_AUTH) || !request.url.startsWith(environment.apiBaseUrl)) {
     return next(request);
   }
 

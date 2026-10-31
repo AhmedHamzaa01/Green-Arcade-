@@ -1,0 +1,10 @@
+<form (ngSubmit)="reject()">
+  <app-form-dialog [title]="'admin.submissions.rejectTitle' | transloco" submitKey="admin.submissions.reject" [danger]="true">
+    <mat-form-field class="full">
+      <mat-label>{{ 'admin.submissions.reason' | transloco }}</mat-label>
+      <textarea matInput rows="3" [formControl]="reason" cdkFocusInitial></textarea>
+      <mat-hint>{{ 'admin.submissions.reasonHint' | transloco }}</mat-hint>
+      <mat-error>{{ reason | fieldError }}</mat-error>
+    </mat-form-field>
+  </app-form-dialog>
+</form>

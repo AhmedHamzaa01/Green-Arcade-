@@ -1,0 +1,6 @@
+.empty { display: flex; flex-direction: column; align-items: center; gap: var(--rc-space-3); text-align: center;
+         padding: var(--rc-space-7) var(--rc-space-4); color: var(--mat-sys-on-surface-variant); }
+.icon { display: grid; place-items: center; width: 72px; height: 72px; border-radius: 50%;
+        background: var(--rc-surface-soft); color: var(--mat-sys-primary); }
+mat-icon { font-size: 36px; width: 36px; height: 36px; }
+p { margin: 0; max-width: 42ch; }

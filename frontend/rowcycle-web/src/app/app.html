@@ -1,104 +1,64 @@
-<mat-toolbar class="toolbar">
-  <a class="brand" routerLink="/">
-    <mat-icon>recycling</mat-icon>
-    <span>{{ 'app.name' | transloco }}</span>
-  </a>
-
-  <!-- Wide screens: links in the bar -->
-  <nav class="desktop-nav">
-    <a mat-button routerLink="/products" routerLinkActive="active">{{ 'nav.store' | transloco }}</a>
-    @if (session.isLoggedIn()) {
-      <a mat-button routerLink="/actions" routerLinkActive="active">{{ 'nav.actions' | transloco }}</a>
-      <a mat-button routerLink="/account/profile" routerLinkActive="active">{{ 'nav.profile' | transloco }}</a>
-      <a mat-button routerLink="/account/points" routerLinkActive="active">{{ 'nav.points' | transloco }}</a>
-    }
-    @if (session.hasRole('Admin', 'StoreManager', 'Moderator')) {
-      <button mat-button [matMenuTriggerFor]="adminMenu">
-        {{ 'nav.admin' | transloco }}<mat-icon iconPositionEnd>expand_more</mat-icon>
-      </button>
-    }
-  </nav>
-
-  <span class="spacer"></span>
-
-  @if (session.isLoggedIn()) {
-    <a mat-icon-button routerLink="/cart" [attr.aria-label]="'nav.cart' | transloco">
-      <mat-icon [matBadge]="cart.count() || null" matBadgeSize="small" matBadgeColor="primary" aria-hidden="false">shopping_cart</mat-icon>
-    </a>
-  }
-
-  @if (session.user(); as user) {
-    <button mat-button class="desktop-nav" [matMenuTriggerFor]="userMenu">
-      <mat-icon>account_circle</mat-icon>{{ user.fullName }}
-    </button>
-  } @else {
-    <span class="desktop-nav">
-      <a mat-button routerLink="/login">{{ 'nav.login' | transloco }}</a>
-      <a mat-flat-button routerLink="/register">{{ 'nav.register' | transloco }}</a>
-    </span>
-  }
-
-  <!-- Phones: everything in one menu -->
-  <button mat-icon-button class="mobile-nav" [matMenuTriggerFor]="mobileMenu" [attr.aria-label]="'nav.menu' | transloco">
-    <mat-icon>menu</mat-icon>
-  </button>
-</mat-toolbar>
-
-<mat-menu #adminMenu="matMenu">
-  <ng-container *ngTemplateOutlet="staffLinks" />
-</mat-menu>
-
-<!-- Staff links, by role: moderators review submissions; store managers manage the catalog; admins see everything. -->
-<ng-template #staffLinks>
-  <a mat-menu-item routerLink="/admin/dashboard"><mat-icon>dashboard</mat-icon>{{ 'nav.dashboard' | transloco }}</a>
-  @if (session.hasRole('Admin', 'Moderator')) {
-    <a mat-menu-item routerLink="/admin/submissions"><mat-icon>fact_check</mat-icon>{{ 'nav.submissions' | transloco }}</a>
-  }
-  @if (session.hasRole('Admin', 'StoreManager')) {
-    <a mat-menu-item routerLink="/admin/orders"><mat-icon>local_shipping</mat-icon>{{ 'nav.staffOrders' | transloco }}</a>
-    <a mat-menu-item routerLink="/admin/products"><mat-icon>inventory_2</mat-icon>{{ 'nav.products' | transloco }}</a>
-    <a mat-menu-item routerLink="/admin/categories"><mat-icon>category</mat-icon>{{ 'nav.categories' | transloco }}</a>
-  }
-  @if (session.hasRole('Admin')) {
-    <a mat-menu-item routerLink="/admin/users"><mat-icon>group</mat-icon>{{ 'nav.users' | transloco }}</a>
-    <a mat-menu-item routerLink="/admin/submission-categories"><mat-icon>checklist</mat-icon>{{ 'nav.actionCategories' | transloco }}</a>
-    <a mat-menu-item routerLink="/admin/badges"><mat-icon>emoji_events</mat-icon>{{ 'nav.badges' | transloco }}</a>
-    <a mat-menu-item routerLink="/admin/settings"><mat-icon>tune</mat-icon>{{ 'nav.settings' | transloco }}</a>
-    <a mat-menu-item routerLink="/admin/audit-log"><mat-icon>history</mat-icon>{{ 'nav.auditLog' | transloco }}</a>
-  }
-</ng-template>
-
-<mat-menu #userMenu="matMenu">
-  <a mat-menu-item routerLink="/account/profile"><mat-icon>person</mat-icon>{{ 'nav.profile' | transloco }}</a>
-  <a mat-menu-item routerLink="/account/orders"><mat-icon>receipt_long</mat-icon>{{ 'nav.orders' | transloco }}</a>
-  <a mat-menu-item routerLink="/account/addresses"><mat-icon>home</mat-icon>{{ 'nav.addresses' | transloco }}</a>
-  <button mat-menu-item (click)="logout()"><mat-icon>logout</mat-icon>{{ 'nav.logout' | transloco }}</button>
-</mat-menu>
-
-<mat-menu #mobileMenu="matMenu">
-  <a mat-menu-item routerLink="/"><mat-icon>home</mat-icon>{{ 'nav.home' | transloco }}</a>
-  <a mat-menu-item routerLink="/products"><mat-icon>storefront</mat-icon>{{ 'nav.store' | transloco }}</a>
-  @if (session.isLoggedIn()) {
-    <a mat-menu-item routerLink="/actions/new"><mat-icon>add_a_photo</mat-icon>{{ 'nav.newAction' | transloco }}</a>
-    <a mat-menu-item routerLink="/actions/mine"><mat-icon>photo_library</mat-icon>{{ 'nav.myActions' | transloco }}</a>
-    <a mat-menu-item routerLink="/account/profile"><mat-icon>person</mat-icon>{{ 'nav.profile' | transloco }}</a>
-    <a mat-menu-item routerLink="/account/points"><mat-icon>stars</mat-icon>{{ 'nav.points' | transloco }}</a>
-    <a mat-menu-item routerLink="/account/orders"><mat-icon>receipt_long</mat-icon>{{ 'nav.orders' | transloco }}</a>
-    <a mat-menu-item routerLink="/account/addresses"><mat-icon>home</mat-icon>{{ 'nav.addresses' | transloco }}</a>
-  }
-  @if (session.hasRole('Admin', 'StoreManager', 'Moderator')) {
-    <mat-divider />
-    <ng-container *ngTemplateOutlet="staffLinks" />
-  }
-  <mat-divider />
-  @if (session.isLoggedIn()) {
-    <button mat-menu-item (click)="logout()"><mat-icon>logout</mat-icon>{{ 'nav.logout' | transloco }}</button>
-  } @else {
-    <a mat-menu-item routerLink="/login"><mat-icon>login</mat-icon>{{ 'nav.login' | transloco }}</a>
-    <a mat-menu-item routerLink="/register"><mat-icon>person_add</mat-icon>{{ 'nav.register' | transloco }}</a>
-  }
-</mat-menu>
-
-<main>
+@if (inStaffArea()) {
+  <!-- Staff area: its own layout (side panel) comes from the admin routes. -->
   <router-outlet />
-</main>
+} @else {
+  <header class="topbar">
+    <div class="topbar-inner">
+      <a class="brand" routerLink="/" [attr.aria-label]="'app.name' | transloco">
+        <span class="logo"><mat-icon>recycling</mat-icon></span>
+        <span>{{ 'app.name' | transloco }}</span>
+      </a>
+
+      <!-- Wide screens: main links in the bar -->
+      <nav class="desktop-only links" [attr.aria-label]="'nav.main' | transloco">
+        <a routerLink="/products" routerLinkActive="active">{{ 'nav.store' | transloco }}</a>
+        @if (session.isLoggedIn()) {
+          <a routerLink="/actions" routerLinkActive="active">{{ 'nav.actions' | transloco }}</a>
+          <a routerLink="/account/points" routerLinkActive="active">{{ 'nav.points' | transloco }}</a>
+        }
+      </nav>
+
+      <span class="spacer"></span>
+
+      @if (session.user(); as user) {
+        <a class="points-pill desktop-only" routerLink="/account/points">
+          <mat-icon>stars</mat-icon>{{ user.pointsBalance }}
+        </a>
+        <a matIconButton routerLink="/cart" [attr.aria-label]="'nav.cart' | transloco">
+          <mat-icon [matBadge]="cart.count() || null" matBadgeSize="small" aria-hidden="false">shopping_bag</mat-icon>
+        </a>
+        <button class="user-button desktop-only" [matMenuTriggerFor]="userMenu">
+          <span class="avatar">{{ user.fullName.charAt(0) }}</span>
+          <span class="user-name">{{ user.fullName }}</span>
+          <mat-icon>expand_more</mat-icon>
+        </button>
+      } @else {
+        <!-- Phones: Log in / Sign up are in the bottom bar. -->
+        <span class="desktop-only row">
+          <a mat-button routerLink="/login">{{ 'nav.login' | transloco }}</a>
+          <a mat-flat-button routerLink="/register">{{ 'nav.register' | transloco }}</a>
+        </span>
+      }
+    </div>
+  </header>
+
+  <mat-menu #userMenu="matMenu" xPosition="before">
+    <a mat-menu-item routerLink="/account/profile"><mat-icon>person</mat-icon>{{ 'nav.account' | transloco }}</a>
+    <a mat-menu-item routerLink="/actions/mine"><mat-icon>photo_library</mat-icon>{{ 'nav.myActions' | transloco }}</a>
+    <a mat-menu-item routerLink="/account/orders"><mat-icon>receipt_long</mat-icon>{{ 'nav.orders' | transloco }}</a>
+    <a mat-menu-item routerLink="/account/addresses"><mat-icon>home_pin</mat-icon>{{ 'nav.addresses' | transloco }}</a>
+    @if (isStaff()) {
+      <mat-divider />
+      <a mat-menu-item routerLink="/admin"><mat-icon>space_dashboard</mat-icon>{{ 'nav.staffArea' | transloco }}</a>
+    }
+    <mat-divider />
+    <button mat-menu-item (click)="logout()"><mat-icon>logout</mat-icon>{{ 'nav.logout' | transloco }}</button>
+  </mat-menu>
+
+  <main class="content">
+    <router-outlet />
+  </main>
+
+  <!-- Phones: thumb-friendly tabs -->
+  <app-bottom-nav class="mobile-only" />
+}

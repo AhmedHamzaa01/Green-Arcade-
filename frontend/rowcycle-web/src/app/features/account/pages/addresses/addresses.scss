@@ -1,0 +1,7 @@
+.add { margin-top: 12px; }
+.grid { display: grid; gap: 16px; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); }
+mat-card.default { outline: 2px solid var(--mat-sys-primary); }
+.between { justify-content: space-between; }
+.end { justify-content: flex-end; }
+.small { font-size: 12px; }
+.badge { font: var(--mat-sys-label-small); padding: 2px 8px; border-radius: 10px; background: var(--mat-sys-primary-container); color: var(--mat-sys-on-primary-container); }

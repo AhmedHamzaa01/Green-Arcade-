@@ -1,0 +1,61 @@
+.photo {
+  display: flex;
+  flex-direction: column;
+  gap: var(--rc-space-2);
+}
+
+.drop {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-height: 180px;
+  padding: var(--rc-space-5);
+  border: 2px dashed var(--rc-border-strong);
+  border-radius: var(--rc-radius-lg);
+  background: var(--rc-surface-soft);
+  color: var(--mat-sys-on-surface);
+  font: inherit;
+  cursor: pointer;
+  overflow: hidden;
+
+  &:hover,
+  &:focus-visible { border-color: var(--mat-sys-primary); }
+  &.invalid { border-color: var(--mat-sys-error); }
+  &.has-photo { padding: 0; border-style: solid; background: #000; }
+
+  img { width: 100%; max-height: 360px; object-fit: contain; display: block; }
+}
+
+.drop-icon {
+  display: grid;
+  place-items: center;
+  width: 56px;
+  height: 56px;
+  border-radius: 16px;
+  background: var(--mat-sys-primary);
+  color: var(--mat-sys-on-primary);
+}
+
+.hint {
+  color: var(--mat-sys-on-surface-variant);
+  font-size: 12px;
+}
+
+.change {
+  position: absolute;
+  bottom: 10px;
+  inset-inline-end: 10px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.92);
+  font-weight: 600;
+  font-size: 13px;
+
+  mat-icon { font-size: 18px; width: 18px; height: 18px; }
+}

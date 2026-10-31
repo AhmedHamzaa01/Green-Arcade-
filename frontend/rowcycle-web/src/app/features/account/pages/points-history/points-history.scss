@@ -1,0 +1,24 @@
+.balance-card {
+  display: flex;
+  align-items: center;
+  gap: var(--rc-space-4);
+  margin-bottom: var(--rc-space-5);
+  padding: var(--rc-space-5);
+  border-radius: var(--rc-radius-lg);
+  background: linear-gradient(135deg, #e4f2ec 0%, #f4ecdc 100%);
+}
+
+.icon {
+  display: grid;
+  place-items: center;
+  width: 56px;
+  height: 56px;
+  border-radius: 16px;
+  background: var(--mat-sys-primary);
+  color: var(--mat-sys-on-primary);
+
+  mat-icon { font-size: 30px; width: 30px; height: 30px; }
+}
+
+.label { color: var(--mat-sys-on-surface-variant); font-weight: 600; }
+.balance { font: 800 36px/1.1 var(--rc-heading); color: var(--mat-sys-primary); }

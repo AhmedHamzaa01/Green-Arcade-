@@ -1,0 +1,22 @@
+<div class="page">
+  <a mat-button routerLink="/admin/orders"><mat-icon>arrow_back</mat-icon>{{ 'admin.orders.back' | transloco }}</a>
+  @if (order.value(); as o) {
+    <mat-card class="actions">
+      <mat-card-content class="row">
+        @if (o.nextStatuses.length === 0) {
+          <span class="muted">{{ 'admin.orders.final' | transloco }}</span>
+        } @else {
+          <span class="muted">{{ 'admin.orders.moveTo' | transloco }}</span>
+          @for (s of o.nextStatuses; track s) {
+            <button mat-flat-button [class.danger]="s === 'Cancelled'" (click)="move(o, s)" [disabled]="busy()">
+              {{ 'status.' + s | transloco }}
+            </button>
+          }
+        }
+      </mat-card-content>
+    </mat-card>
+    <app-order-view [order]="o" />
+  } @else if (order.isLoading()) {
+    <app-loading />
+  }
+</div>
